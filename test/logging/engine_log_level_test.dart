@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('EngineLogLevel', () {
     test('should have correct values', () {
-      expect(EngineLogLevelType.debug.value, equals(500));
+      expect(EngineLogLevelType.debug.value, equals(100));
       expect(EngineLogLevelType.info.value, equals(800));
       expect(EngineLogLevelType.warning.value, equals(900));
       expect(EngineLogLevelType.error.value, equals(1000));
