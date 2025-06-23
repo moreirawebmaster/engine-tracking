@@ -560,9 +560,107 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 ```
 
+## 🏗️ Estrutura do Projeto
+
+### 📁 Organização de Diretórios e Arquivos
+
+```
+engine-tracking/
+├── .github/                     # 🔧 Automação e Templates GitHub
+│   ├── workflows/               # 🔄 GitHub Actions Pipelines
+│   │   ├── ci.yml              # Pipeline principal CI/CD
+│   │   ├── publish.yml         # Publicação automática pub.dev
+│   │   └── quality.yml         # Auditorias semanais de qualidade
+│   ├── ISSUE_TEMPLATE/         # 📝 Templates de Issues
+│   │   ├── bug_report.md       # Template para reportar bugs
+│   │   └── feature_request.md  # Template para solicitar funcionalidades
+│   ├── pull_request_template.md # Template para Pull Requests
+│   └── README.md               # Documentação da infraestrutura CI/CD
+├── lib/                        # 📚 Código fonte principal
+│   ├── engine_tracking.dart    # 🚪 Ponto de entrada principal
+│   └── src/                    # 📦 Implementações internas
+│       ├── src.dart            # Export barrel centralizado
+│       ├── analytics/          # 📊 Sistema de Analytics
+│       │   ├── analytics.dart  # Export barrel do módulo
+│       │   └── engine_analytics.dart # Implementação principal
+│       ├── bug_tracking/       # 🐛 Sistema de Bug Tracking
+│       │   ├── bug_tracking.dart # Export barrel do módulo
+│       │   └── engine_bug_tracking.dart # Implementação principal
+│       ├── config/             # ⚙️ Configurações dos serviços
+│       │   ├── config.dart     # Export barrel das configurações
+│       │   ├── engine_firebase_analytics_config.dart
+│       │   ├── engine_crashlytics_config.dart
+│       │   └── engine_faro_config.dart
+│       ├── models/             # 🏗️ Modelos de dados
+│       │   ├── models.dart     # Export barrel dos modelos
+│       │   ├── engine_analytics_model.dart
+│       │   └── engine_bug_tracking_model.dart
+│       ├── enums/              # 🏷️ Enumerações
+│       │   ├── enums.dart      # Export barrel das enumerações
+│       │   └── engine_log_level_type.dart
+│       ├── logging/            # 📝 Sistema de logging
+│       │   ├── logging.dart    # Export barrel do logging
+│       │   └── engine_log.dart # Implementação de logs
+│       └── observers/          # 👁️ Observadores Flutter
+│           ├── observers.dart  # Export barrel dos observadores
+│           └── engine_navigator_observer.dart
+├── test/                       # 🧪 Testes unitários e de integração
+│   ├── analytics/              # Testes do sistema de analytics
+│   ├── bug_tracking/           # Testes do sistema de bug tracking
+│   ├── config/                 # Testes das configurações
+│   ├── models/                 # Testes dos modelos de dados
+│   ├── logging/                # Testes do sistema de logging
+│   └── test_coverage.dart      # Suite completa de testes
+├── example/                    # 📱 Aplicação de exemplo
+│   ├── lib/main.dart          # App Flutter demonstrativo
+│   ├── pubspec.yaml           # Dependências do exemplo
+│   └── README.md              # Documentação do exemplo
+├── scripts/                    # 🛠️ Scripts de desenvolvimento
+│   ├── test_coverage.sh       # Script de cobertura de testes
+│   └── pana_analysis.sh       # Script de análise de qualidade
+├── codecov.yml                # 📊 Configuração Codecov
+├── pana_config.yaml          # 🔍 Configuração Pana
+├── pubspec.yaml              # 📦 Configuração do pacote
+├── CHANGELOG.md              # 📝 Histórico de mudanças
+├── LICENSE                   # ⚖️ Licença MIT
+├── README.md                 # 📖 Documentação principal
+└── analysis_options.yaml    # 🔬 Configuração do Dart Analyzer
+```
+
+#### ⚙️ Arquivos de Configuração
+
+##### 📊 `codecov.yml` - Cobertura de Código
+- Meta de cobertura: 45% (ajustada para dependências externas)
+- Exclusões: Arquivos gerados, testes, exemplos
+- Integração com PRs para comentários automáticos
+
+##### 🔍 `pana_config.yaml` - Análise de Qualidade
+- Padrão de excelência: 160/160 pontos
+- Verificações completas habilitadas
+- Exclusão de arquivos de desenvolvimento
+
+##### 📦 `pubspec.yaml` - Configuração do Pacote
+- Dependências otimizadas
+- Metadados completos para pub.dev
+- Compatibilidade com Flutter >=3.32.0 e Dart >=3.8.0
+
+### 🎯 Arquitetura e Padrões
+
+#### 🏗️ Padrões Arquiteturais
+- **Construtor Privado**: Previne instanciação desnecessária
+- **API Estática**: Métodos estáticos para facilidade de uso
+- **Inicialização Condicional**: Serviços inicializam apenas se habilitados
+- **Export Unificado**: Import único para todo o pacote
+
+#### 🔒 Princípios de Qualidade
+- **Tipo-seguro**: Implementação completamente tipada
+- **Testável**: Arquitetura focada em testabilidade
+- **Configurável**: Flexibilidade total na configuração
+- **Performático**: Inicialização sob demanda
+
 ## 🔧 Desenvolvimento
 
-### 📁 Estrutura do Projeto
+### 📁 Estrutura Técnica
 
 ```
 lib/

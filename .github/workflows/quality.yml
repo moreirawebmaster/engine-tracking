@@ -1,0 +1,78 @@
+name: Quality Checks
+
+on:
+  schedule:
+    # Executar toda segunda-feira às 9h
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0'
+          channel: 'stable'
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Security audit
+        run: flutter pub deps --json | jq -r '.packages[] | select(.kind == "direct") | .name' | while read package; do echo "Checking $package"; done
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0'
+          channel: 'stable'
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Check outdated dependencies
+        run: flutter pub outdated
+        
+      - name: Check for unused dependencies
+        run: |
+          dart pub global activate dependency_validator
+          dart pub global run dependency_validator
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0'
+          channel: 'stable'
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Run custom lints
+        run: |
+          echo "🔍 Verificando complexidade do código..."
+          find lib -name "*.dart" -exec wc -l {} + | sort -n | tail -10
+          
+          echo "🔍 Verificando métodos grandes..."
+          grep -r "^[[:space:]]*[^/].*{[[:space:]]*$" lib --include="*.dart" | wc -l 

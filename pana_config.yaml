@@ -1,0 +1,25 @@
+analysis:
+  severity: warning
+  suggestions: true
+  outdated_dependencies: true
+
+scoring:
+  minimum_score: 160
+  fail_on_low_score: true
+
+ignore:
+  - "example/**"
+  - "test/**"
+  - "coverage/**"
+  - "build/**"
+  - ".dart_tool/**"
+  - "**/*.g.dart"
+  - "**/*.freezed.dart"
+  - "**/*.mocks.dart"
+
+checks:
+  readme: true
+  changelog: true
+  example: true
+  license: true
+  pubspec: true
