@@ -1,0 +1,87 @@
+// Arquivo para garantir que todas as importações sejam testadas
+// Isto ajuda a manter a cobertura de testes acima de 95%
+
+import 'package:engine_tracking/engine_tracking.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('Test Coverage', () {
+    test('should import all classes correctly', () {
+      // Analytics
+      expect(() => const EngineFirebaseAnalyticsConfig(enabled: true), returnsNormally);
+      expect(
+        () => const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        returnsNormally,
+      );
+      expect(
+        () => EngineAnalyticsModel(
+          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+          faroConfig: const EngineFaroConfig(
+            enabled: false,
+            endpoint: '',
+            appName: '',
+            appVersion: '',
+            environment: '',
+            apiKey: '',
+          ),
+        ),
+        returnsNormally,
+      );
+      expect(() => EngineAnalyticsModelDefault(), returnsNormally);
+
+      // Bug Tracking
+      expect(() => const EngineCrashlyticsConfig(enabled: true), returnsNormally);
+      expect(
+        () => EngineBugTrackingModel(
+          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
+          faroConfig: const EngineFaroConfig(
+            enabled: false,
+            endpoint: '',
+            appName: '',
+            appVersion: '',
+            environment: '',
+            apiKey: '',
+          ),
+        ),
+        returnsNormally,
+      );
+      expect(() => EngineBugTrackingModelDefault(), returnsNormally);
+    });
+
+    test('should have static methods available', () {
+      // Analytics static methods should be available
+      expect(EngineAnalytics.isEnabled, isA<bool>());
+      expect(EngineAnalytics.faro, isNull);
+
+      // Bug tracking static methods should be available
+      expect(EngineBugTracking.isEnabled, isA<bool>());
+    });
+
+    test('should handle edge cases', () {
+      // Test toString methods
+      const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
+      expect(firebaseConfig.toString(), isNotEmpty);
+
+      const crashlyticsConfig = EngineCrashlyticsConfig(enabled: false);
+      expect(crashlyticsConfig.toString(), isNotEmpty);
+
+      const faroConfig = EngineFaroConfig(
+        enabled: true,
+        endpoint: 'test',
+        appName: 'test',
+        appVersion: 'test',
+        environment: 'test',
+        apiKey: 'test',
+      );
+      expect(faroConfig.toString(), isNotEmpty);
+      expect(faroConfig.toString(), contains('****')); // API key should be masked
+    });
+  });
+}
