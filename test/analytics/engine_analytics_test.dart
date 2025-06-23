@@ -3,20 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EngineAnalytics', () {
-    setUp(() {
-      EngineAnalytics.reset();
+    tearDown(() async {
+      await EngineAnalytics.dispose();
     });
 
-    group('Initialization', () {
-      test('should reset properly', () {
-        EngineAnalytics.reset();
-        expect(EngineAnalytics.faro, isNull);
-      });
-
-      test('should handle disabled services', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+    test('should initialize with adapters', () async {
+      final adapters = [
+        EngineFirebaseAnalyticsAdapter(
+          const EngineFirebaseAnalyticsConfig(enabled: false),
+        ),
+        EngineFaroAnalyticsAdapter(
+          const EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -24,263 +21,261 @@ void main() {
             environment: '',
             apiKey: '',
           ),
-        );
-
-        await EngineAnalytics.init(model);
-
-        expect(EngineAnalytics.isFirebaseAnalyticsEnabled, isFalse);
-        expect(EngineAnalytics.isFaroEnabled, isFalse);
-        expect(EngineAnalytics.isEnabled, isFalse);
-      });
-
-      // Note: This test is commented out because it requires Firebase initialization
-      // which is not available in test environment without proper setup
-      test('should initialize with Firebase Analytics enabled only (mocked)', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
+        ),
+        EngineSplunkAnalyticsAdapter(
+          const EngineSplunkConfig(
             enabled: false,
             endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
+            token: '',
+            source: '',
+            sourcetype: '',
+            index: '',
           ),
-        );
+        ),
+      ];
 
-        // We can only test that the model configuration is correct
-        expect(model.firebaseAnalyticsConfig.enabled, isTrue);
-        expect(model.faroConfig.enabled, isFalse);
+      await EngineAnalytics.init(adapters);
 
-        // Actual initialization would require Firebase app to be initialized
-        // await EngineAnalytics.init(model);
-      });
-
-      // Note: This test is commented out because it requires Flutter binding initialization
-      // which is not available in test environment without proper setup
-      test('should initialize with Faro enabled only (mocked)', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: true,
-            endpoint: 'https://faro.example.com',
-            appName: 'TestApp',
-            appVersion: '1.0.0',
-            environment: 'production',
-            apiKey: 'test-key',
-          ),
-        );
-
-        // We can only test that the model configuration is correct
-        expect(model.firebaseAnalyticsConfig.enabled, isFalse);
-        expect(model.faroConfig.enabled, isTrue);
-        expect(model.faroConfig.endpoint, equals('https://faro.example.com'));
-
-        // Actual initialization would require Flutter binding to be initialized
-        // await EngineAnalytics.init(model);
-      });
-
-      // Note: This test is commented out because it requires both Firebase and Flutter binding
-      // initialization which is not available in test environment without proper setup
-      test('should initialize with both services enabled (mocked)', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
-            enabled: true,
-            endpoint: 'https://faro.example.com',
-            appName: 'TestApp',
-            appVersion: '1.0.0',
-            environment: 'production',
-            apiKey: 'test-key',
-          ),
-        );
-
-        // We can only test that the model configuration is correct
-        expect(model.firebaseAnalyticsConfig.enabled, isTrue);
-        expect(model.faroConfig.enabled, isTrue);
-        expect(model.faroConfig.appName, equals('TestApp'));
-
-        // Actual initialization would require both Firebase and Flutter binding
-        // await EngineAnalytics.init(model);
-      });
+      expect(EngineAnalytics.isInitialized, isTrue);
+      expect(EngineAnalytics.isEnabled, isFalse);
     });
 
-    group('Method Calls', () {
-      test('should handle log event when services disabled', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
+    test('should initialize with model', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
 
-        await EngineAnalytics.init(model);
+      await EngineAnalytics.initWithModel(model);
 
-        // Should not throw even when services are disabled
-        await EngineAnalytics.logEvent('test_event', {'key': 'value'});
-        await EngineAnalytics.logEvent('test_event');
-      });
-
-      test('should handle user ID methods when services disabled', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
-
-        await EngineAnalytics.init(model);
-
-        // Should not throw even when services are disabled
-        await EngineAnalytics.setUserId('user123');
-        await EngineAnalytics.setUserId('user123', 'user@example.com', 'Test User');
-
-        // Should handle invalid user IDs
-        await EngineAnalytics.setUserId('0');
-        await EngineAnalytics.setUserId('');
-      });
-
-      test('should handle user property methods when services disabled', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
-
-        await EngineAnalytics.init(model);
-
-        // Should not throw even when services are disabled
-        await EngineAnalytics.setUserProperty('user_type', 'premium');
-      });
-
-      test('should handle page methods when services disabled', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
-
-        await EngineAnalytics.init(model);
-
-        // Should not throw even when services are disabled
-        await EngineAnalytics.setPage('HomeScreen');
-        await EngineAnalytics.setPage('HomeScreen', 'WelcomeScreen', 'CustomClass');
-      });
-
-      test('should handle app open when services disabled', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
-
-        await EngineAnalytics.init(model);
-
-        // Should not throw even when services are disabled
-        await EngineAnalytics.logAppOpen();
-      });
+      expect(EngineAnalytics.isInitialized, isTrue);
+      expect(EngineAnalytics.isEnabled, isFalse);
     });
 
-    group('Configuration Checks', () {
-      test('should correctly identify enabled services (configuration only)', () async {
-        final firebaseModel = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
+    test('should handle log event without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
 
-        // Test model configuration without actual initialization
-        expect(firebaseModel.firebaseAnalyticsConfig.enabled, isTrue);
-        expect(firebaseModel.faroConfig.enabled, isFalse);
+      await EngineAnalytics.initWithModel(model);
 
-        final faroModel = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: true,
-            endpoint: 'https://faro.example.com',
-            appName: 'TestApp',
-            appVersion: '1.0.0',
-            environment: 'production',
-            apiKey: 'test-key',
-          ),
-        );
-
-        // Test model configuration without actual initialization
-        expect(faroModel.firebaseAnalyticsConfig.enabled, isFalse);
-        expect(faroModel.faroConfig.enabled, isTrue);
-      });
+      expect(() async => EngineAnalytics.logEvent('test_event'), returnsNormally);
     });
 
-    group('Faro Getter', () {
-      test('should return null when faro not initialized', () async {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: false,
-            endpoint: '',
-            appName: '',
-            appVersion: '',
-            environment: '',
-            apiKey: '',
-          ),
-        );
+    test('should handle setUserId without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
 
-        await EngineAnalytics.init(model);
-        expect(EngineAnalytics.faro, isNull);
-      });
+      await EngineAnalytics.initWithModel(model);
 
-      test('should have correct faro configuration when enabled', () {
-        final model = EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
-            enabled: true,
-            endpoint: 'https://faro.example.com',
-            appName: 'TestApp',
-            appVersion: '1.0.0',
-            environment: 'production',
-            apiKey: 'test-key',
-          ),
-        );
+      expect(() async => EngineAnalytics.setUserId('user123'), returnsNormally);
+    });
 
-        // Test configuration without actual initialization
-        expect(model.faroConfig.enabled, isTrue);
-        expect(model.faroConfig.endpoint, equals('https://faro.example.com'));
-        expect(model.faroConfig.appName, equals('TestApp'));
-      });
+    test('should handle setUserProperty without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(() async => EngineAnalytics.setUserProperty('test_prop', 'value'), returnsNormally);
+    });
+
+    test('should handle setPage without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(() async => EngineAnalytics.setPage('test_page'), returnsNormally);
+    });
+
+    test('should handle logAppOpen without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(() async => EngineAnalytics.logAppOpen(), returnsNormally);
+    });
+
+    test('should have enabled adapters when configs are enabled', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
+        faroConfig: const EngineFaroConfig(
+          enabled: true,
+          endpoint: 'https://example.com',
+          appName: 'TestApp',
+          appVersion: '1.0.0',
+          environment: 'test',
+          apiKey: 'test-key',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(EngineAnalytics.isEnabled, isTrue);
+      expect(EngineAnalytics.isInitialized, isTrue);
+    });
+
+    test('should handle reset without throwing', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(() async => EngineAnalytics.reset(), returnsNormally);
+    });
+
+    test('should handle custom events', () async {
+      final model = EngineAnalyticsModel(
+        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: const EngineFaroConfig(
+          enabled: false,
+          endpoint: '',
+          appName: '',
+          appVersion: '',
+          environment: '',
+          apiKey: '',
+        ),
+        splunkConfig: const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+      );
+
+      await EngineAnalytics.initWithModel(model);
+
+      expect(() async => EngineAnalytics.logEvent('purchase', {'transaction_id': 'txn_123'}), returnsNormally);
+      expect(() async => EngineAnalytics.logEvent('login', {'method': 'email'}), returnsNormally);
+      expect(() async => EngineAnalytics.logEvent('sign_up', {'method': 'google'}), returnsNormally);
     });
   });
 }

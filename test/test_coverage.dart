@@ -21,6 +21,17 @@ void main() {
         returnsNormally,
       );
       expect(
+        () => const EngineSplunkConfig(
+          enabled: false,
+          endpoint: '',
+          token: '',
+          source: '',
+          sourcetype: '',
+          index: '',
+        ),
+        returnsNormally,
+      );
+      expect(
         () => EngineAnalyticsModel(
           firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
           faroConfig: const EngineFaroConfig(
@@ -30,6 +41,14 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+          ),
+          splunkConfig: const EngineSplunkConfig(
+            enabled: false,
+            endpoint: '',
+            token: '',
+            source: '',
+            sourcetype: '',
+            index: '',
           ),
         ),
         returnsNormally,
@@ -58,7 +77,7 @@ void main() {
     test('should have static methods available', () {
       // Analytics static methods should be available
       expect(EngineAnalytics.isEnabled, isA<bool>());
-      expect(EngineAnalytics.faro, isNull);
+      expect(EngineAnalytics.isInitialized, isA<bool>());
 
       // Bug tracking static methods should be available
       expect(EngineBugTracking.isEnabled, isA<bool>());
@@ -82,6 +101,17 @@ void main() {
       );
       expect(faroConfig.toString(), isNotEmpty);
       expect(faroConfig.toString(), contains('****')); // API key should be masked
+
+      const splunkConfig = EngineSplunkConfig(
+        enabled: true,
+        endpoint: 'https://splunk.com',
+        token: 'secret-token',
+        source: 'app',
+        sourcetype: 'json',
+        index: 'main',
+      );
+      expect(splunkConfig.toString(), isNotEmpty);
+      expect(splunkConfig.toString(), contains('****')); // Token should be masked
     });
   });
 }

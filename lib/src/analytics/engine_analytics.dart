@@ -1,122 +1,128 @@
 import 'dart:async';
 
 import 'package:engine_tracking/engine_tracking.dart';
-import 'package:faro/faro_sdk.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 
 class EngineAnalytics {
   EngineAnalytics._();
 
-  static FirebaseAnalytics? _analytics;
-  static Faro? _faro;
-  static EngineAnalyticsModel? _engineAnalyticsModel;
   static bool _isInitialized = false;
 
-  static Future<void> init(final EngineAnalyticsModel model) async {
-    _engineAnalyticsModel = model;
+  static bool get isEnabled => _adapters.isNotEmpty;
+  static bool get isInitialized => _isInitialized;
 
-    await Future.wait([
-      if (model.firebaseAnalyticsConfig.enabled) _initFirebaseAnalytics(),
-      if (model.faroConfig.enabled) _initFaro(),
-    ]);
+  static final _adapters = <IEngineAnalyticsAdapter>[];
+
+  static Future<void> init(final List<IEngineAnalyticsAdapter> adapters) async {
+    if (_isInitialized) {
+      return;
+    }
+
+    _adapters
+      ..clear()
+      ..addAll(adapters.where((final adapter) => adapter.isEnabled));
+
+    final futures = _adapters.map((final adapter) => adapter.initialize()).toList();
+
+    await Future.wait(futures);
 
     _isInitialized = true;
   }
 
-  static void reset() {
-    _analytics = null;
-    _faro = null;
-    _engineAnalyticsModel = null;
-    _isInitialized = false;
+  static Future<void> initWithModel(final EngineAnalyticsModel model) async {
+    final adapters = <IEngineAnalyticsAdapter>[
+      EngineFirebaseAnalyticsAdapter(model.firebaseAnalyticsConfig),
+      EngineFaroAnalyticsAdapter(model.faroConfig),
+      EngineSplunkAnalyticsAdapter(model.splunkConfig),
+    ];
+
+    await init(adapters);
   }
 
-  static Future<void> _initFirebaseAnalytics() async {
-    _analytics = FirebaseAnalytics.instance;
-  }
-
-  static Future<void> _initFaro() async {
-    _faro = Faro();
-    if (!EngineBugTracking.isFaroEnabled) {
-      await _faro?.init(
-        optionsConfiguration: FaroConfig(
-          apiKey: _engineAnalyticsModel!.faroConfig.apiKey,
-          appName: _engineAnalyticsModel!.faroConfig.appName,
-          appVersion: _engineAnalyticsModel!.faroConfig.appVersion,
-          appEnv: _engineAnalyticsModel!.faroConfig.environment,
-          collectorUrl: _engineAnalyticsModel!.faroConfig.endpoint,
-          enableCrashReporting: false,
-          anrTracking: false,
-        ),
-      );
-    }
-  }
-
-  static Future<void> logEvent(final String name, [final Map<String, Object>? parameters]) async {
-    if (isFirebaseAnalyticsEnabled) {
-      await _analytics?.logEvent(name: name, parameters: parameters);
-    }
-
-    if (isFaroEnabled) {
-      await _faro?.pushEvent(name, attributes: parameters?.cast<String, dynamic>());
-    }
-  }
-
-  static Future<void> setUserId(final String userId, [final String? email, final String? name]) async {
-    if (userId == '0' || userId.isEmpty) {
+  static Future<void> dispose() async {
+    if (!_isInitialized) {
       return;
     }
 
-    if (isFirebaseAnalyticsEnabled) {
-      await _analytics?.setUserId(id: userId);
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.dispose(),
+        )
+        .toList();
+    await Future.wait(futures);
 
-    if (isFaroEnabled) {
-      _faro?.setUserMeta(userId: userId, userEmail: email, userName: name);
-    }
+    _adapters.clear();
+    _isInitialized = false;
   }
 
-  static Future<void> setUserProperty(final String name, final String value) async {
-    if (isFirebaseAnalyticsEnabled) {
-      await _analytics?.setUserProperty(name: name, value: value);
+  static Future<void> reset() async {
+    final futures = _adapters.map((final adapter) => adapter.reset()).toList();
+    await Future.wait(futures);
+  }
+
+  static Future<void> logEvent(final String name, [final Map<String, dynamic>? parameters]) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
+
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.logEvent(name, parameters),
+        )
+        .toList();
+    await Future.wait(futures);
+  }
+
+  static Future<void> setUserId(final String? userId, [final String? email, final String? name]) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
+    }
+
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.setUserId(userId, email, name),
+        )
+        .toList();
+    await Future.wait(futures);
+  }
+
+  static Future<void> setUserProperty(final String name, final String? value) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
+    }
+
+    final futures = _adapters.map((final adapter) => adapter.setUserProperty(name, value));
+    await Future.wait(futures);
   }
 
   static Future<void> setPage(
-    final String pageName, [
-    final String previousPageName = '',
-    final String pageClass = 'Flutter',
+    final String screenName, [
+    final String? previousScreen,
+    final Map<String, dynamic>? parameters,
   ]) async {
-    if (isFirebaseAnalyticsEnabled) {
-      await _analytics?.logScreenView(screenName: pageName, screenClass: pageClass);
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
 
-    if (isFaroEnabled) {
-      _faro?.setViewMeta(name: pageName);
-      await _faro?.pushEvent(
-        'view_changed',
-        attributes: {
-          'fromView': previousPageName,
-          'toView': pageName,
-        },
-      );
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.setPage(
+            screenName,
+            previousScreen,
+            parameters,
+          ),
+        )
+        .toList();
+    await Future.wait(futures);
   }
 
-  static Future<void> logAppOpen() async {
-    if (isFirebaseAnalyticsEnabled) {
-      await _analytics?.logAppOpen();
+  static Future<void> logAppOpen([final Map<String, dynamic>? parameters]) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
 
-    if (isFaroEnabled) {
-      await _faro?.pushEvent('app_open');
-    }
+    final futures = _adapters.map(
+      (final adapter) => adapter.logAppOpen(parameters),
+    );
+    await Future.wait(futures);
   }
-
-  static bool get isFirebaseAnalyticsEnabled => _engineAnalyticsModel?.firebaseAnalyticsConfig.enabled ?? false;
-
-  static bool get isFaroEnabled => _engineAnalyticsModel?.faroConfig.enabled ?? false;
-
-  static bool get isEnabled => _isInitialized && (isFirebaseAnalyticsEnabled || isFaroEnabled);
-
-  static Faro? get faro => _faro;
 }

@@ -1,6 +1,228 @@
 import 'package:flutter/material.dart';
 import 'package:engine_tracking/engine_tracking.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Engine Tracking Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Engine Tracking Demo'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool _analyticsInitialized = false;
+  String _status = 'Analytics não inicializado';
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnalytics();
+  }
+
+  Future<void> _initializeAnalytics() async {
+    try {
+      // Exemplo de inicialização com múltiplos adapters
+      final adapters = [
+        EngineFirebaseAnalyticsAdapter(
+          const EngineFirebaseAnalyticsConfig(enabled: false), // Desabilitado para demo
+        ),
+        EngineFaroAnalyticsAdapter(
+          const EngineFaroConfig(
+            enabled: false, // Desabilitado para demo
+            endpoint: 'https://faro-demo.grafana.net/collect',
+            appName: 'demo-app',
+            appVersion: '1.0.0',
+            environment: 'development',
+            apiKey: 'demo-key',
+          ),
+        ),
+        EngineSplunkAnalyticsAdapter(
+          const EngineSplunkConfig(
+            enabled: false, // Desabilitado para demo
+            endpoint: 'https://splunk-hec.example.com:8088/services/collector',
+            token: 'demo-token',
+            source: 'mobile-app',
+            sourcetype: 'json',
+            index: 'main',
+          ),
+        ),
+      ];
+
+      await EngineAnalytics.init(adapters);
+
+      setState(() {
+        _analyticsInitialized = EngineAnalytics.isInitialized;
+        _status = _analyticsInitialized
+            ? 'Analytics inicializado com sucesso!'
+            : 'Analytics não habilitado (configs disabled)';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Erro ao inicializar analytics: $e';
+      });
+    }
+  }
+
+  Future<void> _logCustomEvent() async {
+    await EngineAnalytics.logEvent('button_pressed', {
+      'button_name': 'demo_button',
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Evento customizado enviado!')),
+    );
+  }
+
+  Future<void> _setUserInfo() async {
+    await EngineAnalytics.setUserId(
+      'demo_user_123',
+      'user@example.com',
+      'Demo User',
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Informações do usuário definidas!')),
+    );
+  }
+
+  Future<void> _trackPageView() async {
+    await EngineAnalytics.setPage(
+      'demo_page',
+      'home_page',
+      {
+        'screen_class': 'DemoScreen',
+        'feature_enabled': true,
+      },
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Visualização de página rastreada!')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Demo do Engine Tracking - Padrão Adapter',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _analyticsInitialized ? Colors.green[100] : Colors.orange[100],
+                border: Border.all(
+                  color: _analyticsInitialized ? Colors.green : Colors.orange,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    _analyticsInitialized ? Icons.check_circle : Icons.info,
+                    color: _analyticsInitialized ? Colors.green : Colors.orange,
+                    size: 32,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Status: $_status',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Inicializado: ${EngineAnalytics.isInitialized}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    'Habilitado: ${EngineAnalytics.isEnabled}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              'Testar Funcionalidades:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _logCustomEvent,
+              icon: const Icon(Icons.analytics),
+              label: const Text('Enviar Evento Customizado'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _setUserInfo,
+              icon: const Icon(Icons.person),
+              label: const Text('Definir Informações do Usuário'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: _trackPageView,
+              icon: const Icon(Icons.pageview),
+              label: const Text('Rastrear Visualização de Página'),
+            ),
+            const SizedBox(height: 30),
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '🔧 Arquitetura Adapter',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '• Firebase Analytics Adapter\n'
+                      '• Grafana Faro Adapter\n'
+                      '• Splunk Analytics Adapter\n'
+                      '• Fácil adição de novos adapters',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
