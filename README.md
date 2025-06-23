@@ -9,7 +9,7 @@ Uma biblioteca Flutter completa para tracking de analytics e bug reporting, ofer
 - **Configuração Flexível**: Ative/desative serviços individualmente através de configurações
 - **Logging Estruturado**: Sistema de logs com diferentes níveis e contextos
 - **Tipo-seguro**: Implementação completamente tipada em Dart
-- **Testável**: Cobertura de testes superior a 95%
+- **Arquitetura Consistente**: Padrão unificado entre Analytics e Bug Tracking
 
 ## 📦 Instalação
 
@@ -339,6 +339,44 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 ```
 
+## 🏗️ Arquitetura do Projeto
+
+### Estrutura Interna
+
+O projeto segue uma arquitetura consistente e bem organizada:
+
+```
+lib/
+├── src/
+│   ├── analytics/
+│   │   ├── engine_analytics.dart        # Serviço principal de analytics
+│   │   └── analytics.dart              # Export barrel
+│   ├── bug_tracking/
+│   │   ├── engine_bug_tracking.dart    # Serviço principal de bug tracking
+│   │   └── bug_tracking.dart           # Export barrel
+│   ├── config/                         # Configurações dos serviços
+│   │   ├── engine_firebase_analytics_config.dart
+│   │   ├── engine_crashlytics_config.dart
+│   │   └── engine_faro_config.dart
+│   ├── models/                         # Modelos de dados
+│   │   ├── engine_analytics_model.dart
+│   │   └── engine_bug_tracking_model.dart
+│   ├── enums/                          # Enumerações
+│   │   └── engine_log_level_type.dart
+│   ├── logging/                        # Sistema de logging
+│   │   └── engine_log.dart
+│   └── observers/                      # Observadores Flutter
+└── engine_tracking.dart                # Export principal
+```
+
+### Padrões Arquiteturais
+
+- **Construtor Privado**: Classes principais (`EngineAnalytics`, `EngineBugTracking`) usam construtores privados
+- **Métodos Estáticos**: Todas as funcionalidades públicas são estáticas
+- **Inicialização Condicional**: Serviços são inicializados apenas se habilitados na configuração
+- **Export Unificado**: Todos os imports podem ser feitos através de `package:engine_tracking/engine_tracking.dart`
+- **Configuração Tipada**: Uso de classes específicas para cada tipo de configuração
+
 ## 🔧 Configurações Avançadas
 
 ### Configuração Padrão
@@ -399,10 +437,7 @@ open coverage/html/index.html
 
 - ✅ iOS
 - ✅ Android
-- ✅ Web
-- ✅ macOS
-- ✅ Windows
-- ✅ Linux
+
 
 ## 🤝 Contribuição
 
@@ -422,6 +457,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 - [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics)
 - [Grafana Faro](https://grafana.com/docs/faro/)
 - [Flutter](https://flutter.dev/)
+
 
 ## 📞 Suporte
 
