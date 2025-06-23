@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:engine_tracking/src/models/engine_bug_tracking_model.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 import 'package:faro/faro_sdk.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';

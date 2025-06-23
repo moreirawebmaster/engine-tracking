@@ -1,7 +1,4 @@
-import 'package:engine_tracking/src/analytics/engine_analytics.dart';
-import 'package:engine_tracking/src/config/engine_faro_config.dart';
-import 'package:engine_tracking/src/config/engine_firebase_analytics_config.dart';
-import 'package:engine_tracking/src/models/engine_analytics_model.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 import 'package:faro/faro_sdk.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:engine_tracking/src/bug_tracking/engine_bug_tracking.dart';
-import 'package:engine_tracking/src/logging/engine_log_level.dart';
+import 'package:engine_tracking/src/enums/engine_log_level_type.dart';
 
 /// Utility class for logging and crash reporting in the Engine framework.
 ///
@@ -15,12 +15,12 @@ class EngineLog {
   static Future<void> _logWithLevel(
     final String message, {
     final String? logName,
-    final EngineLogLevel? level,
+    final EngineLogLevelType? level,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
-    final levelLog = level ?? EngineLogLevel.info;
+    final levelLog = level ?? EngineLogLevelType.info;
     final prefix = _getLevelPrefix(levelLog);
     final dataString = data == null ? '' : '- [Data]: ${data.toString()}';
 
@@ -38,11 +38,11 @@ class EngineLog {
     if (EngineBugTracking.isEnabled) {
       unawaited(EngineBugTracking.log(logMessage));
 
-      if (levelLog == EngineLogLevel.error || levelLog == EngineLogLevel.fatal) {
+      if (levelLog == EngineLogLevelType.error || levelLog == EngineLogLevelType.fatal) {
         await EngineBugTracking.recordError(
           error ?? Exception(logMessage),
           stackTrace ?? StackTrace.current,
-          isFatal: levelLog == EngineLogLevel.fatal,
+          isFatal: levelLog == EngineLogLevelType.fatal,
           reason: logMessage,
           data: data,
         );
@@ -67,7 +67,7 @@ class EngineLog {
     await _logWithLevel(
       message,
       logName: logName,
-      level: EngineLogLevel.debug,
+      level: EngineLogLevelType.debug,
       error: error,
       stackTrace: stackTrace,
       data: data,
@@ -85,7 +85,7 @@ class EngineLog {
     await _logWithLevel(
       message,
       logName: logName,
-      level: EngineLogLevel.info,
+      level: EngineLogLevelType.info,
       error: error,
       stackTrace: stackTrace,
       data: data,
@@ -103,7 +103,7 @@ class EngineLog {
     await _logWithLevel(
       message,
       logName: logName,
-      level: EngineLogLevel.warning,
+      level: EngineLogLevelType.warning,
       error: error,
       stackTrace: stackTrace,
       data: data,
@@ -121,7 +121,7 @@ class EngineLog {
     await _logWithLevel(
       message,
       logName: logName,
-      level: EngineLogLevel.error,
+      level: EngineLogLevelType.error,
       error: error,
       stackTrace: stackTrace,
       data: data,
@@ -139,24 +139,24 @@ class EngineLog {
     await _logWithLevel(
       message,
       logName: logName,
-      level: EngineLogLevel.fatal,
+      level: EngineLogLevelType.fatal,
       error: error,
       stackTrace: stackTrace,
       data: data,
     );
   }
 
-  static String _getLevelPrefix(final EngineLogLevel level) {
+  static String _getLevelPrefix(final EngineLogLevelType level) {
     switch (level) {
-      case EngineLogLevel.debug:
+      case EngineLogLevelType.debug:
         return '[DEBUG]';
-      case EngineLogLevel.info:
+      case EngineLogLevelType.info:
         return '[INFO]';
-      case EngineLogLevel.warning:
+      case EngineLogLevelType.warning:
         return '[WARNING]';
-      case EngineLogLevel.error:
+      case EngineLogLevelType.error:
         return '[ERROR]';
-      case EngineLogLevel.fatal:
+      case EngineLogLevelType.fatal:
         return '[FATAL]';
     }
   }
