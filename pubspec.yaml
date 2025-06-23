@@ -11,10 +11,10 @@ funding:
 
 topics:
   - tracking
-  - logging
   - analytics
-  - bugtracking
-  - android
+  - firebase
+  - crashlytics
+  - logging
 
 platforms:
   android:
