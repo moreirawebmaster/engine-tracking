@@ -14,6 +14,8 @@ void main() {
         appVersion: '1.0.0',
         environment: 'production',
         apiKey: 'test-key',
+        namespace: '',
+        platform: '',
       );
 
       final model = EngineBugTrackingModel(
@@ -34,6 +36,8 @@ void main() {
         appVersion: '',
         environment: '',
         apiKey: '',
+        namespace: '',
+        platform: '',
       );
 
       final model = EngineBugTrackingModel(

@@ -16,6 +16,14 @@ class EngineBugTrackingModelDefault implements EngineBugTrackingModel {
   EngineCrashlyticsConfig get crashlyticsConfig => const EngineCrashlyticsConfig(enabled: false);
 
   @override
-  EngineFaroConfig get faroConfig =>
-      const EngineFaroConfig(enabled: false, endpoint: '', appName: '', appVersion: '', environment: '', apiKey: '');
+  EngineFaroConfig get faroConfig => const EngineFaroConfig(
+    enabled: false,
+    endpoint: '',
+    appName: '',
+    appVersion: '',
+    environment: '',
+    apiKey: '',
+    namespace: '',
+    platform: '',
+  );
 }

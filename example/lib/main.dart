@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/material.dart';
+
+import 'view_tracking_example.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,12 +13,14 @@ void main() async {
 
 Future<void> initializeTracking() async {
   final faroConfig = EngineFaroConfig(
-    enabled: true, // Desabilitado para demo
-    endpoint: 'https://faro-collector-prod-sa-east-1.grafana.net/collect/d447b8aa9e6c8fdae9cf8c28701ede4e',
-    appName: 'stmr',
+    enabled: true,
+    endpoint: 'https://faro-collector-prod-sa-east-1.grafana.net/collect/54d9b2d4c4e2a550c890876a914a3525',
+    appName: 'engine-tracking',
     appVersion: '1.0.0',
     environment: 'production',
-    apiKey: 'd447b8aa9e6c8fdae9cf8c28701ede4e', // Mesma chave compartilhada
+    apiKey: '54d9b2d4c4e2a550c890876a914a3525',
+    namespace: 'engine.stmr.tech',
+    platform: Platform.isAndroid ? 'android' : 'ios',
   );
   // Configure Analytics
   final analyticsModel = EngineAnalyticsModel(
@@ -157,6 +163,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _navigateToViewTrackingExample() async {
+    await EngineAnalytics.logEvent('navigation', {'from_page': 'HomePage', 'to_page': 'ViewTrackingExample'});
+
+    if (mounted) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewTrackingExample()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -214,6 +228,12 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _navigateToSecondPage,
                   icon: const Icon(Icons.navigate_next),
                   label: const Text('Navigate'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _navigateToViewTrackingExample,
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('View Tracking'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                 ),
               ],
             ),

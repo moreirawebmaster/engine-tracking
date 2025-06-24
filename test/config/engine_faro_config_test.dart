@@ -11,6 +11,8 @@ void main() {
         appVersion: '1.0.0',
         environment: 'production',
         apiKey: 'test-api-key',
+        namespace: '',
+        platform: '',
       );
 
       expect(config.enabled, isTrue);
@@ -29,6 +31,8 @@ void main() {
         appVersion: '',
         environment: '',
         apiKey: '',
+        namespace: '',
+        platform: '',
       );
 
       expect(config.enabled, isFalse);
@@ -47,6 +51,8 @@ void main() {
         appVersion: '1.0.0',
         environment: 'production',
         apiKey: 'secret-key-123',
+        namespace: '',
+        platform: '',
       );
 
       final toString = config.toString();
@@ -67,6 +73,8 @@ void main() {
         appVersion: '',
         environment: '',
         apiKey: '',
+        namespace: '',
+        platform: '',
       );
 
       final toString = config.toString();

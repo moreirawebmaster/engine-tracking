@@ -706,6 +706,391 @@ example/                            # App de demonstração
 └── README.md                       # Documentação do exemplo
 ```
 
+# Sistema de Tracking de Views
+
+Este sistema fornece funcionalidades automáticas de tracking para widgets StatelessWidget e StatefulWidget, permitindo monitorar o comportamento do usuário passo a passo.
+
+## 🎯 Widget Tracking
+
+O Engine Tracking oferece um sistema avançado de tracking automático para widgets, permitindo monitoramento transparente de navegação, ações do usuário e ciclo de vida de telas.
+
+### Características dos Widgets
+
+- 📊 **Tracking Automático**: Visualizações de tela registradas automaticamente
+- 🔄 **Ciclo de Vida**: Monitoramento de init/dispose em StatefulWidgets  
+- 👆 **Ações do Usuário**: Métodos integrados para logging de interações
+- 📝 **Eventos Customizados**: Sistema flexível para eventos específicos
+- 🐛 **Tratamento de Erros**: Captura contextualizada de erros por tela
+- ⚙️ **Configurável**: Controle granular sobre tracking automático
+
+### Implementações Disponíveis
+
+#### 1. Classes Base (Recomendado)
+
+As classes base oferecem implementação completa com tracking automático integrado.
+
+##### StatelessWidget Base
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+class HomePage extends EngineStatelessWidgetBase {
+  const HomePage({super.key});
+
+  @override
+  String get screenName => 'home_page';
+
+  @override
+  Map<String, dynamic>? get screenParameters => {
+    'version': '1.0.0',
+    'source': 'main_menu',
+  };
+
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Início')),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              logUserAction('button_pressed', parameters: {
+                'button_type': 'primary',
+                'action': 'navigate_to_settings',
+              });
+            },
+            child: const Text('Configurações'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              logCustomEvent('feature_accessed', parameters: {
+                'feature': 'premium_content',
+              });
+            },
+            child: const Text('Conteúdo Premium'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+##### StatefulWidget Base
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+class ProfilePage extends EngineStatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  EngineStatefulWidgetState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends EngineStatefulWidgetState<ProfilePage> {
+  String _userName = '';
+  
+  @override
+  String get screenName => 'profile_page';
+
+  @override
+  Map<String, dynamic>? get screenParameters => {
+    'user_type': 'premium',
+  };
+
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          TextField(
+            onChanged: (value) {
+              setState(() {
+                _userName = value;
+              });
+              
+              logStateChange('username_changed', additionalData: {
+                'character_count': value.length,
+              });
+            },
+          ),
+          ElevatedButton(
+            onPressed: () {
+              logUserAction('profile_updated', parameters: {
+                'field': 'username',
+                'new_length': _userName.length,
+              });
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Exemplo Completo com Classes Base
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+class SettingsPage extends EngineStatelessWidgetBase {
+  const SettingsPage({super.key});
+
+  @override
+  String get screenName => 'settings_page';
+
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Configurações')),
+      body: ListView(
+        children: [
+          ListTile(
+            title: const Text('Notificações'),
+            onTap: () => logUserAction('settings_item_tapped', 
+              parameters: {'item': 'notifications'}),
+          ),
+          ListTile(
+            title: const Text('Privacidade'),
+            onTap: () => logUserAction('settings_item_tapped', 
+              parameters: {'item': 'privacy'}),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+class LoginPage extends EngineStatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  EngineStatefulWidgetState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends EngineStatefulWidgetState<LoginPage> {
+  bool _isLoading = false;
+
+  @override
+  String get screenName => 'login_page';
+
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: [
+          TextField(
+            decoration: const InputDecoration(labelText: 'Email'),
+            onSubmitted: (value) {
+              logUserAction('field_completed', parameters: {
+                'field': 'email',
+                'has_value': value.isNotEmpty,
+              });
+            },
+          ),
+          ElevatedButton(
+            onPressed: _isLoading ? null : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              
+              logStateChange('login_started');
+              
+              try {
+                await Future.delayed(const Duration(seconds: 2));
+                logUserAction('login_success');
+              } catch (e) {
+                logScreenError('Login falhou', 
+                  exception: e, 
+                  additionalData: {'retry_count': 1});
+              }
+              
+              setState(() {
+                _isLoading = false;
+              });
+            },
+            child: _isLoading 
+              ? const CircularProgressIndicator() 
+              : const Text('Entrar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Métodos Disponíveis
+
+### Tracking Automático
+- `_trackScreenView()`: Registra visualização da tela automaticamente
+- **Ciclo de vida**: initState/dispose tracking (apenas StatefulWidget)
+
+### Métodos de Logging
+- `logUserAction(action, {parameters})`: Registra ações do usuário
+- `logCustomEvent(eventName, {parameters})`: Registra eventos customizados
+- `logScreenError(error, {exception, stackTrace, additionalData})`: Registra erros
+- `logStateChange(description, {additionalData})`: Registra mudanças de estado (StatefulWidget)
+
+### Configurações
+- `screenName`: Nome da tela (padrão: nome da classe)
+- `screenParameters`: Parâmetros adicionais da tela
+- `enableAutoTracking`: Ativa/desativa tracking automático
+- `enableLifecycleTracking`: Ativa/desativa tracking de ciclo de vida (StatefulWidget)
+
+## Dados Coletados
+
+### Visualização de Tela
+```json
+{
+  "screen_name": "home_page",
+  "screen_type": "StatelessWidget",
+  "timestamp": "2023-12-01T10:30:00.000Z",
+  "parameters": {"version": "1.0.0"}
+}
+```
+
+### Ação do Usuário
+```json
+{
+  "screen_name": "home_page",
+  "action": "button_pressed",
+  "widget_type": "StatelessWidget",
+  "button_type": "primary"
+}
+```
+
+### Fechamento de Tela (StatefulWidget)
+```json
+{
+  "screen_name": "profile_page",
+  "widget_type": "StatefulWidget",
+  "time_spent_seconds": 45,
+  "time_spent_minutes": 0
+}
+```
+
+## Integração com Analytics
+
+Todos os eventos são automaticamente enviados para:
+- **Firebase Analytics** (se configurado)
+- **Grafana Faro** (se configurado)
+- **Splunk** (se configurado)
+- **Engine Log** para debugging
+
+## Melhores Práticas
+
+1. **Use nomes descritivos** para telas e ações
+2. **Inclua parâmetros relevantes** sem dados sensíveis
+3. **Monitore erros** com contexto apropriado
+4. **Use classes base** para funcionalidade completa
+5. **Personalize screenName** para identificação clara
+6. **Agrupe ações relacionadas** com prefixos consistentes
+
+## Desabilitando Tracking
+
+```dart
+class MyPage extends EngineStatelessWidgetBase {
+  const MyPage({super.key});
+  
+  @override
+  bool get enableAutoTracking => false; // Desabilita tracking automático
+  
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    // ... resto da implementação
+  }
+}
+```
+
+## Exemplo de Uso Avançado
+
+```dart
+class ShoppingCartPage extends StatefulWidget {
+  final List<Product> initialProducts;
+  
+  const ShoppingCartPage({super.key, required this.initialProducts});
+
+  @override
+  State<ShoppingCartPage> createState() => _ShoppingCartPageState();
+}
+
+class _ShoppingCartPageState extends EngineStatefulWidgetState<ShoppingCartPage> {
+  
+  late List<Product> _products;
+  
+  @override
+  void initState() {
+    super.initState();
+    _products = List.from(widget.initialProducts);
+  }
+  
+  @override
+  String get screenName => 'shopping_cart';
+
+  @override
+  Map<String, dynamic>? get screenParameters => {
+    'initial_product_count': widget.initialProducts.length,
+    'cart_value': _calculateTotal(),
+  };
+
+  @override
+  Widget buildWithTracking(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Carrinho')),
+      body: ListView.builder(
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          final product = _products[index];
+          return ListTile(
+            title: Text(product.name),
+            trailing: IconButton(
+              icon: const Icon(Icons.remove_circle),
+              onPressed: () {
+                setState(() {
+                  _products.removeAt(index);
+                });
+                
+                logUserAction('product_removed', parameters: {
+                  'product_id': product.id,
+                  'product_name': product.name,
+                  'remaining_count': _products.length,
+                });
+                
+                logStateChange('cart_updated', additionalData: {
+                  'action': 'removal',
+                  'new_total': _calculateTotal(),
+                });
+              },
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          logUserAction('checkout_initiated', parameters: {
+            'product_count': _products.length,
+            'total_value': _calculateTotal(),
+          });
+        },
+        child: const Icon(Icons.shopping_cart_checkout),
+      ),
+    );
+  }
+  
+  double _calculateTotal() {
+    return _products.fold(0.0, (sum, product) => sum + product.price);
+  }
+}
+```
+
 ### 🧪 Scripts de Desenvolvimento
 
 ```bash

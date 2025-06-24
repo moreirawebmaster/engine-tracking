@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +14,7 @@ class AdaptersExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Engine Tracking Adapters Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
+      theme: ThemeData(primarySwatch: Colors.purple),
       home: const AdaptersExamplePage(title: 'Adapters Pattern Demo'),
     );
   }
@@ -47,13 +47,15 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   }
 
   // Configurações compartilhadas - Boa prática de reaproveitamento
-  static const _sharedFaroConfig = EngineFaroConfig(
-    enabled: true, // Desabilitado para demo
+  static final _sharedFaroConfig = EngineFaroConfig(
+    enabled: true,
     endpoint: 'https://faro-collector-prod-sa-east-1.grafana.net/collect',
     appName: 'stmr',
     appVersion: '1.0.0',
     environment: 'production',
-    apiKey: 'd447b8aa9e6c8fdae9cf8c28701ede4e', // Mesma chave compartilhada
+    apiKey: 'd447b8aa9e6c8fdae9cf8c28701ede4e',
+    namespace: 'exemple',
+    platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
   static const _firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: false);
@@ -117,10 +119,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+      appBar: AppBar(title: Text(widget.title), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -138,11 +137,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
               title: '📊 Analytics Adapters',
               status: _analyticsStatus,
               isInitialized: _analyticsInitialized,
-              adapters: [
-                'Firebase Analytics Adapter',
-                'Grafana Faro Analytics Adapter',
-                'Splunk Analytics Adapter',
-              ],
+              adapters: ['Firebase Analytics Adapter', 'Grafana Faro Analytics Adapter', 'Splunk Analytics Adapter'],
             ),
 
             const SizedBox(height: 16),
@@ -152,42 +147,21 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
               title: '🐛 Bug Tracking Adapters',
               status: _bugTrackingStatus,
               isInitialized: _bugTrackingInitialized,
-              adapters: [
-                'Firebase Crashlytics Adapter',
-                'Grafana Faro Bug Tracking Adapter',
-              ],
+              adapters: ['Firebase Crashlytics Adapter', 'Grafana Faro Bug Tracking Adapter'],
             ),
 
             const SizedBox(height: 30),
 
-            const Text(
-              '🚀 Teste as Funcionalidades:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
+            const Text('🚀 Teste as Funcionalidades:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 16),
 
             // Analytics Actions
             _buildActionSection(
               title: 'Analytics Actions',
               actions: [
-                _buildActionButton(
-                  'Enviar Evento Personalizado',
-                  Icons.analytics,
-                  Colors.blue,
-                  _sendAnalyticsEvent,
-                ),
-                _buildActionButton(
-                  'Definir Propriedade do Usuário',
-                  Icons.person_add,
-                  Colors.green,
-                  _setUserProperty,
-                ),
-                _buildActionButton(
-                  'Rastrear Tela',
-                  Icons.pageview,
-                  Colors.orange,
-                  _trackScreen,
-                ),
+                _buildActionButton('Enviar Evento Personalizado', Icons.analytics, Colors.blue, _sendAnalyticsEvent),
+                _buildActionButton('Definir Propriedade do Usuário', Icons.person_add, Colors.green, _setUserProperty),
+                _buildActionButton('Rastrear Tela', Icons.pageview, Colors.orange, _trackScreen),
               ],
             ),
 
@@ -197,24 +171,9 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
             _buildActionSection(
               title: 'Bug Tracking Actions',
               actions: [
-                _buildActionButton(
-                  'Log de Informação',
-                  Icons.info,
-                  Colors.cyan,
-                  _logInfo,
-                ),
-                _buildActionButton(
-                  'Simular Erro',
-                  Icons.error,
-                  Colors.red,
-                  _simulateError,
-                ),
-                _buildActionButton(
-                  'Definir Chave Personalizada',
-                  Icons.key,
-                  Colors.purple,
-                  _setCustomKey,
-                ),
+                _buildActionButton('Log de Informação', Icons.info, Colors.cyan, _logInfo),
+                _buildActionButton('Simular Erro', Icons.error, Colors.red, _simulateError),
+                _buildActionButton('Definir Chave Personalizada', Icons.key, Colors.purple, _setCustomKey),
               ],
             ),
 
@@ -227,10 +186,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '✨ Vantagens do Padrão Adapter',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
+                    Text('✨ Vantagens do Padrão Adapter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     SizedBox(height: 12),
                     Text(
                       '• Flexibilidade total na escolha de provedores\n'
@@ -293,18 +249,13 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isInitialized ? Colors.green[50] : Colors.orange[50],
-                border: Border.all(
-                  color: isInitialized ? Colors.green : Colors.orange,
-                ),
+                border: Border.all(color: isInitialized ? Colors.green : Colors.orange),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -314,28 +265,17 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
                     color: isInitialized ? Colors.green : Colors.orange,
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      status,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ),
+                  Expanded(child: Text(status, style: const TextStyle(fontSize: 14))),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Adapters disponíveis:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
+            const Text('Adapters disponíveis:', style: TextStyle(fontWeight: FontWeight.w500)),
             const SizedBox(height: 4),
             ...adapters.map(
               (adapter) => Padding(
                 padding: const EdgeInsets.only(left: 16, top: 2),
-                child: Text(
-                  '• $adapter',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                child: Text('• $adapter', style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ),
             ),
           ],
@@ -344,34 +284,18 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
     );
   }
 
-  Widget _buildActionSection({
-    required String title,
-    required List<Widget> actions,
-  }) {
+  Widget _buildActionSection({required String title, required List<Widget> actions}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
+        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
         const SizedBox(height: 12),
-        ...actions.map(
-          (action) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: action,
-          ),
-        ),
+        ...actions.map((action) => Padding(padding: const EdgeInsets.only(bottom: 8), child: action)),
       ],
     );
   }
 
-  Widget _buildActionButton(
-    String label,
-    IconData icon,
-    Color color,
-    VoidCallback onPressed,
-  ) {
+  Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -409,11 +333,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   }
 
   Future<void> _logInfo() async {
-    await EngineBugTracking.log(
-      'Demonstração do adapter de bug tracking',
-      level: 'info',
-      attributes: {'demo': 'true'},
-    );
+    await EngineBugTracking.log('Demonstração do adapter de bug tracking', level: 'info', attributes: {'demo': 'true'});
 
     _showSnackBar('Log de informação registrado!', Colors.cyan);
   }
@@ -441,33 +361,29 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   }
 
   void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color, duration: const Duration(seconds: 2)));
   }
 }
 
 void adaptersFlexibleExample() async {
   // Exemplo 1: Usando apenas Firebase Analytics
-  final firebaseAnalyticsAdapter = EngineFirebaseAnalyticsAdapter(
-    const EngineFirebaseAnalyticsConfig(enabled: true),
-  );
+  final firebaseAnalyticsAdapter = EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true));
 
   await EngineAnalytics.init([firebaseAnalyticsAdapter]);
 
   // Exemplo 2: Configurações compartilhadas entre Analytics e Bug Tracking
   // Esta é uma prática recomendada para reaproveitar configurações
-  const sharedFaroConfig = EngineFaroConfig(
+  final sharedFaroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro-collector.grafana.net/collect',
     appName: 'MyApp',
     appVersion: '1.0.0',
     environment: 'production',
     apiKey: 'your-shared-faro-api-key', // Mesma chave para analytics e bug tracking
+    namespace: 'exemple',
+    platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
   const firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: true);
@@ -495,10 +411,7 @@ void adaptersFlexibleExample() async {
   ];
 
   // Inicialização simultânea dos serviços
-  await Future.wait([
-    EngineAnalytics.init(analyticsAdapters),
-    EngineBugTracking.init(bugTrackingAdapters),
-  ]);
+  await Future.wait([EngineAnalytics.init(analyticsAdapters), EngineBugTracking.init(bugTrackingAdapters)]);
 
   // Exemplo 3: Usando modelos tradicionais com configurações compartilhadas
   final analyticsModel = EngineAnalyticsModel(
@@ -516,10 +429,7 @@ void adaptersFlexibleExample() async {
   await EngineAnalytics.dispose();
   await EngineBugTracking.dispose();
 
-  await Future.wait([
-    EngineAnalytics.initWithModel(analyticsModel),
-    EngineBugTracking.initWithModel(bugTrackingModel),
-  ]);
+  await Future.wait([EngineAnalytics.initWithModel(analyticsModel), EngineBugTracking.initWithModel(bugTrackingModel)]);
 
   // Exemplo de uso após inicialização
   await EngineAnalytics.logEvent('adapter_demo', {'demo': 'true'});
@@ -642,12 +552,7 @@ class CustomBugTrackingAdapter implements IEngineBugTrackingAdapter {
   }
 
   @override
-  Future<void> log(
-    String message, {
-    String? level,
-    Map<String, dynamic>? attributes,
-    StackTrace? stackTrace,
-  }) async {
+  Future<void> log(String message, {String? level, Map<String, dynamic>? attributes, StackTrace? stackTrace}) async {
     if (!isEnabled || !_isInitialized) return;
 
     print('Custom Bug Tracking - Log: $message [Level: $level]');
@@ -702,20 +607,20 @@ void mixedInitializationExample() async {
   // e reaproveitamento de configurações
 
   // Configuração compartilhada do Faro
-  const sharedFaroConfig = EngineFaroConfig(
+  final sharedFaroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro.example.com/collect',
     appName: 'MixedApp',
     appVersion: '1.0.0',
     environment: 'production',
     apiKey: 'shared-faro-key',
+    namespace: 'exemple',
+    platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
   // Método 1: Analytics com adapters diretos
   await EngineAnalytics.init([
-    EngineFirebaseAnalyticsAdapter(
-      const EngineFirebaseAnalyticsConfig(enabled: true),
-    ),
+    EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true)),
     EngineFaroAnalyticsAdapter(sharedFaroConfig), // Config compartilhada
   ]);
 

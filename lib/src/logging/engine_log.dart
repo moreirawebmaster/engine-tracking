@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
-import 'package:engine_tracking/src/bug_tracking/engine_bug_tracking.dart';
-import 'package:engine_tracking/src/enums/engine_log_level_type.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 
 /// Utility class for logging and crash reporting in the Engine framework.
 ///
@@ -14,7 +13,8 @@ class EngineLog {
 
   static Future<void> _logWithLevel(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final EngineLogLevelType? level,
     final Object? error,
     final StackTrace? stackTrace,
@@ -28,12 +28,25 @@ class EngineLog {
 
     developer.log(
       logMessage,
-      name: logName ?? _name,
+      name: logName,
       error: error,
       stackTrace: stackTrace,
       time: DateTime.now(),
       level: levelLog.value,
     );
+
+    if (EngineAnalytics.isEnabled && hasAnalytics) {
+      await EngineAnalytics.logEvent(
+        message,
+        {
+          'message': logMessage,
+          'tag': logName,
+          'level': levelLog.name,
+          if (data != null) ...data,
+          'time': DateTime.now(),
+        },
+      );
+    }
 
     if (EngineBugTracking.isEnabled) {
       unawaited(EngineBugTracking.log(logMessage));
@@ -59,13 +72,15 @@ class EngineLog {
   /// [data] Optional additional data to include with the log
   static Future<void> debug(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
     await _logWithLevel(
       message,
+      hasAnalytics: hasAnalytics,
       logName: logName,
       level: EngineLogLevelType.debug,
       error: error,
@@ -77,13 +92,15 @@ class EngineLog {
   /// Log info level message
   static Future<void> info(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
     await _logWithLevel(
       message,
+      hasAnalytics: hasAnalytics,
       logName: logName,
       level: EngineLogLevelType.info,
       error: error,
@@ -95,13 +112,15 @@ class EngineLog {
   /// Log warning level message
   static Future<void> warning(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
     await _logWithLevel(
       message,
+      hasAnalytics: hasAnalytics,
       logName: logName,
       level: EngineLogLevelType.warning,
       error: error,
@@ -113,13 +132,15 @@ class EngineLog {
   /// Log error level message
   static Future<void> error(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
     await _logWithLevel(
       message,
+      hasAnalytics: hasAnalytics,
       logName: logName,
       level: EngineLogLevelType.error,
       error: error,
@@ -131,13 +152,15 @@ class EngineLog {
   /// Log fatal level message
   static Future<void> fatal(
     final String message, {
-    final String? logName,
+    final bool hasAnalytics = true,
+    final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
     final Map<String, dynamic>? data,
   }) async {
     await _logWithLevel(
       message,
+      hasAnalytics: hasAnalytics,
       logName: logName,
       level: EngineLogLevelType.fatal,
       error: error,
@@ -160,9 +183,4 @@ class EngineLog {
         return '[FATAL]';
     }
   }
-}
-
-/// Extension para formatar Map como string
-extension MapFormattingExtension on Map<String, dynamic> {
-  String toFormattedString() => entries.map((final entry) => '${entry.key}: ${entry.value}').join(', ');
 }

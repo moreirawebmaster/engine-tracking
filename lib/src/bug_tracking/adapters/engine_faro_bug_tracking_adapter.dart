@@ -46,6 +46,9 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
           collectorUrl: _config.endpoint,
           enableCrashReporting: true,
           anrTracking: true,
+          refreshRateVitals: true,
+          fetchVitalsInterval: const Duration(seconds: 10),
+          namespace: _config.namespace,
         ),
       );
       _isInitialized = true;

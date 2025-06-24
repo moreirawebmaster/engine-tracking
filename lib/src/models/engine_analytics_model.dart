@@ -23,8 +23,16 @@ class EngineAnalyticsModelDefault implements EngineAnalyticsModel {
   EngineFirebaseAnalyticsConfig get firebaseAnalyticsConfig => const EngineFirebaseAnalyticsConfig(enabled: false);
 
   @override
-  EngineFaroConfig get faroConfig =>
-      const EngineFaroConfig(enabled: false, endpoint: '', appName: '', appVersion: '', environment: '', apiKey: '');
+  EngineFaroConfig get faroConfig => const EngineFaroConfig(
+    enabled: false,
+    endpoint: '',
+    appName: '',
+    appVersion: '',
+    environment: '',
+    apiKey: '',
+    namespace: '',
+    platform: '',
+  );
 
   @override
   EngineSplunkConfig get splunkConfig =>

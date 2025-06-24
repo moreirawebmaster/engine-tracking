@@ -112,12 +112,6 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
     try {
       _faro!.setViewMeta(name: screenName);
-      final attributes = <String, dynamic>{
-        'fromView': previousScreen ?? '',
-        'toView': screenName,
-        ...?parameters,
-      };
-      await _faro!.pushEvent('view_changed', attributes: _convertToStringMap(attributes));
     } catch (e) {
       debugPrint('setPage: Error setting page: $e');
     }

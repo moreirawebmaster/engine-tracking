@@ -20,6 +20,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         ),
         EngineSplunkAnalyticsAdapter(
@@ -50,6 +52,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -77,6 +81,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -103,6 +109,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -129,6 +137,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -155,6 +165,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -181,6 +193,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -207,6 +221,8 @@ void main() {
           appVersion: '1.0.0',
           environment: 'test',
           apiKey: 'test-key',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -234,6 +250,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
@@ -260,6 +278,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         splunkConfig: const EngineSplunkConfig(
           enabled: false,

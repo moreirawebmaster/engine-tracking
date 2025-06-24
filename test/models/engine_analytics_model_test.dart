@@ -12,6 +12,8 @@ void main() {
         appVersion: '1.0.0',
         environment: 'test',
         apiKey: 'test-key',
+        namespace: '',
+        platform: '',
       );
       const splunkConfig = EngineSplunkConfig(
         enabled: true,
@@ -42,6 +44,8 @@ void main() {
         appVersion: '',
         environment: '',
         apiKey: '',
+        namespace: '',
+        platform: '',
       );
       const splunkConfig = EngineSplunkConfig(
         enabled: false,
@@ -72,6 +76,8 @@ void main() {
         appVersion: '1.0.0',
         environment: 'test',
         apiKey: 'test-key',
+        namespace: '',
+        platform: '',
       );
       const splunkConfig = EngineSplunkConfig(
         enabled: true,

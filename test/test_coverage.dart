@@ -17,6 +17,8 @@ void main() {
           appVersion: '',
           environment: '',
           apiKey: '',
+          namespace: '',
+          platform: '',
         ),
         returnsNormally,
       );
@@ -41,6 +43,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
           splunkConfig: const EngineSplunkConfig(
             enabled: false,
@@ -67,6 +71,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         ),
         returnsNormally,
@@ -98,6 +104,8 @@ void main() {
         appVersion: 'test',
         environment: 'test',
         apiKey: 'test',
+        namespace: '',
+        platform: '',
       );
       expect(faroConfig.toString(), isNotEmpty);
       expect(faroConfig.toString(), contains('****')); // API key should be masked

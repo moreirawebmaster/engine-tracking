@@ -8,6 +8,8 @@ class EngineFaroConfig {
     required this.appVersion,
     required this.environment,
     required this.apiKey,
+    required this.namespace,
+    required this.platform,
     this.httpOverrides,
   });
 
@@ -17,9 +19,11 @@ class EngineFaroConfig {
   final String appVersion;
   final String environment;
   final String apiKey;
+  final String namespace;
+  final String platform;
   final HttpOverrides? httpOverrides;
 
   @override
   String toString() =>
-      'EngineFaroConfig(enabled: $enabled, endpoint: $endpoint, appName: $appName, appVersion: $appVersion, environment: $environment, apiKey: ****)';
+      'EngineFaroConfig(enabled: $enabled, endpoint: $endpoint, appName: $appName, appVersion: $appVersion, environment: $environment, apiKey: ****, namespace: $namespace, platform: $platform)';
 }

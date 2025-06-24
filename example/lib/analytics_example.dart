@@ -2,17 +2,13 @@ import 'package:engine_tracking/engine_tracking.dart';
 
 void analyticsFlexibleExample() async {
   // Exemplo 1: Usando apenas Firebase Analytics
-  final firebaseAdapter = EngineFirebaseAnalyticsAdapter(
-    const EngineFirebaseAnalyticsConfig(enabled: true),
-  );
+  final firebaseAdapter = EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true));
 
   await EngineAnalytics.init([firebaseAdapter]);
 
   // Exemplo 2: Usando múltiplos adapters
   final adapters = [
-    EngineFirebaseAnalyticsAdapter(
-      const EngineFirebaseAnalyticsConfig(enabled: true),
-    ),
+    EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true)),
     EngineFaroAnalyticsAdapter(
       const EngineFaroConfig(
         enabled: true,
@@ -21,6 +17,8 @@ void analyticsFlexibleExample() async {
         appVersion: '1.0.0',
         environment: 'production',
         apiKey: 'your-api-key',
+        namespace: '',
+        platform: '',
       ),
     ),
     EngineSplunkAnalyticsAdapter(
@@ -47,6 +45,8 @@ void analyticsFlexibleExample() async {
       appVersion: '1.0.0',
       environment: 'production',
       apiKey: 'your-api-key',
+      namespace: '',
+      platform: '',
     ),
     splunkConfig: const EngineSplunkConfig(
       enabled: false,

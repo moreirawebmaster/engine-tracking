@@ -24,6 +24,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -46,6 +48,8 @@ void main() {
               appVersion: '',
               environment: '',
               apiKey: '',
+              namespace: '',
+              platform: '',
             ),
           ),
         ];
@@ -66,6 +70,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -83,6 +89,8 @@ void main() {
             appVersion: '1.0.0',
             environment: 'production',
             apiKey: 'test-key',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -101,6 +109,8 @@ void main() {
             appVersion: '1.0.0',
             environment: 'production',
             apiKey: 'test-key',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -121,6 +131,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -139,6 +151,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -158,6 +172,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -182,6 +198,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -212,6 +230,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -238,6 +258,8 @@ void main() {
             appVersion: '',
             environment: '',
             apiKey: '',
+            namespace: '',
+            platform: '',
           ),
         );
 
@@ -253,6 +275,8 @@ void main() {
             appVersion: '1.0.0',
             environment: 'production',
             apiKey: 'test-key',
+            namespace: '',
+            platform: '',
           ),
         );
 
