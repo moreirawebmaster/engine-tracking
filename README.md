@@ -11,6 +11,8 @@ Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting
 
 - 📊 **Analytics Dual**: Suporte simultâneo para Firebase Analytics e Grafana Faro
 - 🐛 **Bug Tracking Avançado**: Integração com Firebase Crashlytics e Grafana Faro para monitoramento de erros
+- 🌐 **HTTP Tracking**: Monitoramento automático de requisições HTTPS com métricas detalhadas
+- 👁️ **View Tracking**: Sistema automático de tracking de telas com `EngineStatelessWidget` e `EngineStatefulWidget`
 - ⚙️ **Configuração Flexível**: Ative/desative serviços individualmente através de configurações
 - 📝 **Logging Estruturado**: Sistema de logs com diferentes níveis e contextos
 - 🔒 **Tipo-seguro**: Implementação completamente tipada em Dart
@@ -18,6 +20,7 @@ Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting
 - 🏗️ **Arquitetura Consistente**: Padrão unificado entre Analytics e Bug Tracking
 - 🎯 **Inicialização Condicional**: Serviços são inicializados apenas se habilitados na configuração
 - 📦 **Export Unificado**: Todos os imports podem ser feitos através de `package:engine_tracking/engine_tracking.dart`
+- 🚀 **Exemplos Completos**: Apps de demonstração com casos de uso reais (HTTP + View Tracking)
 
 ## 📦 Instalação
 
@@ -33,6 +36,32 @@ Execute:
 ```bash
 flutter pub get
 ```
+
+## 🚀 Exemplos de Uso
+
+O pacote inclui exemplos completos demonstrando todas as funcionalidades:
+
+### 📱 Exemplo Principal
+Demonstra inicialização, tracking de eventos, propriedades de usuário e navegação:
+```bash
+cd example && flutter run
+```
+
+### 🌐 Exemplo HTTP Tracking
+Novo exemplo demonstrando tracking de requisições HTTPS com APIs públicas:
+- **PokéAPI**: Requisições GET para dados de pokémons
+- **JSONPlaceholder**: GET de posts/usuários e POST para criação
+- **Tracking completo**: Tempo de resposta, códigos de status, tratamento de erros
+
+Para acessar: Execute o app e toque em **"HTTP Tracking"**
+
+### 👁️ Exemplo View Tracking
+Sistema completo de tracking automático de telas com `EngineStatelessWidget` e `EngineStatefulWidget`:
+- Tracking automático de visualizações
+- Logging de ações do usuário
+- Monitoramento de ciclo de vida
+
+Para acessar: Execute o app e toque em **"View Tracking"**
 
 ## 📊 Analytics
 
@@ -706,7 +735,7 @@ example/                            # App de demonstração
 └── README.md                       # Documentação do exemplo
 ```
 
-# Sistema de Tracking de Views
+## Sistema de Tracking de Views
 
 Este sistema fornece funcionalidades automáticas de tracking para widgets StatelessWidget e StatefulWidget, permitindo monitorar o comportamento do usuário passo a passo.
 
@@ -725,17 +754,17 @@ O Engine Tracking oferece um sistema avançado de tracking automático para widg
 
 ### Implementações Disponíveis
 
-#### 1. Classes Base (Recomendado)
+#### 1. Classes Engine (Recomendado)
 
-As classes base oferecem implementação completa com tracking automático integrado.
+As classes Engine oferecem implementação completa com tracking automático integrado.
 
-##### StatelessWidget Base
+##### EngineStatelessWidget
 
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 
-class HomePage extends EngineStatelessWidgetBase {
-  const HomePage({super.key});
+class HomePage extends EngineStatelessWidget {
+  HomePage({super.key});
 
   @override
   String get screenName => 'home_page';
@@ -776,7 +805,7 @@ class HomePage extends EngineStatelessWidgetBase {
 }
 ```
 
-##### StatefulWidget Base
+##### EngineStatefulWidget
 
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
@@ -831,13 +860,13 @@ class _ProfilePageState extends EngineStatefulWidgetState<ProfilePage> {
 }
 ```
 
-### Exemplo Completo com Classes Base
+### Exemplo Completo com Classes Engine
 
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 
-class SettingsPage extends EngineStatelessWidgetBase {
-  const SettingsPage({super.key});
+class SettingsPage extends EngineStatelessWidget {
+  SettingsPage({super.key});
 
   @override
   String get screenName => 'settings_page';
@@ -990,15 +1019,15 @@ Todos os eventos são automaticamente enviados para:
 1. **Use nomes descritivos** para telas e ações
 2. **Inclua parâmetros relevantes** sem dados sensíveis
 3. **Monitore erros** com contexto apropriado
-4. **Use classes base** para funcionalidade completa
+4. **Use classes Engine** para funcionalidade completa
 5. **Personalize screenName** para identificação clara
 6. **Agrupe ações relacionadas** com prefixos consistentes
 
 ## Desabilitando Tracking
 
 ```dart
-class MyPage extends EngineStatelessWidgetBase {
-  const MyPage({super.key});
+class MyPage extends EngineStatelessWidget {
+  MyPage({super.key});
   
   @override
   bool get enableAutoTracking => false; // Desabilita tracking automático

@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-01-23
+
+### Added
+- **🌐 HTTP Tracking Example**: Novo exemplo completo demonstrando tracking de requisições HTTPS
+
+### Enhanced
+#### Exemplo HTTP Tracking
+- **PokéAPI Integration**: Demonstração de requisições GET para dados de pokémons
+- **JSONPlaceholder Integration**: Exemplo completo com GET e POST para posts e usuários
+- **Métricas Detalhadas**: Tracking automático de:
+  - Tempo de resposta em milissegundos
+  - Códigos de status HTTP
+  - Tamanho das respostas em bytes
+  - Sucesso/falha das requisições
+  - Timestamps completos
+- **Tratamento de Erros**: Sistema robusto de captura e logging de erros HTTP
+- **Interface Responsiva**: Design adaptativo com scroll automático
+
+#### Funcionalidades das APIs
+- **Pokemon List Page**: Lista interativa de pokémons com detalhes em modal
+- **Posts List Page**: Visualização e criação de posts com tracking completo
+- **Users List Page**: Lista detalhada de usuários com informações completas
+
+#### Sistema de Tracking
+- **EngineStatelessWidget**: Implementação otimizada para tracking automático
+
+### Fixed
+- **Code Organization**: Otimização do código com redução de linhas desnecessárias
+
+### Dependencies
+- **http: ^1.1.0**: Adicionada para requisições HTTP no exemplo
+
 ## [1.1.0] - 2025-01-23
 
 ### Added
