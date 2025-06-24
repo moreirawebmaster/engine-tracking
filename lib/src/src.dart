@@ -5,3 +5,4 @@ export 'enums/enums.dart';
 export 'logging/logging.dart';
 export 'models/models.dart';
 export 'observers/observers.dart';
+export 'utils/utils.dart';

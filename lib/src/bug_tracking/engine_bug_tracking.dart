@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:engine_tracking/engine_tracking.dart';
-import 'package:faro/faro_sdk.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
 class EngineBugTracking {
@@ -18,98 +15,115 @@ class EngineBugTracking {
     };
   }
 
-  static FirebaseCrashlytics? _crashlytics;
-  static Faro? _faro;
-  static EngineBugTrackingModel? _engineBugTrackingModel;
   static bool _isInitialized = false;
 
-  /// Initialize crash reporting functionality
-  ///
-  /// [model] is the model that contains the configuration for the bug tracking
-  static Future<void> init(final EngineBugTrackingModel model) async {
-    _engineBugTrackingModel = model;
+  static bool get isEnabled => _adapters.isNotEmpty;
+  static bool get isInitialized => _isInitialized;
 
-    await Future.wait([
-      if (model.crashlyticsConfig.enabled) _initCrashlytics(),
-      if (model.faroConfig.enabled) _initFaro(),
-    ]);
+  static final _adapters = <IEngineBugTrackingAdapter>[];
+
+  static bool isAdapterInitialized(final PredicateBugTracking predicate) => _adapters.any(predicate);
+
+  static bool get isCrashlyticsInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineCrashlyticsAdapter && adapter.isInitialized);
+  static bool get isFaroInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineFaroBugTrackingAdapter && adapter.isInitialized);
+
+  static Future<void> init(final List<IEngineBugTrackingAdapter> adapters) async {
+    if (_isInitialized) {
+      return;
+    }
+
+    _adapters
+      ..clear()
+      ..addAll(adapters.where((final adapter) => adapter.isEnabled));
+
+    final futures = _adapters.map((final adapter) => adapter.initialize()).toList();
+
+    await Future.wait(futures);
 
     _isInitialized = true;
   }
 
-  static void reset() {
-    _crashlytics = null;
-    _faro = null;
-    _engineBugTrackingModel = null;
-    _isInitialized = false;
+  static Future<void> initWithModel(final EngineBugTrackingModel model) async {
+    final adapters = <IEngineBugTrackingAdapter>[
+      EngineCrashlyticsAdapter(model.crashlyticsConfig),
+      EngineFaroBugTrackingAdapter(model.faroConfig),
+    ];
+
+    await init(adapters);
   }
 
-  static Future<void> _initCrashlytics() async {
-    _crashlytics = FirebaseCrashlytics.instance;
-    await _crashlytics!.setCrashlyticsCollectionEnabled(true);
-  }
-
-  /// Initialize Faro with configuration
-  static Future<void> _initFaro() async {
-    _faro = Faro();
-    HttpOverrides.global = FaroHttpOverrides(null);
-    await _faro?.init(
-      optionsConfiguration: FaroConfig(
-        apiKey: _engineBugTrackingModel!.faroConfig.apiKey,
-        appName: _engineBugTrackingModel!.faroConfig.appName,
-        appVersion: _engineBugTrackingModel!.faroConfig.appVersion,
-        appEnv: _engineBugTrackingModel!.faroConfig.environment,
-        collectorUrl: _engineBugTrackingModel!.faroConfig.endpoint,
-        enableCrashReporting: true,
-        anrTracking: true,
-      ),
-    );
-  }
-
-  /// Set a custom key-value pair for crash reporting
-  static Future<void> setCustomKey(final String key, final Object value) async {
-    if (isCrashlyticsEnabled) {
-      await _crashlytics!.setCustomKey(key, value);
-    }
-  }
-
-  /// Set user identifier for crash reporting
-  static Future<void> setUserIdentifier(final String id, final String email, final String name) async {
-    if (id == '0') {
+  static Future<void> dispose() async {
+    if (!_isInitialized) {
       return;
     }
 
-    if (isCrashlyticsEnabled) {
-      await _crashlytics?.setUserIdentifier(id);
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.dispose(),
+        )
+        .toList();
+    await Future.wait(futures);
 
-    if (isFaroEnabled) {
-      _faro?.setUserMeta(userId: id, userEmail: email, userName: name);
-    }
+    _adapters.clear();
+    _isInitialized = false;
   }
 
-  /// Log a message for crash reporting
+  static void reset() {
+    _adapters.clear();
+    _isInitialized = false;
+  }
+
+  static Future<void> setCustomKey(final String key, final Object value) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
+    }
+
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.setCustomKey(key, value),
+        )
+        .toList();
+    await Future.wait(futures);
+  }
+
+  static Future<void> setUserIdentifier(final String id, final String email, final String name) async {
+    if (!isEnabled || !_isInitialized) {
+      return;
+    }
+
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.setUserIdentifier(id, email, name),
+        )
+        .toList();
+    await Future.wait(futures);
+  }
+
   static Future<void> log(
     final String message, {
     final String? level,
     final Map<String, dynamic>? attributes,
     final StackTrace? stackTrace,
   }) async {
-    if (isCrashlyticsEnabled) {
-      await _crashlytics?.log(message);
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
 
-    if (isFaroEnabled) {
-      await _faro?.pushLog(
-        message,
-        level: level,
-        context: attributes,
-        trace: {'stack': stackTrace?.toString() ?? 'Stack trace not available'},
-      );
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.log(
+            message,
+            level: level,
+            attributes: attributes,
+            stackTrace: stackTrace,
+          ),
+        )
+        .toList();
+    await Future.wait(futures);
   }
 
-  /// Record an error for crash reporting
   static Future<void> recordError(
     final dynamic exception,
     final StackTrace? stackTrace, {
@@ -118,82 +132,54 @@ class EngineBugTracking {
     final bool isFatal = false,
     final Map<String, dynamic>? data,
   }) async {
-    if (isCrashlyticsEnabled) {
-      try {
-        await _crashlytics!.recordError(
-          exception,
-          stackTrace,
-          reason: reason,
-          information: information,
-          fatal: isFatal,
-          printDetails: kDebugMode,
-        );
-      } catch (e) {
-        debugPrint('Failed to record error in Crashlytics: $e');
-      }
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
 
-    if (isFaroEnabled) {
-      await _faro?.pushError(
-        type: reason ?? 'Unknown',
-        value: exception.toString(),
-        context: {
-          'data': data?.toString() ?? '',
-          'information': information.map((final e) => e.toString()).join(', '),
-          'isFatal': isFatal.toString(),
-        },
-        stacktrace: stackTrace,
-      );
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.recordError(
+            exception,
+            stackTrace,
+            reason: reason,
+            information: information,
+            isFatal: isFatal,
+            data: data,
+          ),
+        )
+        .toList();
+    await Future.wait(futures);
   }
 
-  /// Record a Flutter error for crash reporting
   static Future<void> recordFlutterError(final FlutterErrorDetails errorDetails) async {
-    if (isCrashlyticsEnabled) {
-      try {
-        await _crashlytics!.recordFlutterError(errorDetails);
-      } catch (e) {
-        debugPrint('Failed to record Flutter error in Crashlytics: $e');
-      }
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
 
-    if (isFaroEnabled) {
-      await _faro?.pushError(
-        type: 'FlutterError',
-        value: errorDetails.exception.toString(),
-        context: {
-          'data': errorDetails.exception.toString(),
-          'information': errorDetails.informationCollector?.call().join(', ') ?? 'No information available',
-          'isFatal': 'false',
-          'silent': errorDetails.silent.toString(),
-          'package': errorDetails.library.toString(),
-          'context': errorDetails.context?.toStringDeep() ?? 'No context available',
-          'summary': errorDetails.summary.toString(),
-        },
-        stacktrace: errorDetails.stack,
-      );
-    }
+    final futures = _adapters
+        .map(
+          (final adapter) => adapter.recordFlutterError(errorDetails),
+        )
+        .toList();
+    await Future.wait(futures);
   }
 
-  /// Test crash functionality (only in debug mode)
   static Future<void> testCrash() async {
-    if (kDebugMode) {
-      if (isCrashlyticsEnabled) {
-        try {
-          _crashlytics!.crash();
-        } catch (e) {
-          debugPrint('Failed to test crash in Crashlytics: $e');
-        }
-      }
+    if (!isEnabled || !_isInitialized) {
+      return;
     }
+
+    final futures = _adapters.map(
+      (final adapter) => adapter.testCrash(),
+    );
+    await Future.wait(futures);
   }
 
-  /// Check if Firebase Crashlytics is enabled and available
-  static bool get isCrashlyticsEnabled => _engineBugTrackingModel?.crashlyticsConfig.enabled ?? false;
+  @Deprecated('Use individual adapter checks instead')
+  static bool get isCrashlyticsEnabled =>
+      _adapters.any((final adapter) => adapter is EngineCrashlyticsAdapter && adapter.isEnabled);
 
-  /// Check if Faro is enabled and available
-  static bool get isFaroEnabled => _engineBugTrackingModel?.faroConfig.enabled ?? false;
-
-  /// Check if the bug tracking is enabled
-  static bool get isEnabled => _isInitialized && (isCrashlyticsEnabled || isFaroEnabled);
+  @Deprecated('Use individual adapter checks instead')
+  static bool get isFaroEnabled =>
+      _adapters.any((final adapter) => adapter is EngineFaroBugTrackingAdapter && adapter.isEnabled);
 }

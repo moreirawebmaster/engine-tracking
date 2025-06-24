@@ -9,8 +9,16 @@ class EngineAnalytics {
 
   static bool get isEnabled => _adapters.isNotEmpty;
   static bool get isInitialized => _isInitialized;
+  static bool get isFaroInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineFaroAnalyticsAdapter && adapter.isInitialized);
+  static bool get isFirebaseInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineFirebaseAnalyticsAdapter && adapter.isInitialized);
+  static bool get isSplunkInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineSplunkAnalyticsAdapter && adapter.isInitialized);
 
   static final _adapters = <IEngineAnalyticsAdapter>[];
+
+  static bool isAdapterInitialized(final PredicateAnalytics predicate) => _adapters.any(predicate);
 
   static Future<void> init(final List<IEngineAnalyticsAdapter> adapters) async {
     if (_isInitialized) {

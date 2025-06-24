@@ -1,5 +1,4 @@
-import 'package:engine_tracking/src/analytics/adapters/i_engine_analytics_adapter.dart';
-import 'package:engine_tracking/src/config/engine_faro_config.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 import 'package:faro/faro_sdk.dart';
 import 'package:flutter/widgets.dart';
 
@@ -22,6 +21,13 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
   Faro? _faro;
 
+  Map<String, String>? _convertToStringMap(final Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return map.map((final key, final value) => MapEntry(key, value.toString()));
+  }
+
   @override
   Future<void> initialize() async {
     if (!isEnabled || _isInitialized) {
@@ -31,7 +37,7 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
     try {
       _faro = Faro();
-      if (_config.enabled) {
+      if (!EngineBugTracking.isFaroInitialized) {
         await _faro?.init(
           optionsConfiguration: FaroConfig(
             apiKey: _config.apiKey,
@@ -39,8 +45,6 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
             appVersion: _config.appVersion,
             appEnv: _config.environment,
             collectorUrl: _config.endpoint,
-            enableCrashReporting: false,
-            anrTracking: false,
           ),
         );
       }
@@ -63,7 +67,7 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
-      await _faro!.pushEvent(name, attributes: parameters);
+      await _faro!.pushEvent(name, attributes: _convertToStringMap(parameters));
     } catch (e) {
       debugPrint('logEvent: Error logging event: $e');
     }
@@ -102,20 +106,18 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
     final Map<String, dynamic>? parameters,
   ]) async {
     if (!isFaroInitialized) {
-      debugPrint('setUserProperty: Faro is not initialized');
+      debugPrint('setPage: Faro is not initialized');
       return;
     }
 
     try {
       _faro!.setViewMeta(name: screenName);
-      await _faro!.pushEvent(
-        'view_changed',
-        attributes: {
-          'fromView': previousScreen ?? '',
-          'toView': screenName,
-          ...?parameters,
-        },
-      );
+      final attributes = <String, dynamic>{
+        'fromView': previousScreen ?? '',
+        'toView': screenName,
+        ...?parameters,
+      };
+      await _faro!.pushEvent('view_changed', attributes: _convertToStringMap(attributes));
     } catch (e) {
       debugPrint('setPage: Error setting page: $e');
     }
@@ -129,7 +131,7 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
-      await _faro!.pushEvent('app_open', attributes: parameters);
+      await _faro!.pushEvent('app_open', attributes: _convertToStringMap(parameters));
     } catch (e) {
       debugPrint('logAppOpen: Error logging app open: $e');
     }

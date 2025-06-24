@@ -27,14 +27,35 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
-        expect(EngineBugTracking.isCrashlyticsEnabled, isFalse);
-        expect(EngineBugTracking.isFaroEnabled, isFalse);
+        expect(EngineBugTracking.isEnabled, isFalse);
+        expect(EngineBugTracking.isInitialized, isTrue);
+      });
+
+      test('should initialize with adapters', () async {
+        final adapters = [
+          EngineCrashlyticsAdapter(
+            const EngineCrashlyticsConfig(enabled: false),
+          ),
+          EngineFaroBugTrackingAdapter(
+            const EngineFaroConfig(
+              enabled: false,
+              endpoint: '',
+              appName: '',
+              appVersion: '',
+              environment: '',
+              apiKey: '',
+            ),
+          ),
+        ];
+
+        await EngineBugTracking.init(adapters);
+
+        expect(EngineBugTracking.isInitialized, isTrue);
         expect(EngineBugTracking.isEnabled, isFalse);
       });
 
-      // Note: This test is commented out because it requires Firebase initialization
       test('should initialize with Crashlytics enabled only (mocked)', () async {
         final model = EngineBugTrackingModel(
           crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
@@ -48,15 +69,10 @@ void main() {
           ),
         );
 
-        // Test model configuration without actual initialization
         expect(model.crashlyticsConfig.enabled, isTrue);
         expect(model.faroConfig.enabled, isFalse);
-
-        // Actual initialization would require Firebase app to be initialized
-        // await EngineBugTracking.init(model);
       });
 
-      // Note: This test is commented out because it requires Flutter binding initialization
       test('should initialize with Faro enabled only (mocked)', () async {
         final model = EngineBugTrackingModel(
           crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
@@ -70,16 +86,11 @@ void main() {
           ),
         );
 
-        // Test model configuration without actual initialization
         expect(model.crashlyticsConfig.enabled, isFalse);
         expect(model.faroConfig.enabled, isTrue);
         expect(model.faroConfig.endpoint, equals('https://faro.example.com'));
-
-        // Actual initialization would require Flutter binding to be initialized
-        // await EngineBugTracking.init(model);
       });
 
-      // Note: This test is commented out because it requires both Firebase and binding initialization
       test('should initialize with both services enabled (mocked)', () async {
         final model = EngineBugTrackingModel(
           crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
@@ -93,13 +104,9 @@ void main() {
           ),
         );
 
-        // Test model configuration without actual initialization
         expect(model.crashlyticsConfig.enabled, isTrue);
         expect(model.faroConfig.enabled, isTrue);
         expect(model.faroConfig.appName, equals('TestApp'));
-
-        // Actual initialization would require both Firebase and Flutter binding
-        // await EngineBugTracking.init(model);
       });
     });
 
@@ -117,9 +124,8 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
-        // Should not throw even when services are disabled
         await EngineBugTracking.setCustomKey('test_key', 'test_value');
       });
 
@@ -136,12 +142,9 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
-        // Should not throw even when services are disabled
         await EngineBugTracking.setUserIdentifier('user123', 'user@example.com', 'Test User');
-
-        // Should handle zero user ID
         await EngineBugTracking.setUserIdentifier('0', 'user@example.com', 'Test User');
       });
 
@@ -158,9 +161,8 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
-        // Should not throw even when services are disabled
         await EngineBugTracking.log('Test message');
         await EngineBugTracking.log(
           'Test message',
@@ -183,9 +185,8 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
-        // Should not throw even when services are disabled
         try {
           throw Exception('Test exception');
         } catch (e, stackTrace) {
@@ -214,7 +215,7 @@ void main() {
           ),
         );
 
-        await EngineBugTracking.init(model);
+        await EngineBugTracking.initWithModel(model);
 
         final errorDetails = FlutterErrorDetails(
           exception: Exception('Test Flutter error'),
@@ -222,7 +223,6 @@ void main() {
           library: 'test',
         );
 
-        // Should not throw even when services are disabled
         await EngineBugTracking.recordFlutterError(errorDetails);
       });
     });
@@ -241,7 +241,6 @@ void main() {
           ),
         );
 
-        // Test model configuration without actual initialization
         expect(crashlyticsModel.crashlyticsConfig.enabled, isTrue);
         expect(crashlyticsModel.faroConfig.enabled, isFalse);
 
@@ -257,7 +256,6 @@ void main() {
           ),
         );
 
-        // Test model configuration without actual initialization
         expect(faroModel.crashlyticsConfig.enabled, isFalse);
         expect(faroModel.faroConfig.enabled, isTrue);
       });
