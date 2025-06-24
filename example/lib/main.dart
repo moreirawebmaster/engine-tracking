@@ -242,13 +242,11 @@ class _HomePageState extends State<HomePage> {
                   onPressed: _navigateToViewTrackingExample,
                   icon: const Icon(Icons.visibility),
                   label: const Text('View Tracking'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                 ),
                 ElevatedButton.icon(
                   onPressed: _navigateToHttpTrackingExample,
                   icon: const Icon(Icons.http),
                   label: const Text('HTTP Tracking'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
                 ),
               ],
             ),
