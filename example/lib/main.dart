@@ -4,6 +4,7 @@ import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/material.dart';
 
 import 'view_tracking_example.dart';
+import 'http_tracking_example.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,6 +172,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _navigateToHttpTrackingExample() async {
+    await EngineAnalytics.logEvent('navigation', {'from_page': 'HomePage', 'to_page': 'HttpTrackingExample'});
+
+    if (mounted) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const HttpTrackingExample()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,6 +243,12 @@ class _HomePageState extends State<HomePage> {
                   icon: const Icon(Icons.visibility),
                   label: const Text('View Tracking'),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _navigateToHttpTrackingExample,
+                  icon: const Icon(Icons.http),
+                  label: const Text('HTTP Tracking'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
                 ),
               ],
             ),

@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// Usage:
 /// ```dart
-/// class MinhaTelaPage extends EngineStatelessWidgetBase {
+/// class MinhaTelaPage extends EngineStatelessWidget {
 ///   const MinhaTelaPage({super.key});
 ///
 ///   @override
@@ -23,20 +23,12 @@ import 'package:flutter/widgets.dart';
 ///   }
 /// }
 /// ```
-abstract class EngineStatelessWidgetBase extends StatelessWidget {
-  EngineStatelessWidgetBase({super.key}) {
+abstract class EngineStatelessWidget extends StatelessWidget {
+  EngineStatelessWidget({super.key}) {
     _screenOpenTime = DateTime.now();
 
     if (enableLifecycleTracking) {
-      unawaited(
-        EngineLog.debug(
-          'screen_initialized',
-          logName: 'init',
-          data: {
-            'screen_name': screenName,
-          },
-        ),
-      );
+      unawaited(EngineLog.debug('screen_initialized', logName: 'init', data: {'screen_name': screenName}));
     }
 
     if (enableAutoTracking) {
@@ -71,10 +63,7 @@ abstract class EngineStatelessWidgetBase extends StatelessWidget {
           EngineLog.debug(
             'screen_closed',
             logName: 'view',
-            data: {
-              'screen_name': screenName,
-              'time_spent_seconds': timeSpent.inSeconds,
-            },
+            data: {'screen_name': screenName, 'time_spent_seconds': timeSpent.inSeconds},
           ),
         );
       }
@@ -90,46 +79,26 @@ abstract class EngineStatelessWidgetBase extends StatelessWidget {
     await EngineLog.debug(
       'screen_viewed',
       logName: 'view',
-      data: {
-        'screen_name': screenName,
-        if (screenParameters != null) 'parameters': screenParameters,
-      },
+      data: {'screen_name': screenName, if (screenParameters != null) 'parameters': screenParameters},
     );
   }
 
   /// Logs a user action on the current screen
-  Future<void> logUserAction(
-    final String action, {
-    final Map<String, dynamic>? parameters,
-  }) async {
+  Future<void> logUserAction(final String action, {final Map<String, dynamic>? parameters}) async {
     final actionData = <String, dynamic>{
       'screen_name': screenName,
       'action': action,
       if (parameters != null) ...parameters,
     };
 
-    await EngineLog.debug(
-      'user_action',
-      logName: 'action',
-      data: actionData,
-    );
+    await EngineLog.debug('user_action', logName: 'action', data: actionData);
   }
 
   /// Logs a custom event on the current screen
-  Future<void> logCustomEvent(
-    final String eventName, {
-    final Map<String, dynamic>? parameters,
-  }) async {
-    final eventData = <String, dynamic>{
-      'screen_name': screenName,
-      if (parameters != null) ...parameters,
-    };
+  Future<void> logCustomEvent(final String eventName, {final Map<String, dynamic>? parameters}) async {
+    final eventData = <String, dynamic>{'screen_name': screenName, if (parameters != null) ...parameters};
 
-    await EngineLog.info(
-      eventName,
-      logName: 'event',
-      data: eventData,
-    );
+    await EngineLog.info(eventName, logName: 'event', data: eventData);
   }
 
   /// Logs a screen-specific error
@@ -139,26 +108,14 @@ abstract class EngineStatelessWidgetBase extends StatelessWidget {
     final StackTrace? stackTrace,
     final Map<String, dynamic>? additionalData,
   }) async {
-    final errorData = <String, dynamic>{
-      'screen_name': screenName,
-      if (additionalData != null) ...additionalData,
-    };
+    final errorData = <String, dynamic>{'screen_name': screenName, if (additionalData != null) ...additionalData};
 
-    await EngineLog.error(
-      reason,
-      logName: 'error',
-      data: errorData,
-      error: exception,
-      stackTrace: stackTrace,
-    );
+    await EngineLog.error(reason, logName: 'error', data: errorData, error: exception, stackTrace: stackTrace);
   }
 }
 
 class _ScreenLifecycleWrapper extends StatefulWidget {
-  const _ScreenLifecycleWrapper({
-    required this.child,
-    required this.onDispose,
-  });
+  const _ScreenLifecycleWrapper({required this.child, required this.onDispose});
 
   final Widget child;
   final VoidCallback onDispose;

@@ -31,7 +31,7 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
 
     try {
       _faro = Faro();
-      HttpOverrides.global = FaroHttpOverrides(null);
+      HttpOverrides.global = FaroHttpOverrides(_config.httpOverrides);
 
       if (EngineAnalytics.isFaroInitialized) {
         return;

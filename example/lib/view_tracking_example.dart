@@ -20,8 +20,8 @@ class ViewTrackingExample extends StatelessWidget {
   }
 }
 
-/// Exemplo usando classe base EngineStatelessWidgetBase
-class MainMenuPage extends EngineStatelessWidgetBase {
+/// Exemplo usando classe base EngineStatelessWidget
+class MainMenuPage extends EngineStatelessWidget {
   MainMenuPage({super.key});
 
   @override
@@ -226,7 +226,7 @@ class _ProfilePageState extends EngineStatefulWidgetState<ProfilePage> {
 }
 
 /// Exemplo usando classe base para StatelessWidget
-class SettingsPage extends EngineStatelessWidgetBase {
+class SettingsPage extends EngineStatelessWidget {
   SettingsPage({super.key});
 
   @override
