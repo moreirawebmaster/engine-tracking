@@ -47,7 +47,6 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
           enableCrashReporting: true,
           anrTracking: true,
           refreshRateVitals: true,
-          fetchVitalsInterval: const Duration(seconds: 10),
           namespace: _config.namespace,
         ),
       );
@@ -110,7 +109,7 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
         message,
         level: level,
         context: convertToStringMap(attributes),
-        trace: {'stack': stackTrace?.toString() ?? 'Stack trace not available'},
+        trace: {'stack': (stackTrace ?? StackTrace.current).toString()},
       );
     } catch (e) {
       debugPrint('log: Error logging message: $e');

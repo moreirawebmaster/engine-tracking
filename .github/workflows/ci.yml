@@ -25,10 +25,10 @@ jobs:
         run: flutter pub get
         
       - name: Analyze code
-        run: flutter analyze
+        run: flutter analyze --fatal-infos --fatal-warnings lib test
         
       - name: Check format
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed lib test
 
   test:
     name: Run Tests

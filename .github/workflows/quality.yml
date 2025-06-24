@@ -72,7 +72,7 @@ jobs:
       - name: Run custom lints
         run: |
           echo "🔍 Verificando complexidade do código..."
-          find lib -name "*.dart" -exec wc -l {} + | sort -n | tail -10
+          find lib test -name "*.dart" -exec wc -l {} + | sort -n | tail -10
           
           echo "🔍 Verificando métodos grandes..."
-          grep -r "^[[:space:]]*[^/].*{[[:space:]]*$" lib --include="*.dart" | wc -l 
+          grep -r "^[[:space:]]*[^/].*{[[:space:]]*$" lib test --include="*.dart" | wc -l 

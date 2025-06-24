@@ -174,12 +174,4 @@ class EngineBugTracking {
     );
     await Future.wait(futures);
   }
-
-  @Deprecated('Use individual adapter checks instead')
-  static bool get isCrashlyticsEnabled =>
-      _adapters.any((final adapter) => adapter is EngineCrashlyticsAdapter && adapter.isEnabled);
-
-  @Deprecated('Use individual adapter checks instead')
-  static bool get isFaroEnabled =>
-      _adapters.any((final adapter) => adapter is EngineFaroBugTrackingAdapter && adapter.isEnabled);
 }

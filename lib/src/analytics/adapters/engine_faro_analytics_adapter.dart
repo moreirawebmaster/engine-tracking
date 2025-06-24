@@ -45,6 +45,10 @@ class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
             appVersion: _config.appVersion,
             appEnv: _config.environment,
             collectorUrl: _config.endpoint,
+            enableCrashReporting: true,
+            anrTracking: true,
+            refreshRateVitals: true,
+            namespace: _config.namespace,
           ),
         );
       }

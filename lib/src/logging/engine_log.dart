@@ -35,29 +35,38 @@ class EngineLog {
       level: levelLog.value,
     );
 
+    final attributes = {
+      'message': logMessage,
+      'tag': logName,
+      'level': levelLog.name,
+      if (data != null) ...data,
+      'time': DateTime.now(),
+    };
+
     if (EngineAnalytics.isEnabled && hasAnalytics) {
       await EngineAnalytics.logEvent(
         message,
-        {
-          'message': logMessage,
-          'tag': logName,
-          'level': levelLog.name,
-          if (data != null) ...data,
-          'time': DateTime.now(),
-        },
+        attributes,
       );
     }
 
     if (EngineBugTracking.isEnabled) {
-      unawaited(EngineBugTracking.log(logMessage));
+      unawaited(
+        EngineBugTracking.log(
+          message,
+          attributes: attributes,
+          level: levelLog.name,
+          stackTrace: stackTrace,
+        ),
+      );
 
       if (levelLog == EngineLogLevelType.error || levelLog == EngineLogLevelType.fatal) {
         await EngineBugTracking.recordError(
           error ?? Exception(logMessage),
           stackTrace ?? StackTrace.current,
           isFatal: levelLog == EngineLogLevelType.fatal,
-          reason: logMessage,
-          data: data,
+          reason: message,
+          data: attributes,
         );
       }
     }
