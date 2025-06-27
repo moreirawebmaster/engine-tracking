@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-01-15
+
+### Enhanced
+#### 📋 Documentação de Arquitetura
+- **Diagramas Mermaid**: Adicionados 4 diagramas completos da arquitetura no README:
+  - **Widgets Stateless/Stateful**: Mostra execução de métodos e lifecycle tracking
+  - **Sistema de Logging (EngineLog)**: Fluxo detalhado com condicionais de Analytics e Bug Tracking
+  - **Sistema de Analytics**: Arquitetura de adapters e integração com dashboards
+  - **Sistema de Bug Tracking**: Fluxo de captura de erros e crash reporting
+
+#### 🔧 Melhorias no Diagrama EngineLog
+- **Condicionais Claras**: Representação visual das condições `EngineAnalytics.isEnabled && includeInAnalytics`
+- **Fluxo de Erro**: Mostra que logs de level `error` e `fatal` geram crash reporting adicional
+- **Nomenclatura Melhorada**: Parâmetro `includeInAnalytics` mais descritivo que `hasAnalytics`
+- **Estilização Visual**: Condicionais destacadas com cores para melhor legibilidade
+
+#### 🎨 Recursos Visuais
+- **Cores Organizadas**: Paleta de cores consistente por tipo de componente
+- **Formas Diferenciadas**: Losangos para condicionais, retângulos para componentes
+- **Legenda Incluída**: Facilita compreensão da arquitetura
+- **Fluxo Hierárquico**: Visualização clara do fluxo de dados de cima para baixo
+
+### Documentation
+- **Arquitetura Completa**: Seção dedicada mostrando como toda a solução funciona integrada
+- **Fluxos Condicionais**: Demonstra quando Analytics e Bug Tracking são ativados
+- **Representação Fiel**: Diagramas 100% alinhados com a implementação real do código
+
 ## [1.1.1] - 2025-01-23
 
 ### Added

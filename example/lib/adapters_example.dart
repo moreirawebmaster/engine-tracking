@@ -159,7 +159,12 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
             _buildActionSection(
               title: 'Analytics Actions',
               actions: [
-                _buildActionButton('Enviar Evento Personalizado', Icons.analytics, Colors.blue, _sendAnalyticsEvent),
+                _buildActionButton(
+                  'Enviar Evento Personalizado',
+                  Icons.analytics,
+                  Colors.blue,
+                  _includeInAnalyticsEvent,
+                ),
                 _buildActionButton('Definir Propriedade do Usuário', Icons.person_add, Colors.green, _setUserProperty),
                 _buildActionButton('Rastrear Tela', Icons.pageview, Colors.orange, _trackScreen),
               ],
@@ -311,7 +316,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
     );
   }
 
-  Future<void> _sendAnalyticsEvent() async {
+  Future<void> _includeInAnalyticsEvent() async {
     await EngineAnalytics.logEvent('adapter_demo_event', {
       'demo_type': 'analytics',
       'timestamp': DateTime.now().millisecondsSinceEpoch,

@@ -107,22 +107,34 @@ graph TD
     G --> H
     
     H --> I["developer.log()"]
-    H --> J["EngineAnalytics.logEvent()"]
-    H --> K["EngineBugTracking.log()"]
+    H --> J{{"EngineAnalytics.isEnabled && includeInAnalytics?"}}
+    H --> K{{"EngineBugTracking.isEnabled?"}}
     
-    J --> L["Firebase Analytics"]
-    J --> M["Grafana Faro"]
-    J --> N["Splunk"]
+    J -->|Sim| L["EngineAnalytics.logEvent()"]
+    J -->|Não| M["Skip Analytics"]
     
-    K --> O["Firebase Crashlytics"]
-    K --> P["Grafana Faro Bug Tracking"]
+    K -->|Sim| N["EngineBugTracking.log()"]
+    K -->|Não| O["Skip Bug Tracking"]
     
-    F --> Q["EngineBugTracking.recordError()"]
-    G --> Q
+    L --> P["Firebase Analytics"]
+    L --> Q["Grafana Faro"]
+    L --> R["Splunk"]
     
-    Q --> R["Crash Reporting"]
-    R --> O
-    R --> P
+    N --> S["Firebase Crashlytics"]
+    N --> T["Grafana Faro Bug Tracking"]
+    
+    K -->|Sim| U{{"level == error || fatal?"}}
+    U -->|Sim| V["EngineBugTracking.recordError()"]
+    U -->|Não| W["Apenas log normal"]
+    
+    V --> X["Crash Reporting"]
+    X --> S
+    X --> T
+    
+    style J fill:#f9f,stroke:#333,stroke-width:2px
+    style K fill:#f9f,stroke:#333,stroke-width:2px
+    style U fill:#faa,stroke:#333,stroke-width:2px
+    style V fill:#faa,stroke:#333,stroke-width:2px
 ```
 
 ### 📊 Sistema de Analytics (EngineAnalytics)
