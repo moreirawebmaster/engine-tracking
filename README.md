@@ -37,6 +37,184 @@ Execute:
 flutter pub get
 ```
 
+## 🏗️ Arquitetura da Solução
+
+### 📱 Widgets Stateless e Stateful com Tracking Automático
+
+```mermaid
+graph TD
+    A["App"] --> B["EngineStatelessWidget"]
+    A --> C["EngineStatefulWidget"]
+    
+    B --> D["buildWithTracking()"]
+    C --> E["buildWithTracking()"]
+    
+    B --> F["Métodos Executáveis"]
+    C --> G["Métodos Executáveis"]
+    
+    F --> H["logUserAction()"]
+    F --> I["logCustomEvent()"]
+    F --> J["logScreenError()"]
+    
+    G --> K["logUserAction()"]
+    G --> L["logCustomEvent()"]
+    G --> M["logScreenError()"]
+    G --> N["logStateChange()"]
+    
+    H --> O["EngineLog.debug()"]
+    I --> O
+    J --> P["EngineLog.error()"]
+    K --> O
+    L --> O
+    M --> P
+    N --> O
+    
+    B --> Q["Lifecycle Tracking"]
+    C --> R["Lifecycle Tracking"]
+    
+    Q --> S["screen_initialized"]
+    Q --> T["screen_viewed"]
+    Q --> U["screen_closed"]
+    
+    R --> V["screen_initialized"]
+    R --> W["screen_viewed"]
+    R --> X["screen_closed"]
+    
+    S --> O
+    T --> O
+    U --> O
+    V --> O
+    W --> O
+    X --> O
+```
+
+### 📝 Sistema de Logging (EngineLog)
+
+```mermaid
+graph TD
+    A["Aplicação"] --> B["EngineLog"]
+    
+    B --> C["debug()"]
+    B --> D["info()"]
+    B --> E["warning()"]
+    B --> F["error()"]
+    B --> G["fatal()"]
+    
+    C --> H["_logWithLevel()"]
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+    
+    H --> I["developer.log()"]
+    H --> J{{"EngineAnalytics.isEnabled && includeInAnalytics?"}}
+    H --> K{{"EngineBugTracking.isEnabled?"}}
+    
+    J -->|Sim| L["EngineAnalytics.logEvent()"]
+    J -->|Não| M["Skip Analytics"]
+    
+    K -->|Sim| N["EngineBugTracking.log()"]
+    K -->|Não| O["Skip Bug Tracking"]
+    
+    L --> P["Firebase Analytics"]
+    L --> Q["Grafana Faro"]
+    L --> R["Splunk"]
+    
+    N --> S["Firebase Crashlytics"]
+    N --> T["Grafana Faro Bug Tracking"]
+    
+    K -->|Sim| U{{"level == error || fatal?"}}
+    U -->|Sim| V["EngineBugTracking.recordError()"]
+    U -->|Não| W["Apenas log normal"]
+    
+    V --> X["Crash Reporting"]
+    X --> S
+    X --> T
+    
+    style J fill:#f9f,stroke:#333,stroke-width:2px
+    style K fill:#f9f,stroke:#333,stroke-width:2px
+    style U fill:#faa,stroke:#333,stroke-width:2px
+    style V fill:#faa,stroke:#333,stroke-width:2px
+```
+
+### 📊 Sistema de Analytics (EngineAnalytics)
+
+```mermaid
+graph TD
+    A["Aplicação"] --> B["EngineAnalytics"]
+    
+    B --> C["init()"]
+    B --> D["logEvent()"]
+    B --> E["setUserId()"]
+    B --> F["setUserProperty()"]
+    B --> G["setPage()"]
+    B --> H["logAppOpen()"]
+    
+    C --> I["EngineAnalyticsModel"]
+    I --> J["Firebase Analytics Config"]
+    I --> K["Faro Config"]
+    I --> L["Splunk Config"]
+    
+    D --> M["Adapters"]
+    E --> M
+    F --> M
+    G --> M
+    H --> M
+    
+    M --> N["EngineFirebaseAnalyticsAdapter"]
+    M --> O["EngineFaroAnalyticsAdapter"]
+    M --> P["EngineSplunkAnalyticsAdapter"]
+    
+    N --> Q["Firebase Analytics SDK"]
+    O --> R["Grafana Faro SDK"]
+    P --> S["Splunk SDK"]
+    
+    Q --> T["Google Analytics Dashboard"]
+    R --> U["Grafana Dashboard"]
+    S --> V["Splunk Dashboard"]
+```
+
+### 🐛 Sistema de Bug Tracking (EngineBugTracking)
+
+```mermaid
+graph TD
+    A["Aplicação"] --> B["EngineBugTracking"]
+    
+    B --> C["init()"]
+    B --> D["log()"]
+    B --> E["recordError()"]
+    B --> F["recordFlutterError()"]
+    B --> G["setCustomKey()"]
+    B --> H["setUserIdentifier()"]
+    B --> I["testCrash()"]
+    
+    C --> J["EngineBugTrackingModel"]
+    J --> K["Crashlytics Config"]
+    J --> L["Faro Config"]
+    
+    D --> M["Adapters"]
+    E --> M
+    F --> M
+    G --> M
+    H --> M
+    I --> M
+    
+    M --> N["EngineCrashlyticsAdapter"]
+    M --> O["EngineFaroBugTrackingAdapter"]
+    
+    N --> P["Firebase Crashlytics SDK"]
+    O --> Q["Grafana Faro SDK"]
+    
+    P --> R["Firebase Console"]
+    Q --> S["Grafana Dashboard"]
+    
+    T["Flutter Error Handler"] --> F
+    U["Platform Error Handler"] --> E
+    
+    V["Custom Errors"] --> E
+    W["Logging Events"] --> D
+```
+
 ## 🚀 Exemplos de Uso
 
 O pacote inclui exemplos completos demonstrando todas as funcionalidades:

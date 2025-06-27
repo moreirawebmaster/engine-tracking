@@ -13,7 +13,7 @@ class EngineLog {
 
   static Future<void> _logWithLevel(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final EngineLogLevelType? level,
     final Object? error,
@@ -43,7 +43,7 @@ class EngineLog {
       'time': DateTime.now(),
     };
 
-    if (EngineAnalytics.isEnabled && hasAnalytics) {
+    if (EngineAnalytics.isEnabled && includeInAnalytics) {
       await EngineAnalytics.logEvent(
         message,
         attributes,
@@ -81,7 +81,7 @@ class EngineLog {
   /// [data] Optional additional data to include with the log
   static Future<void> debug(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
@@ -89,7 +89,7 @@ class EngineLog {
   }) async {
     await _logWithLevel(
       message,
-      hasAnalytics: hasAnalytics,
+      includeInAnalytics: includeInAnalytics,
       logName: logName,
       level: EngineLogLevelType.debug,
       error: error,
@@ -101,7 +101,7 @@ class EngineLog {
   /// Log info level message
   static Future<void> info(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
@@ -109,7 +109,7 @@ class EngineLog {
   }) async {
     await _logWithLevel(
       message,
-      hasAnalytics: hasAnalytics,
+      includeInAnalytics: includeInAnalytics,
       logName: logName,
       level: EngineLogLevelType.info,
       error: error,
@@ -121,7 +121,7 @@ class EngineLog {
   /// Log warning level message
   static Future<void> warning(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
@@ -129,7 +129,7 @@ class EngineLog {
   }) async {
     await _logWithLevel(
       message,
-      hasAnalytics: hasAnalytics,
+      includeInAnalytics: includeInAnalytics,
       logName: logName,
       level: EngineLogLevelType.warning,
       error: error,
@@ -141,7 +141,7 @@ class EngineLog {
   /// Log error level message
   static Future<void> error(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
@@ -149,7 +149,7 @@ class EngineLog {
   }) async {
     await _logWithLevel(
       message,
-      hasAnalytics: hasAnalytics,
+      includeInAnalytics: includeInAnalytics,
       logName: logName,
       level: EngineLogLevelType.error,
       error: error,
@@ -161,7 +161,7 @@ class EngineLog {
   /// Log fatal level message
   static Future<void> fatal(
     final String message, {
-    final bool hasAnalytics = true,
+    final bool includeInAnalytics = true,
     final String logName = _name,
     final Object? error,
     final StackTrace? stackTrace,
@@ -169,7 +169,7 @@ class EngineLog {
   }) async {
     await _logWithLevel(
       message,
-      hasAnalytics: hasAnalytics,
+      includeInAnalytics: includeInAnalytics,
       logName: logName,
       level: EngineLogLevelType.fatal,
       error: error,
