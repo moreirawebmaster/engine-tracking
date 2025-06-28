@@ -58,11 +58,13 @@ class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
+      final enrichedParameters = EngineSession.instance.enrichWithSessionId(parameters);
+
       final logEntry = logging.LogEntry()
         ..jsonPayload = {
           'eventType': 'analytics',
           'eventName': name,
-          'parameters': parameters ?? {},
+          'parameters': enrichedParameters ?? {},
           'userId': _userId,
           'timestamp': DateTime.now().toIso8601String(),
         }

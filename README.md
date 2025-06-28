@@ -15,6 +15,7 @@ Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting
 - 👁️ **View Tracking**: Sistema automático de tracking de telas com `EngineStatelessWidget` e `EngineStatefulWidget`
 - ⚙️ **Configuração Flexível**: Ative/desative serviços individualmente através de configurações
 - 📝 **Logging Estruturado**: Sistema de logs com diferentes níveis e contextos
+- 🆔 **Session ID Automático**: UUID v4 único por abertura do app para correlação de logs e analytics
 - 🔒 **Tipo-seguro**: Implementação completamente tipada em Dart
 - 🧪 **Testável**: Cobertura de testes superior a 95% para componentes testáveis
 - 🏗️ **Arquitetura Consistente**: Padrão unificado entre Analytics e Bug Tracking
@@ -38,6 +39,42 @@ flutter pub get
 ```
   
 ## 🏗️ Arquitetura da Solução
+
+### 🆔 Sistema de Session ID (Correlação Automática)
+
+```mermaid
+graph TD
+    A["App Initialization"] --> B["EngineSession.instance"]
+    B --> C["Generate UUID v4"]
+    C --> D["xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"]
+    
+    D --> E["Session ID em Memória"]
+    E --> F["Auto-inject Automático"]
+    
+    G["EngineAnalytics.logEvent()"] --> F
+    H["EngineBugTracking.log()"] --> F
+    I["EngineLog.info()"] --> F
+    J["Firebase Analytics"] --> F
+    K["Google Cloud Logging"] --> F
+    L["Crashlytics"] --> F
+    
+    F --> M["Enrich Data"]
+    M --> N["session_id: UUID v4"]
+    
+    N --> O["Firebase Analytics"]
+    N --> P["Google Cloud Logging"] 
+    N --> Q["Grafana Faro"]
+    N --> R["Splunk"]
+    N --> S["Crashlytics"]
+    
+    T["Correlação de Logs"] --> U["Mesmo session_id"]
+    U --> V["Jornada Completa do Usuário"]
+    
+    style B fill:#e1f5fe
+    style F fill:#f3e5f5
+    style N fill:#e8f5e8
+    style V fill:#fff3e0
+```
 
 ### 📱 Widgets Stateless e Stateful com Tracking Automático
 
@@ -293,8 +330,12 @@ Future<void> setupAnalytics() async {
 ### 📈 Logging de Eventos
 
 ```dart
-// Evento simples
+// Evento simples (Session ID incluído automaticamente)
 await EngineAnalytics.logEvent('button_clicked');
+// Output: {
+//   "event_name": "button_clicked",
+//   "session_id": "818c22c7-bcab-4e37-a12e-cd42a49547c6"
+// }
 
 // Evento com parâmetros
 await EngineAnalytics.logEvent('purchase_completed', {
@@ -303,6 +344,14 @@ await EngineAnalytics.logEvent('purchase_completed', {
   'currency': 'BRL',
   'category': 'subscription',
 });
+// Output: {
+//   "event_name": "purchase_completed",
+//   "session_id": "818c22c7-bcab-4e37-a12e-cd42a49547c6",
+//   "item_id": "premium_plan",
+//   "value": 29.99,
+//   "currency": "BRL",
+//   "category": "subscription"
+// }
 
 // Evento de abertura do app
 await EngineAnalytics.logAppOpen();
@@ -479,6 +528,92 @@ await EngineBugTracking.testCrash();
 #endif
 ```
 
+## 🆔 Session ID (Correlação Automática)
+
+O `EngineSession` oferece sistema de correlação de logs e analytics através de UUID v4 único por sessão do app.
+
+### 🎯 Características Principais
+
+- ✨ **Zero Configuração**: Session ID gerado automaticamente na primeira chamada
+- 🔗 **Correlação Automática**: UUID v4 incluído automaticamente em todos os eventos
+- 🆔 **Padrão RFC 4122**: Compatible com qualquer sistema que use UUID v4
+- 🔄 **Singleton Pattern**: Mesma instância de sessão durante toda a vida do app
+- 🧪 **Testável**: Método `resetForTesting()` para cenários de teste
+
+### 🚀 Uso Automático
+
+O Session ID é incluído automaticamente em todos os eventos sem configuração adicional:
+
+```dart
+// Zero configuração necessária!
+await EngineAnalytics.logEvent('button_clicked', {'action': 'submit'});
+// Resultado: 
+// {
+//   "event_name": "button_clicked",
+//   "session_id": "818c22c7-bcab-4e37-a12e-cd42a49547c6",
+//   "action": "submit"
+// }
+
+await EngineLog.info('User action completed');
+// Resultado no Google Cloud Logging:
+// {
+//   "message": "User action completed",
+//   "session_id": "818c22c7-bcab-4e37-a12e-cd42a49547c6",
+//   "level": "info"
+// }
+```
+
+### 🔍 Acesso Direto (Opcional)
+
+Se precisar acessar o Session ID diretamente:
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+// Obter Session ID atual
+String sessionId = EngineSession.instance.sessionId;
+print('Current Session: $sessionId');
+
+// Verificar formato UUID v4
+bool isValidUUID = EngineSession.instance.isValidUUIDv4(sessionId);
+print('Valid UUID v4: $isValidUUID'); // true
+
+// Para testes unitários (reseta session ID)
+EngineSession.instance.resetForTesting();
+```
+
+### 🎯 Formato UUID v4
+
+O Session ID gerado segue o padrão UUID v4 (RFC 4122):
+
+```
+Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+Exemplo: 818c22c7-bcab-4e37-a12e-cd42a49547c6
+
+Características:
+- 32 caracteres hexadecimais (0-9a-f)
+- 5 grupos separados por hífen
+- 13º caractere sempre "4" (versão)
+- 17º caractere sempre "8", "9", "a" ou "b" (variant)
+```
+
+### 📊 Correlação nos Painéis
+
+Com o Session ID, você pode:
+
+- **Firebase Analytics**: Filtrar eventos por `session_id` para ver jornada completa
+- **Google Cloud Logging**: Usar `session_id` para correlacionar logs da mesma sessão
+- **Grafana Faro**: Agrupar eventos por sessão para análise de performance
+- **Splunk**: Criar dashboards de jornada do usuário baseados no `session_id`
+
+```bash
+# Exemplo de query no Google Cloud Logging
+jsonPayload.session_id="818c22c7-bcab-4e37-a12e-cd42a49547c6"
+
+# Exemplo de filtro no Firebase Analytics
+session_id == "818c22c7-bcab-4e37-a12e-cd42a49547c6"
+```
+
 ## 📋 Logging do Sistema
 
 O `EngineLog` oferece sistema de logging estruturado com diferentes níveis.
@@ -488,8 +623,13 @@ O `EngineLog` oferece sistema de logging estruturado com diferentes níveis.
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 
-// Debug
+// Debug (Session ID incluído automaticamente)
 await EngineLog.debug('Debug message', data: {'key': 'value'});
+// Output: {
+//   "message": "Debug message",
+//   "session_id": "818c22c7-bcab-4e37-a12e-cd42a49547c6",
+//   "key": "value"
+// }
 
 // Info
 await EngineLog.info('Info message', data: {'status': 'success'});
@@ -1396,10 +1536,11 @@ flutter test
 ```
 
 **Status dos Testes:**
-- ✅ **87 testes passando** (100% dos testes implementados)
+- ✅ **96 testes passando** (100% dos testes implementados)
 - ✅ **Testes otimizados** para integrações Firebase/Faro/Google Cloud (evitam dependências externas)
 - ✅ **100% de cobertura** nos arquivos de configuração e modelos
 - ✅ **Testes completos** para sistema de logging e Google Cloud Logging
+- ✅ **Testes completos** para Session ID com validação UUID v4 RFC 4122
 
 **Observações:**
 - Testes de inicialização com Firebase/Faro são mocados para evitar dependências reais
@@ -1502,4 +1643,4 @@ Desenvolvido pela STMR - Especialistas em soluções móveis.
 
 ---
 
-**💡 Dica v1.3.0**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. Com Google Cloud Logging e MCP, você agora tem ainda mais opções para centralizar logs e integrar com assistentes de IA! 
+**💡 Dica v1.3.0**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. Com **Session ID automático**, **Google Cloud Logging** e **MCP**, você agora tem correlação completa de logs, centralização avançada e integração perfeita com assistentes de IA! 🆔🔥 

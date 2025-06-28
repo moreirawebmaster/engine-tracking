@@ -1,5 +1,6 @@
 import 'package:engine_tracking/src/analytics/adapters/i_engine_analytics_adapter.dart';
 import 'package:engine_tracking/src/config/engine_firebase_analytics_config.dart';
+import 'package:engine_tracking/src/session/engine_session.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
@@ -50,9 +51,11 @@ class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
+      final enrichedParameters = EngineSession.instance.enrichWithSessionId(parameters);
+
       await _firebaseAnalytics?.logEvent(
         name: name,
-        parameters: parameters?.map(
+        parameters: enrichedParameters?.map(
           (final k, final v) => MapEntry(k, v as Object),
         ),
       );
@@ -101,10 +104,12 @@ class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
+      final enrichedParameters = EngineSession.instance.enrichWithSessionId(parameters);
+
       await _firebaseAnalytics?.logScreenView(
         screenName: screenName,
-        screenClass: parameters?['screen_class'] ?? 'Flutter',
-        parameters: parameters?.map(
+        screenClass: enrichedParameters?['screen_class'] ?? 'Flutter',
+        parameters: enrichedParameters?.map(
           (final k, final v) => MapEntry(k, v as Object),
         ),
       );
@@ -121,7 +126,14 @@ class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
     }
 
     try {
-      await _firebaseAnalytics?.logAppOpen();
+      final enrichedParameters = EngineSession.instance.enrichWithSessionId(parameters);
+
+      await _firebaseAnalytics?.logEvent(
+        name: 'app_open',
+        parameters: enrichedParameters?.map(
+          (final k, final v) => MapEntry(k, v as Object),
+        ),
+      );
     } catch (e) {
       debugPrint('logAppOpen: Error logging app open: $e');
     }

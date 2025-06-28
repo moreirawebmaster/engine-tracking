@@ -35,13 +35,15 @@ class EngineLog {
       level: levelLog.value,
     );
 
-    final attributes = {
+    final baseAttributes = {
       'message': logMessage,
       'tag': logName,
       'level': levelLog.name,
       if (data != null) ...data,
       'time': DateTime.now(),
     };
+
+    final attributes = EngineSession.instance.enrichWithSessionId(baseAttributes);
 
     if (EngineAnalytics.isEnabled && includeInAnalytics) {
       await EngineAnalytics.logEvent(
