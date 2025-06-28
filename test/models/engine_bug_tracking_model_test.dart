@@ -3,6 +3,8 @@ import 'package:engine_tracking/src/config/engine_faro_config.dart';
 import 'package:engine_tracking/src/models/engine_bug_tracking_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/test_configs.dart';
+
 void main() {
   group('EngineBugTrackingModel', () {
     test('should create model with configurations', () {
@@ -21,10 +23,12 @@ void main() {
       final model = EngineBugTrackingModel(
         crashlyticsConfig: crashlyticsConfig,
         faroConfig: faroConfig,
+        googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
       );
 
       expect(model.crashlyticsConfig, equals(crashlyticsConfig));
       expect(model.faroConfig, equals(faroConfig));
+      expect(model.googleLoggingConfig, equals(TestConfigs.googleLoggingConfigEnabled));
     });
 
     test('should have correct toString representation', () {
@@ -43,12 +47,14 @@ void main() {
       final model = EngineBugTrackingModel(
         crashlyticsConfig: crashlyticsConfig,
         faroConfig: faroConfig,
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
       );
 
       final toString = model.toString();
       expect(toString, contains('EngineBugTrackingModel'));
       expect(toString, contains('crashlyticsConfig'));
       expect(toString, contains('faroConfig'));
+      expect(toString, contains('googleLoggingConfig'));
     });
   });
 
@@ -68,6 +74,15 @@ void main() {
       expect(model.faroConfig.appVersion, isEmpty);
       expect(model.faroConfig.environment, isEmpty);
       expect(model.faroConfig.apiKey, isEmpty);
+    });
+
+    test('should have disabled Google Cloud Logging config', () {
+      final model = EngineBugTrackingModelDefault();
+
+      expect(model.googleLoggingConfig.enabled, isFalse);
+      expect(model.googleLoggingConfig.projectId, isEmpty);
+      expect(model.googleLoggingConfig.logName, isEmpty);
+      expect(model.googleLoggingConfig.credentials, isEmpty);
     });
 
     test('should implement EngineBugTrackingModel interface', () {

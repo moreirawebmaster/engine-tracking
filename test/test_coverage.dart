@@ -4,6 +4,8 @@
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'helpers/test_configs.dart';
+
 void main() {
   group('Test Coverage', () {
     test('should import all classes correctly', () {
@@ -34,6 +36,15 @@ void main() {
         returnsNormally,
       );
       expect(
+        () => const EngineGoogleLoggingConfig(
+          enabled: false,
+          projectId: '',
+          logName: '',
+          credentials: {},
+        ),
+        returnsNormally,
+      );
+      expect(
         () => EngineAnalyticsModel(
           firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
           faroConfig: const EngineFaroConfig(
@@ -46,6 +57,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
           splunkConfig: const EngineSplunkConfig(
             enabled: false,
             endpoint: '',
@@ -74,6 +86,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         ),
         returnsNormally,
       );
@@ -120,6 +133,15 @@ void main() {
       );
       expect(splunkConfig.toString(), isNotEmpty);
       expect(splunkConfig.toString(), contains('****')); // Token should be masked
+
+      const googleLoggingConfig = EngineGoogleLoggingConfig(
+        enabled: true,
+        projectId: 'test-project',
+        logName: 'test-logs',
+        credentials: {'private_key': 'secret-key'},
+      );
+      expect(googleLoggingConfig.toString(), isNotEmpty);
+      expect(googleLoggingConfig.toString(), contains('****')); // Credentials should be masked
     });
   });
 }

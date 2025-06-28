@@ -2,6 +2,8 @@ import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/test_configs.dart';
+
 void main() {
   group('EngineBugTracking', () {
     setUp(() {
@@ -27,6 +29,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -73,6 +76,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         expect(model.crashlyticsConfig.enabled, isTrue);
@@ -92,6 +96,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         expect(model.crashlyticsConfig.enabled, isFalse);
@@ -112,6 +117,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         expect(model.crashlyticsConfig.enabled, isTrue);
@@ -134,6 +140,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -154,6 +161,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -175,6 +183,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -201,6 +210,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -233,6 +243,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         await EngineBugTracking.initWithModel(model);
@@ -261,6 +272,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         expect(crashlyticsModel.crashlyticsConfig.enabled, isTrue);
@@ -278,6 +290,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
+          googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
         expect(faroModel.crashlyticsConfig.enabled, isFalse);

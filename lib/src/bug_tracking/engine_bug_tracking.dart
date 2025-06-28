@@ -28,6 +28,9 @@ class EngineBugTracking {
       isAdapterInitialized((final adapter) => adapter is EngineCrashlyticsAdapter && adapter.isInitialized);
   static bool get isFaroInitialized =>
       isAdapterInitialized((final adapter) => adapter is EngineFaroBugTrackingAdapter && adapter.isInitialized);
+  static bool get isGoogleLoggingInitialized => isAdapterInitialized(
+    (final adapter) => adapter is EngineGoogleLoggingBugTrackingAdapter && adapter.isInitialized,
+  );
 
   static Future<void> init(final List<IEngineBugTrackingAdapter> adapters) async {
     if (_isInitialized) {
@@ -49,6 +52,7 @@ class EngineBugTracking {
     final adapters = <IEngineBugTrackingAdapter>[
       EngineCrashlyticsAdapter(model.crashlyticsConfig),
       EngineFaroBugTrackingAdapter(model.faroConfig),
+      EngineGoogleLoggingBugTrackingAdapter(model.googleLoggingConfig),
     ];
 
     await init(adapters);

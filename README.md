@@ -5,12 +5,12 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.32.0+-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.8.0+-blue.svg)](https://dart.dev/)
 
-Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting**, oferecendo integração com Firebase Analytics, Firebase Crashlytics e Grafana Faro.
+Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting**, oferecendo integração com Firebase Analytics, Firebase Crashlytics, Grafana Faro e Google Cloud Logging.
 
 ## 🚀 Características Principais
 
-- 📊 **Analytics Dual**: Suporte simultâneo para Firebase Analytics e Grafana Faro
-- 🐛 **Bug Tracking Avançado**: Integração com Firebase Crashlytics e Grafana Faro para monitoramento de erros
+- 📊 **Analytics Múltiplo**: Suporte simultâneo para Firebase Analytics, Grafana Faro e Google Cloud Logging
+- 🐛 **Bug Tracking Avançado**: Integração com Firebase Crashlytics, Grafana Faro e Google Cloud Logging para monitoramento completo
 - 🌐 **HTTP Tracking**: Monitoramento automático de requisições HTTPS com métricas detalhadas
 - 👁️ **View Tracking**: Sistema automático de tracking de telas com `EngineStatelessWidget` e `EngineStatefulWidget`
 - ⚙️ **Configuração Flexível**: Ative/desative serviços individualmente através de configurações
@@ -28,7 +28,7 @@ Adicione ao seu `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  engine_tracking: ^1.0.0
+  engine_tracking: ^1.3.0
 ```
 
 Execute:
@@ -36,7 +36,7 @@ Execute:
 ```bash
 flutter pub get
 ```
-
+  
 ## 🏗️ Arquitetura da Solução
 
 ### 📱 Widgets Stateless e Stateful com Tracking Automático
@@ -261,7 +261,30 @@ Future<void> setupAnalytics() async {
       environment: 'production',
       apiKey: 'sua-chave-api-faro',
     ),
-  );
+    googleLoggingConfig: const  EngineGoogleLoggingConfig(
+    enabled: true,
+    projectId: 'seu-projeto-gcp',
+    logName: 'engine-tracking',
+    credentials: {
+      // Conteúdo completo do arquivo JSON da Service Account
+      "type": "service_account",
+      "project_id": "seu-projeto-gcp",
+      "private_key_id": "...",
+      "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+      "client_email": "sua-service-account@seu-projeto-gcp.iam.gserviceaccount.com",
+      "client_id": "...",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "...",
+    },
+    resource: {
+      'type': 'global',
+      'labels': {'project_id': 'seu-projeto-gcp'},
+      },
+    ),
+    splunkConfig: const EngineSplunkConfig(enabled: false, /* outros campos */),
+    );
 
   await EngineAnalytics.init(analyticsModel);
 }
@@ -333,6 +356,10 @@ if (EngineAnalytics.isFirebaseAnalyticsEnabled) {
 if (EngineAnalytics.isFaroEnabled) {
   print('📊 Faro Analytics ativo');
 }
+
+if (EngineAnalytics.isGoogleLoggingInitialized) {
+  print('☁️ Google Cloud Logging ativo');
+}
 ```
 
 ## 🐛 Bug Tracking
@@ -355,6 +382,27 @@ Future<void> setupBugTracking() async {
       environment: 'production',
       apiKey: 'sua-chave-api-faro',
     ),
+    googleLoggingConfig: const  EngineGoogleLoggingConfig(
+    enabled: true,
+    projectId: 'seu-projeto-gcp',
+    logName: 'engine-tracking',
+    credentials: {
+      // Conteúdo completo do arquivo JSON da Service Account
+      "type": "service_account",
+      "project_id": "seu-projeto-gcp",
+      "private_key_id": "...",
+      "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+      "client_email": "sua-service-account@seu-projeto-gcp.iam.gserviceaccount.com",
+      "client_id": "...",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "...",
+    },
+    resource: {
+      'type': 'global',
+      'labels': {'project_id': 'seu-projeto-gcp'},
+    },
   );
 
   await EngineBugTracking.init(bugTrackingModel);
@@ -738,9 +786,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     _buildStatusRow('Analytics', EngineAnalytics.isEnabled),
                     _buildStatusRow('Firebase Analytics', EngineAnalytics.isFirebaseAnalyticsEnabled),
                     _buildStatusRow('Faro Analytics', EngineAnalytics.isFaroEnabled),
+                    _buildStatusRow('Google Cloud Logging', EngineAnalytics.isGoogleLoggingInitialized),
                     _buildStatusRow('Bug Tracking', EngineBugTracking.isEnabled),
                     _buildStatusRow('Crashlytics', EngineBugTracking.isCrashlyticsEnabled),
                     _buildStatusRow('Faro Logging', EngineBugTracking.isFaroEnabled),
+                    _buildStatusRow('GCP Bug Tracking', EngineBugTracking.isGoogleLoggingInitialized),
                   ],
                 ),
               ),
@@ -884,7 +934,8 @@ lib/
     │   ├── config.dart             # Export barrel
     │   ├── engine_firebase_analytics_config.dart
     │   ├── engine_crashlytics_config.dart
-    │   └── engine_faro_config.dart
+    │   ├── engine_faro_config.dart
+    │   └── engine_google_logging_config.dart
     ├── models/                     # Modelos de dados
     │   ├── models.dart             # Export barrel
     │   ├── engine_analytics_model.dart
@@ -1189,7 +1240,7 @@ class _LoginPageState extends EngineStatefulWidgetState<LoginPage> {
 Todos os eventos são automaticamente enviados para:
 - **Firebase Analytics** (se configurado)
 - **Grafana Faro** (se configurado)
-- **Splunk** (se configurado)
+- **Google Cloud Logging** (se configurado)
 - **Engine Log** para debugging
 
 ## Melhores Práticas
@@ -1345,10 +1396,10 @@ flutter test
 ```
 
 **Status dos Testes:**
-- ✅ **83 testes passando** (100% dos testes implementados)
-- ✅ **Testes otimizados** para integração Firebase/Faro (evitam dependências externas)
+- ✅ **87 testes passando** (100% dos testes implementados)
+- ✅ **Testes otimizados** para integrações Firebase/Faro/Google Cloud (evitam dependências externas)
 - ✅ **100% de cobertura** nos arquivos de configuração e modelos
-- ✅ **Testes completos** para sistema de logging
+- ✅ **Testes completos** para sistema de logging e Google Cloud Logging
 
 **Observações:**
 - Testes de inicialização com Firebase/Faro são mocados para evitar dependências reais
@@ -1367,6 +1418,61 @@ open coverage/html/index.html
 
 - ✅ iOS
 - ✅ Android
+
+## 🤖 Integração MCP (Model Context Protocol)
+
+O Engine Tracking v1.3.0 inclui suporte completo ao **Model Context Protocol (MCP)**, permitindo que assistentes de IA (como Claude, GPT-4, etc.) acessem dados do projeto em tempo real.
+
+### 🔧 Configuração Rápida
+
+O projeto inclui configuração automática para os principais serviços:
+
+```bash
+# Ver documentação completa
+docs/MCP_CONFIGURATION.md
+docs/MCP_QUICK_SETUP.md
+```
+
+### 🛠️ Serviços Suportados
+
+| Serviço | Funcionalidades | Status |
+|---------|----------------|--------|
+| **GitHub** | Repos, Issues, PRs, Code Search | ✅ Configurado |
+| **Firebase** | Projetos, Deploy, Firestore, Functions | ✅ Configurado |
+| **Supabase** | Tabelas, SQL, Schema, Projetos | ⚙️ Requer tokens |
+| **TaskMaster** | Tarefas, Status, Subtarefas | ✅ Configurado |
+
+### 📋 Ferramentas Incluídas
+
+```bash
+# Testar configurações MCP
+node scripts/test_mcp_connections.js
+
+# Configurar tokens interativamente
+node scripts/setup_mcp_tokens.js
+
+# Ver status atual
+node scripts/setup_mcp_tokens.js --status
+```
+
+### 💡 Capacidades
+
+Com MCP configurado, sua IA pode:
+- 🔍 **Acessar repositórios** GitHub em tempo real
+- 🔥 **Gerenciar projetos** Firebase
+- 🗄️ **Consultar bancos** Supabase
+- 📊 **Monitorar tarefas** TaskMaster
+- 📝 **Analisar código** e estrutura do projeto
+
+### 🚀 Exemplo de Uso
+
+```
+Pergunta à IA: "Mostre o status dos adaptadores Google Cloud Logging"
+Resposta: Lista arquivos, testes e documentação automaticamente
+
+Pergunta: "Quais tarefas estão pendentes no TaskMaster?"
+Resposta: Acessa e mostra tarefas em tempo real
+```
 
 ## 🤝 Contribuição
 
@@ -1396,4 +1502,4 @@ Desenvolvido pela STMR - Especialistas em soluções móveis.
 
 ---
 
-**💡 Dica**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. 
+**💡 Dica v1.3.0**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. Com Google Cloud Logging e MCP, você agora tem ainda mais opções para centralizar logs e integrar com assistentes de IA! 

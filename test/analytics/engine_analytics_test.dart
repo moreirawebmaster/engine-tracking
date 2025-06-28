@@ -1,6 +1,8 @@
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/test_configs.dart';
+
 void main() {
   group('EngineAnalytics', () {
     tearDown(() async {
@@ -55,6 +57,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -84,6 +87,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -112,6 +116,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -140,6 +145,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -168,6 +174,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -196,6 +203,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -224,6 +232,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -253,6 +262,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',
@@ -281,6 +291,7 @@ void main() {
           namespace: '',
           platform: '',
         ),
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: const EngineSplunkConfig(
           enabled: false,
           endpoint: '',

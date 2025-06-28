@@ -1,6 +1,8 @@
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/test_configs.dart';
+
 void main() {
   group('EngineAnalyticsModel', () {
     test('should create instance with valid configs', () {
@@ -27,11 +29,13 @@ void main() {
       final model = EngineAnalyticsModel(
         firebaseAnalyticsConfig: firebaseConfig,
         faroConfig: faroConfig,
+        googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
         splunkConfig: splunkConfig,
       );
 
       expect(model.firebaseAnalyticsConfig, equals(firebaseConfig));
       expect(model.faroConfig, equals(faroConfig));
+      expect(model.googleLoggingConfig, equals(TestConfigs.googleLoggingConfigEnabled));
       expect(model.splunkConfig, equals(splunkConfig));
     });
 
@@ -59,6 +63,7 @@ void main() {
       final model = EngineAnalyticsModel(
         firebaseAnalyticsConfig: firebaseConfig,
         faroConfig: faroConfig,
+        googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: splunkConfig,
       );
 
@@ -91,6 +96,7 @@ void main() {
       final model = EngineAnalyticsModel(
         firebaseAnalyticsConfig: firebaseConfig,
         faroConfig: faroConfig,
+        googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
         splunkConfig: splunkConfig,
       );
 
@@ -98,6 +104,7 @@ void main() {
       expect(stringRepresentation, contains('EngineAnalyticsModel'));
       expect(stringRepresentation, contains('firebaseAnalyticsConfig'));
       expect(stringRepresentation, contains('faroConfig'));
+      expect(stringRepresentation, contains('googleLoggingConfig'));
       expect(stringRepresentation, contains('splunkConfig'));
     });
   });
@@ -108,6 +115,7 @@ void main() {
 
       expect(defaultModel.firebaseAnalyticsConfig.enabled, isFalse);
       expect(defaultModel.faroConfig.enabled, isFalse);
+      expect(defaultModel.googleLoggingConfig.enabled, isFalse);
       expect(defaultModel.splunkConfig.enabled, isFalse);
     });
 
@@ -119,6 +127,10 @@ void main() {
       expect(defaultModel.faroConfig.appVersion, isEmpty);
       expect(defaultModel.faroConfig.environment, isEmpty);
       expect(defaultModel.faroConfig.apiKey, isEmpty);
+
+      expect(defaultModel.googleLoggingConfig.projectId, isEmpty);
+      expect(defaultModel.googleLoggingConfig.logName, isEmpty);
+      expect(defaultModel.googleLoggingConfig.credentials, isEmpty);
 
       expect(defaultModel.splunkConfig.endpoint, isEmpty);
       expect(defaultModel.splunkConfig.token, isEmpty);
