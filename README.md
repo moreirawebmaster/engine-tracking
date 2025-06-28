@@ -69,11 +69,6 @@ graph TD
     
     T["Correlação de Logs"] --> U["Mesmo session_id"]
     U --> V["Jornada Completa do Usuário"]
-    
-    style B fill:#e1f5fe
-    style F fill:#f3e5f5
-    style N fill:#e8f5e8
-    style V fill:#fff3e0
 ```
 
 ### 📱 Widgets Stateless e Stateful com Tracking Automático
@@ -167,11 +162,6 @@ graph TD
     V --> X["Crash Reporting"]
     X --> S
     X --> T
-    
-    style J fill:#f9f,stroke:#333,stroke-width:2px
-    style K fill:#f9f,stroke:#333,stroke-width:2px
-    style U fill:#faa,stroke:#333,stroke-width:2px
-    style V fill:#faa,stroke:#333,stroke-width:2px
 ```
 
 ### 📊 Sistema de Analytics (EngineAnalytics)
