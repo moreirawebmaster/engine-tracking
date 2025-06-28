@@ -13,6 +13,8 @@ class EngineAnalytics {
       isAdapterInitialized((final adapter) => adapter is EngineFaroAnalyticsAdapter && adapter.isInitialized);
   static bool get isFirebaseInitialized =>
       isAdapterInitialized((final adapter) => adapter is EngineFirebaseAnalyticsAdapter && adapter.isInitialized);
+  static bool get isGoogleLoggingInitialized =>
+      isAdapterInitialized((final adapter) => adapter is EngineGoogleLoggingAnalyticsAdapter && adapter.isInitialized);
   static bool get isSplunkInitialized =>
       isAdapterInitialized((final adapter) => adapter is EngineSplunkAnalyticsAdapter && adapter.isInitialized);
 
@@ -40,6 +42,7 @@ class EngineAnalytics {
     final adapters = <IEngineAnalyticsAdapter>[
       EngineFirebaseAnalyticsAdapter(model.firebaseAnalyticsConfig),
       EngineFaroAnalyticsAdapter(model.faroConfig),
+      EngineGoogleLoggingAnalyticsAdapter(model.googleLoggingConfig),
       EngineSplunkAnalyticsAdapter(model.splunkConfig),
     ];
 

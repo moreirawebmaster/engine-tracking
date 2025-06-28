@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-01-23
+
+### Added
+- **🆔 Session ID Automático**: Sistema de correlação de logs e analytics através de UUID v4 único por sessão
+- **EngineSession**: Nova classe singleton para gerenciamento de Session ID
+- **Auto-inject**: Session ID incluído automaticamente em todos os eventos e logs
+- **Validação RFC 4122**: Formato UUID v4 compatível com qualquer sistema
+- **Testes Completos**: 9 testes unitários para Session ID com validação de conformidade
+
+### Enhanced
+#### Sistema de Session ID
+- **Zero Configuração**: Session ID gerado automaticamente na primeira chamada
+- **Correlação Universal**: UUID v4 incluído em Firebase Analytics, Google Cloud Logging, Crashlytics e Faro
+- **Singleton Pattern**: Mesma instância durante toda a vida do app
+- **Formato Padrão**: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx` (RFC 4122 UUID v4)
+- **Testável**: Método `resetForTesting()` para cenários de teste
+
+#### Integração Automática
+- **Firebase Analytics**: Session ID em todos os eventos automaticamente
+- **Google Cloud Logging**: Correlation ID para agrupamento de logs
+- **EngineLog**: Session ID incluído em todos os níveis de log
+- **Método Enrich**: `enrichWithSessionId()` para auto-inject em dados
+
+#### Arquitetura Atualizada
+- **Diagrama Mermaid**: Novo diagrama mostrando fluxo do Session ID
+- **Documentação Completa**: Seção dedicada com exemplos práticos
+- **Casos de Uso**: Exemplos de correlação em painéis de analytics
+
+### Quality Improvements
+- **96 Testes Passando**: Atualização de 87 para 96 testes (100% de sucesso)
+- **UUID v4 Conformance**: Validação completa do formato RFC 4122
+- **Unicidade Testada**: Verificação de 1000/1000 UUIDs únicos gerados
+- **Performance**: Geração eficiente de UUID sem dependências externas
+
+### Documentation
+- **README Atualizado**: Seção completa sobre Session ID
+- **Exemplos Práticos**: Como usar Session ID para correlação de logs
+- **Queries de Exemplo**: Como consultar logs por session_id nos painéis
+- **Melhores Práticas**: Uso do Session ID para análise de jornada do usuário
+
 ## [1.2.1] - 2025-01-15
 
 ### Enhanced

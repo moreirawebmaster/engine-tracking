@@ -77,7 +77,25 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json
 yarn.lock 
-SETUP_GITHUB.md
-FINAL_REPORT.md
-FINAL_IMPLEMENTATION_SUMMARY.md
-CORRECTIONS_SUMMARY.md
+.cursor/
+.windsurf/
+
+# Logs
+logs
+dev-debug.log
+# Dependency directories
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 
+docs/
