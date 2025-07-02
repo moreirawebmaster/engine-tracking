@@ -66,6 +66,10 @@ void main() {
           sourcetype: '',
           index: '',
         ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       await EngineAnalytics.initWithModel(model);
@@ -96,6 +100,10 @@ void main() {
           sourcetype: '',
           index: '',
         ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       await EngineAnalytics.initWithModel(model);
@@ -124,6 +132,10 @@ void main() {
           source: '',
           sourcetype: '',
           index: '',
+        ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
         ),
       );
 
@@ -154,6 +166,10 @@ void main() {
           sourcetype: '',
           index: '',
         ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       await EngineAnalytics.initWithModel(model);
@@ -182,6 +198,10 @@ void main() {
           source: '',
           sourcetype: '',
           index: '',
+        ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
         ),
       );
 
@@ -212,6 +232,10 @@ void main() {
           sourcetype: '',
           index: '',
         ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       await EngineAnalytics.initWithModel(model);
@@ -240,6 +264,10 @@ void main() {
           source: '',
           sourcetype: '',
           index: '',
+        ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
         ),
       );
 
@@ -271,6 +299,10 @@ void main() {
           sourcetype: '',
           index: '',
         ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       await EngineAnalytics.initWithModel(model);
@@ -299,6 +331,10 @@ void main() {
           source: '',
           sourcetype: '',
           index: '',
+        ),
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
         ),
       );
 

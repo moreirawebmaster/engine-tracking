@@ -6,9 +6,7 @@ import '../helpers/test_configs.dart';
 
 void main() {
   group('EngineBugTracking', () {
-    setUp(() {
-      EngineBugTracking.reset();
-    });
+    setUp(EngineBugTracking.reset);
 
     group('Initialization', () {
       test('should reset properly', () {

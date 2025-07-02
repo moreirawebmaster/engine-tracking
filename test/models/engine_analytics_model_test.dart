@@ -25,18 +25,24 @@ void main() {
         sourcetype: 'json',
         index: 'main',
       );
+      const clarityConfig = EngineClarityConfig(
+        enabled: false,
+        projectId: '',
+      );
 
       final model = EngineAnalyticsModel(
         firebaseAnalyticsConfig: firebaseConfig,
         faroConfig: faroConfig,
         googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
         splunkConfig: splunkConfig,
+        clarityConfig: clarityConfig,
       );
 
       expect(model.firebaseAnalyticsConfig, equals(firebaseConfig));
       expect(model.faroConfig, equals(faroConfig));
       expect(model.googleLoggingConfig, equals(TestConfigs.googleLoggingConfigEnabled));
       expect(model.splunkConfig, equals(splunkConfig));
+      expect(model.clarityConfig, equals(clarityConfig));
     });
 
     test('should not be equal to different types', () {
@@ -65,6 +71,10 @@ void main() {
         faroConfig: faroConfig,
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: splunkConfig,
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       expect(model, isNot(equals('string')));
@@ -98,6 +108,10 @@ void main() {
         faroConfig: faroConfig,
         googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
         splunkConfig: splunkConfig,
+        clarityConfig: const EngineClarityConfig(
+          enabled: false,
+          projectId: '',
+        ),
       );
 
       final stringRepresentation = model.toString();
@@ -106,6 +120,7 @@ void main() {
       expect(stringRepresentation, contains('faroConfig'));
       expect(stringRepresentation, contains('googleLoggingConfig'));
       expect(stringRepresentation, contains('splunkConfig'));
+      expect(stringRepresentation, contains('clarityConfig'));
     });
   });
 

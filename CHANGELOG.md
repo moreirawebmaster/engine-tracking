@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-24
+
+### Added
+- **🎥 Microsoft Clarity Integration**: Complete integration with official Clarity Flutter SDK for behavioral analytics
+- **EngineClarityConfig**: Configuration class for Microsoft Clarity with Project ID, User ID, and LogLevel support
+- **Masking Widgets**: `EngineMaskWidget` and `EngineUnmaskWidget` for protecting sensitive content
+- **Example App**: Complete example demonstrating Clarity integration with masking examples
+
+### Enhanced
+#### Microsoft Clarity Features
+- **Session Recordings**: Automatic capture of user sessions for replay
+- **Heatmaps**: Visual representation of user interactions
+- **User Insights**: Automatic detection of rage taps, dead taps, excessive scrolling
+- **Auto-tracking**: Automatic capture of navigation and user interactions
+- **Zero Configuration Events**: No manual event logging needed - Clarity captures automatically
+
+#### Architecture Updates
+- **EngineAnalyticsModel**: Added `clarityConfig` property for Clarity configuration
+- **EngineAnalytics**: Added `isClarityInitialized`
+- **Widget Exports**: Added Clarity masking widgets to widget exports
+- **Adapter Pattern**: Adapted Clarity's unique widget-based initialization to Engine Tracking architecture
+
+### Dependencies
+- **clarity_flutter: ^1.0.0**: Official Microsoft Clarity Flutter SDK
+
+### Technical Details
+- **Unique Implementation**: Clarity requires wrapping the app with ClarityWidget instead of static methods
+- **LogLevel Support**: Automatic production optimization (LogLevel.None in release builds)
+- **User ID Validation**: Base-36 format validation for Clarity user IDs
+- **Session Recording**: ~30 minutes for real-time viewing, ~2 hours for complete processing
+
 ## [1.3.0] - 2025-01-23
 
 ### Added

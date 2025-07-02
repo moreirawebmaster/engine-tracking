@@ -8,11 +8,17 @@ import 'http_tracking_example.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeTracking();
-  runApp(const MyApp());
+  final (analyticsModel, bugTrackingModel) = await initializeTracking();
+
+  runApp(
+    EngineWidget(
+      app: const MyApp(),
+      clarityConfig: analyticsModel.clarityConfig,
+    ),
+  );
 }
 
-Future<void> initializeTracking() async {
+Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingModel)> initializeTracking() async {
   final faroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro-collector-prod-sa-east-1.grafana.net/collect/54d9b2d4c4e2a550c890876a914a3525',
@@ -23,7 +29,12 @@ Future<void> initializeTracking() async {
     namespace: 'engine.stmr.tech',
     platform: Platform.isAndroid ? 'android' : 'ios',
   );
-  // Configure Analytics
+
+  final clarityConfig = EngineClarityConfig(
+    enabled: true,
+    projectId: 's8nukxh19i',
+  );
+
   final analyticsModel = EngineAnalyticsModel(
     firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
     faroConfig: faroConfig,
@@ -35,38 +46,50 @@ Future<void> initializeTracking() async {
       sourcetype: '',
       index: '',
     ),
+    clarityConfig: clarityConfig,
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
-  // Configure Bug Tracking
   final bugTrackingModel = EngineBugTrackingModel(
     crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
     faroConfig: faroConfig,
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
   try {
-    // Initialize services
     await Future.wait([
       EngineAnalytics.initWithModel(analyticsModel),
       EngineBugTracking.initWithModel(bugTrackingModel),
     ]);
 
-    // Set user information
     await Future.wait([
       EngineAnalytics.setUserId('demo_user_123', 'demo@example.com', 'Demo User'),
       EngineBugTracking.setUserIdentifier('demo_user_123', 'demo@example.com', 'Demo User'),
     ]);
 
-    // Log app initialization
     await EngineAnalytics.logAppOpen();
     await EngineBugTracking.log('App initialized successfully', level: 'info');
+
+    return (analyticsModel, bugTrackingModel);
   } catch (e, stackTrace) {
-    // Log initialization errors
     await EngineBugTracking.recordError(
       e,
       stackTrace,
       reason: 'Failed to initialize tracking services',
       isFatal: false,
     );
+
+    return (EngineAnalyticsModelDefault(), EngineBugTrackingModelDefault());
   }
 }
 
@@ -97,7 +120,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Track page view
     EngineAnalytics.setPage('HomePage');
   }
 
@@ -106,14 +128,12 @@ class _HomePageState extends State<HomePage> {
       _counter++;
     });
 
-    // Track button click event
     await EngineAnalytics.logEvent('button_clicked', {
       'button_name': 'increment_counter',
       'counter_value': _counter,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
 
-    // Log the action
     await EngineBugTracking.log(
       'Counter incremented',
       level: 'info',
@@ -123,10 +143,8 @@ class _HomePageState extends State<HomePage> {
 
   void _simulateError() async {
     try {
-      // Simulate an error for demonstration
       throw Exception('This is a simulated error for testing purposes');
     } catch (error, stackTrace) {
-      // Record the error
       await EngineBugTracking.recordError(
         error,
         stackTrace,
@@ -136,7 +154,6 @@ class _HomePageState extends State<HomePage> {
         data: {'counter_value': _counter, 'error_type': 'simulated'},
       );
 
-      // Show snackbar to user
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -199,7 +216,6 @@ class _HomePageState extends State<HomePage> {
             Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 40),
 
-            // Service Status
             Card(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Padding(
@@ -218,7 +234,6 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 20),
 
-            // Action Buttons
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -286,7 +301,6 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    // Track page view with previous screen
     EngineAnalytics.setPage('SecondPage', 'HomePage');
   }
 

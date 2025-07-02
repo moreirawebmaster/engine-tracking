@@ -483,7 +483,6 @@ class _ShoppingCartPageState extends EngineStatefulWidgetState<ShoppingCartPage>
 
 /// Função para demonstrar a inicialização do sistema
 Future<void> initializeTrackingExample() async {
-  // Configuração básica do Analytics
   final analyticsModel = EngineAnalyticsModel(
     firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
     faroConfig: const EngineFaroConfig(
@@ -504,9 +503,18 @@ Future<void> initializeTrackingExample() async {
       sourcetype: '',
       index: '',
     ),
+    clarityConfig: const EngineClarityConfig(
+      enabled: false,
+      projectId: '',
+    ),
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
-  // Configuração básica do Bug Tracking
   final bugTrackingModel = EngineBugTrackingModel(
     crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
     faroConfig: const EngineFaroConfig(
@@ -519,9 +527,14 @@ Future<void> initializeTrackingExample() async {
       namespace: '',
       platform: '',
     ),
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
-  // Inicializar os sistemas
   await EngineAnalytics.initWithModel(analyticsModel);
   await EngineBugTracking.initWithModel(bugTrackingModel);
 

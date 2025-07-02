@@ -66,10 +66,14 @@ void main() {
             sourcetype: '',
             index: '',
           ),
+          clarityConfig: const EngineClarityConfig(
+            enabled: false,
+            projectId: '',
+          ),
         ),
         returnsNormally,
       );
-      expect(() => EngineAnalyticsModelDefault(), returnsNormally);
+      expect(EngineAnalyticsModelDefault.new, returnsNormally);
 
       // Bug Tracking
       expect(() => const EngineCrashlyticsConfig(enabled: true), returnsNormally);
@@ -90,7 +94,7 @@ void main() {
         ),
         returnsNormally,
       );
-      expect(() => EngineBugTrackingModelDefault(), returnsNormally);
+      expect(EngineBugTrackingModelDefault.new, returnsNormally);
     });
 
     test('should have static methods available', () {

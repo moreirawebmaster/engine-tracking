@@ -3,31 +3,6 @@ import 'dart:async';
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/widgets.dart';
 
-///  class for StatefulWidget with automatic tracking functionalities
-///
-/// Usage:
-/// ```dart
-/// class MinhaTelaPage extends EngineStatefulWidget {
-///   const MinhaTelaPage({super.key});
-///
-///   @override
-///   EngineStatefulWidgetState<MinhaTelaPage> createState() => _MinhaTelaPageState();
-/// }
-///
-/// class _MinhaTelaPageState extends EngineStatefulWidgetState<MinhaTelaPage> {
-///   @override
-///   Widget buildWithTracking(BuildContext context) {
-///     return Scaffold(
-///       body: Center(
-///         child: ElevatedButton(
-///           onPressed: () => logUserAction('botao_clicado'),
-///           child: Text('Clique aqui'),
-///         ),
-///       ),
-///     );
-///   }
-/// }
-/// ```
 abstract class EngineStatefulWidget extends StatefulWidget {
   const EngineStatefulWidget({super.key});
 
@@ -35,22 +10,17 @@ abstract class EngineStatefulWidget extends StatefulWidget {
   EngineStatefulWidgetState<EngineStatefulWidget> createState();
 }
 
-///  state for StatefulWidget with automatic tracking functionalities
 abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends State<T> {
   EngineStatefulWidgetState() {
     _screenOpenTime = DateTime.now();
   }
 
-  /// Screen name for tracking. By default uses the class name
   String get screenName => runtimeType.toString();
 
-  /// Additional parameters to send in screen tracking
   Map<String, dynamic>? get screenParameters => null;
 
-  /// Whether to automatically track screen views
   bool get enableAutoTracking => true;
 
-  /// Whether to automatically track lifecycle events
   bool get enableLifecycleTracking => true;
 
   late final DateTime _screenOpenTime;
@@ -72,7 +42,6 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     }
 
     if (enableAutoTracking) {
-      // Execute screen tracking after the first frame
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _trackScreenView();
       });
@@ -98,14 +67,11 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     super.dispose();
   }
 
-  /// Builds the widget with automatic tracking
   @override
   Widget build(final BuildContext context) => buildWithTracking(context);
 
-  /// Method that should be implemented instead of the original build
   Widget buildWithTracking(final BuildContext context);
 
-  /// Tracks the screen view
   Future<void> _trackScreenView() async {
     await EngineLog.debug(
       'screen_viewed',
@@ -117,7 +83,6 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     );
   }
 
-  /// Logs a user action on the current screen
   Future<void> logUserAction(
     final String action, {
     final Map<String, dynamic>? parameters,
@@ -135,7 +100,6 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     );
   }
 
-  /// Logs a custom event on the current screen
   Future<void> logCustomEvent(
     final String eventName, {
     final Map<String, dynamic>? parameters,
@@ -153,7 +117,6 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     );
   }
 
-  /// Logs a screen-specific error
   Future<void> logScreenError(
     final String reason, {
     final Object? exception,
@@ -174,7 +137,6 @@ abstract class EngineStatefulWidgetState<T extends EngineStatefulWidget> extends
     );
   }
 
-  /// Logs a state change on the screen
   Future<void> logStateChange(
     final String stateDescription, {
     final Map<String, dynamic>? additionalData,

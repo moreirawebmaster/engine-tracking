@@ -108,7 +108,7 @@ class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
       await _firebaseAnalytics?.logScreenView(
         screenName: screenName,
-        screenClass: enrichedParameters?['screen_class'] ?? 'Flutter',
+        screenClass: enrichedParameters?['screen_class']?.toString() ?? 'Flutter',
         parameters: enrichedParameters?.map(
           (final k, final v) => MapEntry(k, v as Object),
         ),
