@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1]
+
+### Enhanced
+- **EngineClarityConfig**: Enhanced configuration options for better Clarity integration
+- **EngineLogLevelType**: Added `none` and `verbose` log levels for improved filtering
+- **EngineLog**: Enhanced logging functionality with better level management
+- **EngineWidget**: Refined widget integration for improved tracking performance
+
+### Fixed
+- **Dependency Optimization**: Moved `http` to dev_dependencies, removed unused `firebase_core`
+- **Test Coverage**: Updated enum tests to reflect new log level values
+
 ## [1.4.0] - 2025-01-24
 
 ### Added

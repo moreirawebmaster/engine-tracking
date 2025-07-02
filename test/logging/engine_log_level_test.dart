@@ -36,12 +36,14 @@ void main() {
 
     test('should be enumerable', () {
       const levels = EngineLogLevelType.values;
-      expect(levels.length, equals(5));
+      expect(levels.length, equals(7));
+      expect(levels, contains(EngineLogLevelType.none));
       expect(levels, contains(EngineLogLevelType.debug));
       expect(levels, contains(EngineLogLevelType.info));
       expect(levels, contains(EngineLogLevelType.warning));
       expect(levels, contains(EngineLogLevelType.error));
       expect(levels, contains(EngineLogLevelType.fatal));
+      expect(levels, contains(EngineLogLevelType.verbose));
     });
 
     test('should be comparable', () {
