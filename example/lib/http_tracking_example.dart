@@ -871,11 +871,10 @@ class UsersListPage extends EngineStatelessWidget {
 
 /// Função para demonstrar a inicialização do sistema com tracking HTTP
 Future<void> initializeHttpTrackingExample() async {
-  // Configuração com tracking HTTP habilitado
   final analyticsModel = EngineAnalyticsModel(
     firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
     faroConfig: const EngineFaroConfig(
-      enabled: true, // Habilitado para capturar requisições HTTP
+      enabled: true,
       endpoint: 'https://faro-collector-prod-us-east-0.grafana.net/collect',
       appName: 'engine_tracking_http_example',
       appVersion: '1.0.0',
@@ -892,12 +891,22 @@ Future<void> initializeHttpTrackingExample() async {
       sourcetype: '',
       index: '',
     ),
+    clarityConfig: const EngineClarityConfig(
+      enabled: false,
+      projectId: '',
+    ),
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
   final bugTrackingModel = EngineBugTrackingModel(
     crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
     faroConfig: const EngineFaroConfig(
-      enabled: true, // Habilitado para capturar erros HTTP
+      enabled: true,
       endpoint: 'https://faro-collector-prod-us-east-0.grafana.net/collect',
       appName: 'engine_tracking_http_example',
       appVersion: '1.0.0',
@@ -906,9 +915,14 @@ Future<void> initializeHttpTrackingExample() async {
       namespace: 'flutter_app',
       platform: 'mobile',
     ),
+    googleLoggingConfig: const EngineGoogleLoggingConfig(
+      enabled: false,
+      projectId: '',
+      logName: '',
+      credentials: {},
+    ),
   );
 
-  // Inicializar os sistemas
   await EngineAnalytics.initWithModel(analyticsModel);
   await EngineBugTracking.initWithModel(bugTrackingModel);
 

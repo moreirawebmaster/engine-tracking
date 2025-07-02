@@ -1,3 +1,4 @@
+import 'package:engine_tracking/src/config/engine_clarity_config.dart';
 import 'package:engine_tracking/src/config/engine_faro_config.dart';
 import 'package:engine_tracking/src/config/engine_firebase_analytics_config.dart';
 import 'package:engine_tracking/src/config/engine_google_logging_config.dart';
@@ -5,12 +6,14 @@ import 'package:engine_tracking/src/config/engine_splunk_config.dart';
 
 class EngineAnalyticsModel {
   EngineAnalyticsModel({
+    required this.clarityConfig,
     required this.firebaseAnalyticsConfig,
     required this.faroConfig,
     required this.googleLoggingConfig,
     required this.splunkConfig,
   });
 
+  final EngineClarityConfig clarityConfig;
   final EngineFirebaseAnalyticsConfig firebaseAnalyticsConfig;
   final EngineFaroConfig faroConfig;
   final EngineGoogleLoggingConfig googleLoggingConfig;
@@ -18,10 +21,13 @@ class EngineAnalyticsModel {
 
   @override
   String toString() =>
-      'EngineAnalyticsModel(firebaseAnalyticsConfig: $firebaseAnalyticsConfig, faroConfig: $faroConfig, googleLoggingConfig: $googleLoggingConfig, splunkConfig: $splunkConfig)';
+      'EngineAnalyticsModel(clarityConfig: $clarityConfig, firebaseAnalyticsConfig: $firebaseAnalyticsConfig, faroConfig: $faroConfig, googleLoggingConfig: $googleLoggingConfig, splunkConfig: $splunkConfig)';
 }
 
 class EngineAnalyticsModelDefault implements EngineAnalyticsModel {
+  @override
+  EngineClarityConfig get clarityConfig => const EngineClarityConfig(enabled: false, projectId: '');
+
   @override
   EngineFirebaseAnalyticsConfig get firebaseAnalyticsConfig => const EngineFirebaseAnalyticsConfig(enabled: false);
 

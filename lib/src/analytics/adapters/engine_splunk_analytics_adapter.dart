@@ -161,7 +161,6 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
     try {
       await _sendToSplunk({
         'event': 'analytics_reset',
-        'data': {},
         'timestamp': DateTime.now().millisecondsSinceEpoch / 1000,
       });
     } catch (e) {
@@ -186,6 +185,6 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
     request.write(body);
     final response = await request.close();
 
-    await response.drain();
+    await response.drain<List<int>>();
   }
 }

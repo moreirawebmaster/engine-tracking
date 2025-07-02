@@ -3,10 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EngineSession', () {
-    setUp(() {
-      // Reset instance para cada teste usando método público
-      EngineSession.resetForTesting();
-    });
+    setUp(EngineSession.resetForTesting);
 
     test('should generate unique session IDs', () {
       final session1 = EngineSession.instance.sessionId;

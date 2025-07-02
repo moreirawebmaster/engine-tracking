@@ -69,9 +69,6 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
       debugPrint('setCustomKey: Faro Bug Tracking is not initialized');
       return;
     }
-
-    // Faro doesn't have a direct equivalent for custom keys
-    // We can use context for similar functionality
   }
 
   @override
