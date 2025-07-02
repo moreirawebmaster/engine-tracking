@@ -192,6 +192,10 @@ class EngineLog {
         return '[ERROR]';
       case EngineLogLevelType.fatal:
         return '[FATAL]';
+      case EngineLogLevelType.none:
+        return '';
+      case EngineLogLevelType.verbose:
+        return '[VERBOSE]';
     }
   }
 }

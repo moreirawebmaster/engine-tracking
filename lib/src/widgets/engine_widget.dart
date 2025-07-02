@@ -1,5 +1,5 @@
 import 'package:clarity_flutter/clarity_flutter.dart';
-import 'package:engine_tracking/src/config/engine_clarity_config.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/material.dart';
 
 class EngineWidget extends StatelessWidget {
@@ -20,7 +20,15 @@ class EngineWidget extends StatelessWidget {
         clarityConfig: ClarityConfig(
           projectId: clarityConfig.projectId,
           userId: clarityConfig.userId,
-          logLevel: LogLevel.Verbose,
+          logLevel: switch (clarityConfig.level) {
+            EngineLogLevelType.verbose => LogLevel.Verbose,
+            EngineLogLevelType.fatal => LogLevel.Verbose,
+            EngineLogLevelType.debug => LogLevel.Debug,
+            EngineLogLevelType.info => LogLevel.Info,
+            EngineLogLevelType.warning => LogLevel.Warn,
+            EngineLogLevelType.error => LogLevel.Error,
+            EngineLogLevelType.none => LogLevel.None,
+          },
         ),
       );
     }

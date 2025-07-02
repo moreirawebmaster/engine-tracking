@@ -1,9 +1,11 @@
 enum EngineLogLevelType {
+  none('NONE', 0),
   debug('DEBUG', 100),
   info('INFO', 800),
   warning('WARNING', 900),
   error('ERROR', 1000),
-  fatal('FATAL', 1200);
+  fatal('FATAL', 1200),
+  verbose('VERBOSE', 1600);
 
   final String name;
   final int value;
