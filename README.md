@@ -622,10 +622,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para d
 
 ## 🏢 Sobre a STMR
 
-<div align="center">
-  <img src="assets/images/logo.png" alt="STMR Logo" width="200" />
-</div>
-
 Desenvolvido pela **STMR** - Especialistas em soluções móveis.
 
 A STMR é uma empresa focada no desenvolvimento de soluções tecnológicas inovadoras para dispositivos móveis, especializando-se em arquiteturas robustas, performance otimizada e experiências de usuário excepcionais.
@@ -635,4 +631,4 @@ Fornecer ferramentas e bibliotecas Flutter de alta qualidade que aceleram o dese
 
 ---
 
-**💡 Dica v1.4.0**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. Com **Session ID automático** e **Google Cloud Logging**, você agora tem correlação completa de logs e centralização avançada! 🆔🔥
+**💡 Dica v1.4.0**: Para máxima eficiência, configure apenas os serviços que você realmente utiliza. A biblioteca é otimizada para funcionar com qualquer combinação de serviços habilitados ou desabilitados. Com **Session ID automático**, você agora tem correlação completa de logs e centralização avançada! 🆔🔥
