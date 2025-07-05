@@ -14,8 +14,8 @@ import 'package:flutter/material.dart';
 /// ```
 class EngineMaskWidget extends StatelessWidget {
   const EngineMaskWidget({
-    super.key,
     required this.child,
+    super.key,
   });
 
   final Widget child;
@@ -46,8 +46,8 @@ class EngineMaskWidget extends StatelessWidget {
 /// ```
 class EngineUnmaskWidget extends StatelessWidget {
   const EngineUnmaskWidget({
-    super.key,
     required this.child,
+    super.key,
   });
 
   final Widget child;

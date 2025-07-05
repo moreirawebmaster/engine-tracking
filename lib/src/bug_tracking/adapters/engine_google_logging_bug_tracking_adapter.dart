@@ -5,9 +5,9 @@ import 'package:googleapis/logging/v2.dart' as logging;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
 class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter {
-  bool _isInitialized = false;
-
   EngineGoogleLoggingBugTrackingAdapter(this._config);
+
+  bool _isInitialized = false;
 
   @override
   String get adapterName => 'Google Cloud Logging Bug Tracking';

@@ -3,10 +3,10 @@ import 'package:faro/faro_sdk.dart';
 import 'package:flutter/widgets.dart';
 
 class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter {
+  EngineFaroAnalyticsAdapter(this._config);
+
   final EngineFaroConfig _config;
   bool _isInitialized = false;
-
-  EngineFaroAnalyticsAdapter(this._config);
 
   @override
   String get adapterName => 'Grafana Faro';

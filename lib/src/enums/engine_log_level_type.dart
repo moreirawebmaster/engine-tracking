@@ -7,13 +7,13 @@ enum EngineLogLevelType {
   fatal('FATAL', 1200),
   verbose('VERBOSE', 1600);
 
-  final String name;
-  final int value;
-
   const EngineLogLevelType(this.name, this.value);
   factory EngineLogLevelType.fromName(final String name) =>
       EngineLogLevelType.values.firstWhere((final e) => e.name == name, orElse: () => EngineLogLevelType.debug);
 
   factory EngineLogLevelType.fromValue(final int value) =>
       EngineLogLevelType.values.firstWhere((final e) => e.value == value, orElse: () => EngineLogLevelType.debug);
+
+  final String name;
+  final int value;
 }

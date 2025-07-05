@@ -1,10 +1,10 @@
 import 'dart:math';
 
 class EngineSession {
-  static EngineSession? _instance;
-  static EngineSession get instance => _instance ??= EngineSession._();
-
   EngineSession._();
+
+  static EngineSession? _i;
+  static EngineSession get instance => _i ??= EngineSession._();
 
   String? _sessionId;
 
@@ -39,6 +39,6 @@ class EngineSession {
   }
 
   static void resetForTesting() {
-    _instance = null;
+    _i = null;
   }
 }

@@ -5,9 +5,9 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
-  bool _isInitialized = false;
-
   EngineFirebaseAnalyticsAdapter(this._config);
+
+  bool _isInitialized = false;
 
   @override
   String get adapterName => 'Firebase Analytics';
