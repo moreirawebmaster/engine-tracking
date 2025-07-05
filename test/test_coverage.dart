@@ -1,6 +1,3 @@
-// Arquivo para garantir que todas as importações sejam testadas
-// Isto ajuda a manter a cobertura de testes acima de 95%
-
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,7 +6,6 @@ import 'helpers/test_configs.dart';
 void main() {
   group('Test Coverage', () {
     test('should import all classes correctly', () {
-      // Analytics
       expect(() => const EngineFirebaseAnalyticsConfig(enabled: true), returnsNormally);
       expect(
         () => const EngineFaroConfig(
@@ -75,7 +71,6 @@ void main() {
       );
       expect(EngineAnalyticsModelDefault.new, returnsNormally);
 
-      // Bug Tracking
       expect(() => const EngineCrashlyticsConfig(enabled: true), returnsNormally);
       expect(
         () => EngineBugTrackingModel(
@@ -98,16 +93,16 @@ void main() {
     });
 
     test('should have static methods available', () {
-      // Analytics static methods should be available
       expect(EngineAnalytics.isEnabled, isA<bool>());
       expect(EngineAnalytics.isInitialized, isA<bool>());
 
-      // Bug tracking static methods should be available
       expect(EngineBugTracking.isEnabled, isA<bool>());
+
+      expect(EngineTrackingInitialize.isEnabled, isA<bool>());
+      expect(EngineTrackingInitialize.isInitialized, isA<bool>());
     });
 
     test('should handle edge cases', () {
-      // Test toString methods
       const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
       expect(firebaseConfig.toString(), isNotEmpty);
 
@@ -125,7 +120,7 @@ void main() {
         platform: '',
       );
       expect(faroConfig.toString(), isNotEmpty);
-      expect(faroConfig.toString(), contains('****')); // API key should be masked
+      expect(faroConfig.toString(), contains('****'));
 
       const splunkConfig = EngineSplunkConfig(
         enabled: true,
@@ -136,7 +131,7 @@ void main() {
         index: 'main',
       );
       expect(splunkConfig.toString(), isNotEmpty);
-      expect(splunkConfig.toString(), contains('****')); // Token should be masked
+      expect(splunkConfig.toString(), contains('****'));
 
       const googleLoggingConfig = EngineGoogleLoggingConfig(
         enabled: true,
@@ -145,7 +140,7 @@ void main() {
         credentials: {'private_key': 'secret-key'},
       );
       expect(googleLoggingConfig.toString(), isNotEmpty);
-      expect(googleLoggingConfig.toString(), contains('****')); // Credentials should be masked
+      expect(googleLoggingConfig.toString(), contains('****'));
     });
   });
 }

@@ -282,7 +282,49 @@ cd example && flutter run
 - **🌐 Exemplo HTTP Tracking**: Requisições com PokéAPI e JSONPlaceholder
 - **👁️ Exemplo View Tracking**: Sistema automático de tracking de telas
 
-### 🎯 Configuração Básica
+### 🚀 Inicialização Centralizada (Recomendado)
+
+**Novo!** Use o `EngineTrackingInitialize` para inicializar Analytics e Bug Tracking de uma só vez:
+
+```dart
+import 'package:engine_tracking/engine_tracking.dart';
+
+// Ambos os serviços
+await EngineTrackingInitialize.initWithModels(
+  analyticsModel: EngineAnalyticsModel(/* configs */),
+  bugTrackingModel: EngineBugTrackingModel(/* configs */),
+);
+
+// Apenas Analytics
+await EngineTrackingInitialize.initWithModels(
+  analyticsModel: EngineAnalyticsModel(/* configs */),
+  bugTrackingModel: null,
+);
+
+// Apenas Bug Tracking
+await EngineTrackingInitialize.initWithModels(
+  analyticsModel: null,
+  bugTrackingModel: EngineBugTrackingModel(/* configs */),
+);
+
+// Com Adapters (controle granular)
+await EngineTrackingInitialize.initWithAdapters(
+  analyticsAdapters: [EngineFirebaseAnalyticsAdapter(/* config */)],
+  bugTrackingAdapters: null, // Skip bug tracking
+);
+
+// Inicialização rápida (ambos desabilitados)
+await EngineTrackingInitialize.initWithDefaults();
+
+// Status
+bool bothReady = EngineTrackingInitialize.isInitialized;
+bool anyEnabled = EngineTrackingInitialize.isEnabled;
+
+// Cleanup
+await EngineTrackingInitialize.dispose();
+```
+
+### 🎯 Configuração Básica (Método Individual)
 
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
@@ -335,8 +377,8 @@ Future<void> setupTracking() async {
     googleLoggingConfig: const EngineGoogleLoggingConfig(enabled: true, /* configs */),
   );
 
-  await EngineAnalytics.init(analyticsModel);
-  await EngineBugTracking.init(bugTrackingModel);
+  await EngineAnalytics.initWithModel(analyticsModel);
+  await EngineBugTracking.initWithModel(bugTrackingModel);
 }
 ```
 

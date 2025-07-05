@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0]
+
+### Added
+- **EngineTrackingInitialize**: Central initializer for analytics and bug tracking services
+- **Nullable Parameters**: Optional initialization of analytics or bug tracking individually
+- **Dartdoc Documentation**: Complete public API documentation for all methods and parameters
+
+### Enhanced
+- **Flexible Initialization**: Initialize both services, only analytics, or only bug tracking
+- **Parallel Execution**: Optimized Future.wait for maximum performance
+- **Test Coverage**: 17 new tests for centralized initialization scenarios
+
 ## [1.4.1]
 
 ### Enhanced
