@@ -29,7 +29,7 @@ Uma biblioteca Flutter completa para **tracking de analytics** e **bug reporting
 - 📝 **Logging Estruturado**: Sistema de logs com diferentes níveis e contextos
 - 🆔 **Session ID Automático**: UUID v4 único por abertura do app para correlação de logs e analytics
 - 🔒 **Tipo-seguro**: Implementação completamente tipada em Dart
-- 🧪 **Testável**: Cobertura de testes superior a 95% para componentes testáveis
+- 🛡️ **Confiável**: Implementação robusta e estável para aplicações empresariais
 - 🏗️ **Arquitetura Consistente**: Padrão unificado entre Analytics e Bug Tracking
 - 🎯 **Inicialização Condicional**: Serviços são inicializados apenas se habilitados na configuração
 - 📦 **Export Unificado**: Todos os imports através de `package:engine_tracking/engine_tracking.dart`
@@ -613,29 +613,6 @@ if (EngineAnalytics.isGoogleLoggingInitialized) {
 }
 ```
 
-### 🧪 Testes
-
-Execute os testes:
-
-```bash
-flutter test
-```
-
-**Status dos Testes:**
-- ✅ **96 testes passando** (100% dos testes implementados)
-- ✅ **Testes otimizados** para integrações Firebase/Faro/Google Cloud (evitam dependências externas)
-- ✅ **100% de cobertura** nos arquivos de configuração e modelos
-- ✅ **Testes completos** para sistema de logging e Google Cloud Logging
-- ✅ **Testes completos** para Session ID com validação UUID v4 RFC 4122
-
-Para cobertura de testes:
-
-```bash
-flutter test --coverage
-genhtml coverage/lcov.info -o coverage/html
-open coverage/html/index.html
-```
-
 ---
 
 ## 🤝 Como Contribuir
@@ -650,10 +627,9 @@ Contribuições são bem-vindas! Por favor:
 
 ### 📋 Diretrizes de Contribuição
 
-- Mantenha 95%+ de cobertura de testes
 - Siga o padrão de código existente
 - Documente novas funcionalidades
-- Teste em Android e iOS
+- Valide em Android e iOS
 - Atualize o CHANGELOG.md
 
 ### 📄 Licença
