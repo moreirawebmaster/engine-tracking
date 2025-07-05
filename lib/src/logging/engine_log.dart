@@ -8,7 +8,6 @@ import 'package:engine_tracking/engine_tracking.dart';
 /// This class provides methods for logging at different levels (debug, info, warning, error, fatal)
 /// and integrates with Firebase Crashlytics for crash reporting or other logging services.
 class EngineLog {
-  /// The name used for all log messages
   static const String _name = 'ENGINE_LOG';
 
   static Future<void> _logWithLevel(
