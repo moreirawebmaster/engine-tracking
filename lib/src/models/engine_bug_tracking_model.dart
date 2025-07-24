@@ -3,15 +3,11 @@ import 'package:engine_tracking/src/config/engine_faro_config.dart';
 import 'package:engine_tracking/src/config/engine_google_logging_config.dart';
 
 class EngineBugTrackingModel {
-  EngineBugTrackingModel({
-    required this.crashlyticsConfig,
-    required this.faroConfig,
-    required this.googleLoggingConfig,
-  });
+  EngineBugTrackingModel({this.crashlyticsConfig, this.faroConfig, this.googleLoggingConfig});
 
-  final EngineCrashlyticsConfig crashlyticsConfig;
-  final EngineFaroConfig faroConfig;
-  final EngineGoogleLoggingConfig googleLoggingConfig;
+  final EngineCrashlyticsConfig? crashlyticsConfig;
+  final EngineFaroConfig? faroConfig;
+  final EngineGoogleLoggingConfig? googleLoggingConfig;
 
   @override
   String toString() =>
@@ -20,10 +16,10 @@ class EngineBugTrackingModel {
 
 class EngineBugTrackingModelDefault implements EngineBugTrackingModel {
   @override
-  EngineCrashlyticsConfig get crashlyticsConfig => const EngineCrashlyticsConfig(enabled: false);
+  EngineCrashlyticsConfig get crashlyticsConfig => EngineCrashlyticsConfig(enabled: false);
 
   @override
-  EngineFaroConfig get faroConfig => const EngineFaroConfig(
+  EngineFaroConfig get faroConfig => EngineFaroConfig(
     enabled: false,
     endpoint: '',
     appName: '',
@@ -35,10 +31,6 @@ class EngineBugTrackingModelDefault implements EngineBugTrackingModel {
   );
 
   @override
-  EngineGoogleLoggingConfig get googleLoggingConfig => const EngineGoogleLoggingConfig(
-    enabled: false,
-    projectId: '',
-    logName: '',
-    credentials: {},
-  );
+  EngineGoogleLoggingConfig get googleLoggingConfig =>
+      EngineGoogleLoggingConfig(enabled: false, projectId: '', logName: '', credentials: {});
 }

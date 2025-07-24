@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:googleapis/logging/v2.dart' as logging;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
-class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter {
-  EngineGoogleLoggingBugTrackingAdapter(this._config);
+class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter<EngineGoogleLoggingConfig> {
+  EngineGoogleLoggingBugTrackingAdapter(this.config);
 
   bool _isInitialized = false;
 
@@ -13,14 +13,16 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
   String get adapterName => 'Google Cloud Logging Bug Tracking';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
 
+  @override
+  final EngineGoogleLoggingConfig config;
+
   bool get isGoogleLoggingBugTrackingInitialized => isEnabled && _isInitialized;
 
-  final EngineGoogleLoggingConfig _config;
   late final logging.LoggingApi _loggingApi;
   late final auth.AuthClient _authClient;
   final Map<String, Object> _customKeys = {};
@@ -34,14 +36,15 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _authClient = await auth.clientViaServiceAccount(
-        auth.ServiceAccountCredentials.fromJson(_config.credentials),
+        auth.ServiceAccountCredentials.fromJson(config.credentials),
         [logging.LoggingApi.loggingWriteScope],
       );
 
       _loggingApi = logging.LoggingApi(_authClient);
-      _isInitialized = true;
     } catch (e) {
       debugPrint('initialize: Error initializing Google Cloud Logging: $e');
       _isInitialized = false;
@@ -123,9 +126,9 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
           if (stackTrace != null) 'stackTrace': stackTrace.toString(),
         }
         ..severity = level?.toUpperCase()
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-bug-tracking'
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-bug-tracking'
         ..resource = logging.MonitoredResource.fromJson(
-          _config.resource ??
+          config.resource ??
               {
                 'type': 'global',
               },
@@ -133,7 +136,7 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
 
       final request = logging.WriteLogEntriesRequest()
         ..entries = [logEntry]
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-bug-tracking';
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-bug-tracking';
 
       await _loggingApi.entries.write(request);
     } catch (e) {
@@ -175,9 +178,9 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
           if (stackTrace != null) 'stackTrace': stackTrace.toString(),
         }
         ..severity = isFatal ? 'CRITICAL' : 'ERROR'
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-errors'
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-errors'
         ..resource = logging.MonitoredResource.fromJson(
-          _config.resource ??
+          config.resource ??
               {
                 'type': 'global',
               },
@@ -185,7 +188,7 @@ class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter
 
       final request = logging.WriteLogEntriesRequest()
         ..entries = [logEntry]
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-errors';
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-errors';
 
       await _loggingApi.entries.write(request);
     } catch (e) {

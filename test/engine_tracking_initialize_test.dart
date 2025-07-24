@@ -10,9 +10,9 @@ void main() {
     group('initWithAdapters', () {
       test('should initialize both analytics and bug tracking with adapters', () async {
         final analyticsAdapters = <IEngineAnalyticsAdapter>[
-          EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: false)),
+          EngineFirebaseAnalyticsAdapter(EngineFirebaseAnalyticsConfig(enabled: false)),
           EngineFaroAnalyticsAdapter(
-            const EngineFaroConfig(
+            EngineFaroConfig(
               enabled: false,
               endpoint: '',
               appName: '',
@@ -26,9 +26,9 @@ void main() {
         ];
 
         final bugTrackingAdapters = <IEngineBugTrackingAdapter>[
-          EngineCrashlyticsAdapter(const EngineCrashlyticsConfig(enabled: false)),
+          EngineCrashlyticsAdapter(EngineCrashlyticsConfig(enabled: false)),
           EngineFaroBugTrackingAdapter(
-            const EngineFaroConfig(
+            EngineFaroConfig(
               enabled: false,
               endpoint: '',
               appName: '',
@@ -53,7 +53,7 @@ void main() {
 
       test('should initialize only analytics when bug tracking is null', () async {
         final analyticsAdapters = <IEngineAnalyticsAdapter>[
-          EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: false)),
+          EngineFirebaseAnalyticsAdapter(EngineFirebaseAnalyticsConfig(enabled: false)),
         ];
 
         await EngineTrackingInitialize.initWithAdapters(
@@ -68,7 +68,7 @@ void main() {
 
       test('should initialize only bug tracking when analytics is null', () async {
         final bugTrackingAdapters = <IEngineBugTrackingAdapter>[
-          EngineCrashlyticsAdapter(const EngineCrashlyticsConfig(enabled: false)),
+          EngineCrashlyticsAdapter(EngineCrashlyticsConfig(enabled: false)),
         ];
 
         await EngineTrackingInitialize.initWithAdapters(
@@ -108,9 +108,9 @@ void main() {
     group('initWithModels', () {
       test('should initialize both analytics and bug tracking with models', () async {
         final analyticsModel = EngineAnalyticsModel(
-          clarityConfig: const EngineClarityConfig(enabled: false, projectId: ''),
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          clarityConfig: EngineClarityConfig(enabled: false, projectId: ''),
+          firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -120,13 +120,13 @@ void main() {
             namespace: '',
             platform: '',
           ),
-          googleLoggingConfig: const EngineGoogleLoggingConfig(
+          googleLoggingConfig: EngineGoogleLoggingConfig(
             enabled: false,
             projectId: '',
             logName: '',
             credentials: {},
           ),
-          splunkConfig: const EngineSplunkConfig(
+          splunkConfig: EngineSplunkConfig(
             enabled: false,
             endpoint: '',
             token: '',
@@ -137,8 +137,8 @@ void main() {
         );
 
         final bugTrackingModel = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -148,7 +148,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
-          googleLoggingConfig: const EngineGoogleLoggingConfig(
+          googleLoggingConfig: EngineGoogleLoggingConfig(
             enabled: false,
             projectId: '',
             logName: '',
@@ -168,9 +168,9 @@ void main() {
 
       test('should initialize only analytics when bug tracking is null', () async {
         final analyticsModel = EngineAnalyticsModel(
-          clarityConfig: const EngineClarityConfig(enabled: false, projectId: ''),
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          clarityConfig: EngineClarityConfig(enabled: false, projectId: ''),
+          firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -180,13 +180,13 @@ void main() {
             namespace: '',
             platform: '',
           ),
-          googleLoggingConfig: const EngineGoogleLoggingConfig(
+          googleLoggingConfig: EngineGoogleLoggingConfig(
             enabled: false,
             projectId: '',
             logName: '',
             credentials: {},
           ),
-          splunkConfig: const EngineSplunkConfig(
+          splunkConfig: EngineSplunkConfig(
             enabled: false,
             endpoint: '',
             token: '',
@@ -208,8 +208,8 @@ void main() {
 
       test('should initialize only bug tracking when analytics is null', () async {
         final bugTrackingModel = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -219,7 +219,7 @@ void main() {
             namespace: '',
             platform: '',
           ),
-          googleLoggingConfig: const EngineGoogleLoggingConfig(
+          googleLoggingConfig: EngineGoogleLoggingConfig(
             enabled: false,
             projectId: '',
             logName: '',
@@ -294,9 +294,9 @@ void main() {
     group('isEnabled', () {
       test('should return true when at least one service is enabled', () async {
         final analyticsModel = EngineAnalyticsModel(
-          clarityConfig: const EngineClarityConfig(enabled: false, projectId: ''),
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
+          clarityConfig: EngineClarityConfig(enabled: false, projectId: ''),
+          firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: true),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -306,13 +306,13 @@ void main() {
             namespace: '',
             platform: '',
           ),
-          googleLoggingConfig: const EngineGoogleLoggingConfig(
+          googleLoggingConfig: EngineGoogleLoggingConfig(
             enabled: false,
             projectId: '',
             logName: '',
             credentials: {},
           ),
-          splunkConfig: const EngineSplunkConfig(
+          splunkConfig: EngineSplunkConfig(
             enabled: false,
             endpoint: '',
             token: '',

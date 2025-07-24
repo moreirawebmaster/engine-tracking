@@ -3,6 +3,7 @@ export 'bug_tracking/bug_tracking.dart';
 export 'config/config.dart';
 export 'engine_tracking_initialize.dart';
 export 'enums/enums.dart';
+export 'http/engine_http_tracking.dart';
 export 'logging/logging.dart';
 export 'models/models.dart';
 export 'observers/observers.dart';

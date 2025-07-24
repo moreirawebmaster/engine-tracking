@@ -3,22 +3,25 @@ import 'package:engine_tracking/src/config/engine_crashlytics_config.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
-class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
-  EngineCrashlyticsAdapter(this._config);
+class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter<EngineCrashlyticsConfig> {
+  EngineCrashlyticsAdapter(this.config);
 
   @override
   String get adapterName => 'Firebase Crashlytics';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
 
+  @override
+  final EngineCrashlyticsConfig config;
+
   bool get isCrashlyticsInitialized => isEnabled && _isInitialized && _crashlytics != null;
 
   bool _isInitialized = false;
-  final EngineCrashlyticsConfig _config;
+
   FirebaseCrashlytics? _crashlytics;
 
   @override
@@ -27,10 +30,11 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _crashlytics = FirebaseCrashlytics.instance;
-      await _crashlytics!.setCrashlyticsCollectionEnabled(true);
-      _isInitialized = true;
+      await _crashlytics?.setCrashlyticsCollectionEnabled(true);
     } catch (e) {
       _isInitialized = false;
       debugPrint('failed to initialize Crashlytics $e');
@@ -51,7 +55,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _crashlytics!.setCustomKey(key, value);
+      await _crashlytics?.setCustomKey(key, value);
     } catch (e) {
       debugPrint('setCustomKey: Error setting custom key: $e');
     }
@@ -69,7 +73,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _crashlytics!.setUserIdentifier(id);
+      await _crashlytics?.setUserIdentifier(id);
     } catch (e) {
       debugPrint('setUserIdentifier: Error setting user identifier: $e');
     }
@@ -88,7 +92,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _crashlytics!.log(message);
+      await _crashlytics?.log(message);
     } catch (e) {
       debugPrint('log: Error logging message: $e');
     }
@@ -109,7 +113,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _crashlytics!.recordError(
+      await _crashlytics?.recordError(
         exception,
         stackTrace,
         reason: reason,
@@ -130,7 +134,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _crashlytics!.recordFlutterError(errorDetails);
+      await _crashlytics?.recordFlutterError(errorDetails);
     } catch (e) {
       debugPrint('recordFlutterError: Error recording Flutter error: $e');
     }
@@ -145,7 +149,7 @@ class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter {
 
     if (kDebugMode) {
       try {
-        _crashlytics!.crash();
+        _crashlytics?.crash();
       } catch (e) {
         debugPrint('testCrash: Error testing crash: $e');
       }

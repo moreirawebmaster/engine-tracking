@@ -3,26 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:googleapis/logging/v2.dart' as logging;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
-class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter {
-  EngineGoogleLoggingAnalyticsAdapter(this._config);
+class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineGoogleLoggingConfig> {
+  EngineGoogleLoggingAnalyticsAdapter(this.config);
 
-  bool _isInitialized = false;
+  @override
+  final EngineGoogleLoggingConfig config;
 
   @override
   String get adapterName => 'Google Cloud Logging Analytics';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
 
   bool get isGoogleLoggingAnalyticsInitialized => isEnabled && _isInitialized;
 
-  final EngineGoogleLoggingConfig _config;
+  bool _isInitialized = false;
+
+  String? _userId;
+
   late final logging.LoggingApi _loggingApi;
   late final auth.AuthClient _authClient;
-  String? _userId;
 
   @override
   Future<void> initialize() async {
@@ -30,14 +33,15 @@ class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter {
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _authClient = await auth.clientViaServiceAccount(
-        auth.ServiceAccountCredentials.fromJson(_config.credentials),
+        auth.ServiceAccountCredentials.fromJson(config.credentials),
         [logging.LoggingApi.loggingWriteScope],
       );
 
       _loggingApi = logging.LoggingApi(_authClient);
-      _isInitialized = true;
     } catch (e) {
       debugPrint('initialize: Error initializing Google Cloud Logging: $e');
       _isInitialized = false;
@@ -69,9 +73,9 @@ class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter {
           'timestamp': DateTime.now().toIso8601String(),
         }
         ..severity = 'INFO'
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-analytics'
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-analytics'
         ..resource = logging.MonitoredResource.fromJson(
-          _config.resource ??
+          config.resource ??
               {
                 'type': 'global',
               },
@@ -79,7 +83,7 @@ class EngineGoogleLoggingAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
       final request = logging.WriteLogEntriesRequest()
         ..entries = [logEntry]
-        ..logName = 'projects/${_config.projectId}/logs/${_config.logName}-analytics';
+        ..logName = 'projects/${config.projectId}/logs/${config.logName}-analytics';
 
       await _loggingApi.entries.write(request);
     } catch (e) {

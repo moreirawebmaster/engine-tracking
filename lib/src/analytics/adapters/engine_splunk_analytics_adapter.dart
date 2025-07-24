@@ -5,14 +5,17 @@ import 'package:engine_tracking/src/analytics/adapters/i_engine_analytics_adapte
 import 'package:engine_tracking/src/config/engine_splunk_config.dart';
 import 'package:flutter/material.dart';
 
-class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
-  EngineSplunkAnalyticsAdapter(this._config);
+class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineSplunkConfig> {
+  EngineSplunkAnalyticsAdapter(this.config);
+
+  @override
+  final EngineSplunkConfig config;
 
   @override
   String get adapterName => 'Splunk';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
@@ -20,7 +23,7 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
   bool get isSplunkInitialized => isEnabled && _isInitialized;
 
   bool _isInitialized = false;
-  final EngineSplunkConfig _config;
+
   late final HttpClient _httpClient;
 
   @override
@@ -29,9 +32,10 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _httpClient = HttpClient();
-      _isInitialized = true;
     } catch (e) {
       _isInitialized = false;
       debugPrint('failed to initialize Splunk $e');
@@ -95,11 +99,8 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
 
     try {
       await _sendToSplunk({
-        'event': 'user_property_set',
-        'data': {
-          'property_name': name,
-          'property_value': value,
-        },
+        'event': name,
+        'data': value,
         'timestamp': DateTime.now().millisecondsSinceEpoch / 1000,
       });
     } catch (e) {
@@ -169,16 +170,16 @@ class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter {
   }
 
   Future<void> _sendToSplunk(final Map<String, dynamic> data) async {
-    final request = await _httpClient.postUrl(Uri.parse(_config.endpoint));
+    final request = await _httpClient.postUrl(Uri.parse(config.endpoint));
 
-    request.headers.set('Authorization', 'Splunk ${_config.token}');
+    request.headers.set('Authorization', 'Splunk ${config.token}');
     request.headers.set('Content-Type', 'application/json');
 
     final body = jsonEncode({
       'time': data['timestamp'],
-      'source': _config.source,
-      'sourcetype': _config.sourcetype,
-      'index': _config.index,
+      'source': config.source,
+      'sourcetype': config.sourcetype,
+      'index': config.index,
       'event': data,
     });
 

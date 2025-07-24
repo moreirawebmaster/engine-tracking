@@ -6,8 +6,8 @@ import '../helpers/test_configs.dart';
 void main() {
   group('EngineAnalyticsModel', () {
     test('should create instance with valid configs', () {
-      const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
-      const faroConfig = EngineFaroConfig(
+      final firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
+      final faroConfig = EngineFaroConfig(
         enabled: true,
         endpoint: 'https://example.com',
         appName: 'TestApp',
@@ -17,7 +17,7 @@ void main() {
         namespace: '',
         platform: '',
       );
-      const splunkConfig = EngineSplunkConfig(
+      final splunkConfig = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://splunk.com',
         token: 'test-token',
@@ -25,7 +25,7 @@ void main() {
         sourcetype: 'json',
         index: 'main',
       );
-      const clarityConfig = EngineClarityConfig(
+      final clarityConfig = EngineClarityConfig(
         enabled: false,
         projectId: '',
       );
@@ -46,8 +46,8 @@ void main() {
     });
 
     test('should not be equal to different types', () {
-      const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: false);
-      const faroConfig = EngineFaroConfig(
+      final firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: false);
+      final faroConfig = EngineFaroConfig(
         enabled: false,
         endpoint: '',
         appName: '',
@@ -57,7 +57,7 @@ void main() {
         namespace: '',
         platform: '',
       );
-      const splunkConfig = EngineSplunkConfig(
+      final splunkConfig = EngineSplunkConfig(
         enabled: false,
         endpoint: '',
         token: '',
@@ -71,7 +71,7 @@ void main() {
         faroConfig: faroConfig,
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
         splunkConfig: splunkConfig,
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -83,8 +83,8 @@ void main() {
     });
 
     test('toString should include all configurations', () {
-      const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
-      const faroConfig = EngineFaroConfig(
+      final firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
+      final faroConfig = EngineFaroConfig(
         enabled: true,
         endpoint: 'https://example.com',
         appName: 'TestApp',
@@ -94,7 +94,7 @@ void main() {
         namespace: '',
         platform: '',
       );
-      const splunkConfig = EngineSplunkConfig(
+      final splunkConfig = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://splunk.com',
         token: 'test-token',
@@ -108,7 +108,7 @@ void main() {
         faroConfig: faroConfig,
         googleLoggingConfig: TestConfigs.googleLoggingConfigEnabled,
         splunkConfig: splunkConfig,
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),

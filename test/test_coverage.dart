@@ -6,9 +6,9 @@ import 'helpers/test_configs.dart';
 void main() {
   group('Test Coverage', () {
     test('should import all classes correctly', () {
-      expect(() => const EngineFirebaseAnalyticsConfig(enabled: true), returnsNormally);
+      expect(() => EngineFirebaseAnalyticsConfig(enabled: true), returnsNormally);
       expect(
-        () => const EngineFaroConfig(
+        () => EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -21,7 +21,7 @@ void main() {
         returnsNormally,
       );
       expect(
-        () => const EngineSplunkConfig(
+        () => EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -32,7 +32,7 @@ void main() {
         returnsNormally,
       );
       expect(
-        () => const EngineGoogleLoggingConfig(
+        () => EngineGoogleLoggingConfig(
           enabled: false,
           projectId: '',
           logName: '',
@@ -42,8 +42,8 @@ void main() {
       );
       expect(
         () => EngineAnalyticsModel(
-          firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -54,7 +54,7 @@ void main() {
             platform: '',
           ),
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
-          splunkConfig: const EngineSplunkConfig(
+          splunkConfig: EngineSplunkConfig(
             enabled: false,
             endpoint: '',
             token: '',
@@ -62,7 +62,7 @@ void main() {
             sourcetype: '',
             index: '',
           ),
-          clarityConfig: const EngineClarityConfig(
+          clarityConfig: EngineClarityConfig(
             enabled: false,
             projectId: '',
           ),
@@ -71,11 +71,11 @@ void main() {
       );
       expect(EngineAnalyticsModelDefault.new, returnsNormally);
 
-      expect(() => const EngineCrashlyticsConfig(enabled: true), returnsNormally);
+      expect(() => EngineCrashlyticsConfig(enabled: true), returnsNormally);
       expect(
         () => EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -103,13 +103,13 @@ void main() {
     });
 
     test('should handle edge cases', () {
-      const firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
+      final firebaseConfig = EngineFirebaseAnalyticsConfig(enabled: true);
       expect(firebaseConfig.toString(), isNotEmpty);
 
-      const crashlyticsConfig = EngineCrashlyticsConfig(enabled: false);
+      final crashlyticsConfig = EngineCrashlyticsConfig(enabled: false);
       expect(crashlyticsConfig.toString(), isNotEmpty);
 
-      const faroConfig = EngineFaroConfig(
+      final faroConfig = EngineFaroConfig(
         enabled: true,
         endpoint: 'test',
         appName: 'test',
@@ -122,7 +122,7 @@ void main() {
       expect(faroConfig.toString(), isNotEmpty);
       expect(faroConfig.toString(), contains('****'));
 
-      const splunkConfig = EngineSplunkConfig(
+      final splunkConfig = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://splunk.com',
         token: 'secret-token',
@@ -133,7 +133,7 @@ void main() {
       expect(splunkConfig.toString(), isNotEmpty);
       expect(splunkConfig.toString(), contains('****'));
 
-      const googleLoggingConfig = EngineGoogleLoggingConfig(
+      final googleLoggingConfig = EngineGoogleLoggingConfig(
         enabled: true,
         projectId: 'test-project',
         logName: 'test-logs',

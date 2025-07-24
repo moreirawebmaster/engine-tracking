@@ -8,8 +8,8 @@ import '../helpers/test_configs.dart';
 void main() {
   group('EngineBugTrackingModel', () {
     test('should create model with configurations', () {
-      const crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
-      const faroConfig = EngineFaroConfig(
+      final crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
+      final faroConfig = EngineFaroConfig(
         enabled: true,
         endpoint: 'https://faro.example.com',
         appName: 'TestApp',
@@ -32,8 +32,8 @@ void main() {
     });
 
     test('should have correct toString representation', () {
-      const crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
-      const faroConfig = EngineFaroConfig(
+      final crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
+      final faroConfig = EngineFaroConfig(
         enabled: false,
         endpoint: '',
         appName: '',

@@ -1,6 +1,8 @@
-class EngineSplunkConfig {
-  const EngineSplunkConfig({
-    required this.enabled,
+import 'package:engine_tracking/src/config/config.dart';
+
+class EngineSplunkConfig extends IEngineConfig {
+  EngineSplunkConfig({
+    required super.enabled,
     required this.endpoint,
     required this.token,
     required this.source,
@@ -8,7 +10,6 @@ class EngineSplunkConfig {
     required this.index,
   });
 
-  final bool enabled;
   final String endpoint;
   final String token;
   final String source;
