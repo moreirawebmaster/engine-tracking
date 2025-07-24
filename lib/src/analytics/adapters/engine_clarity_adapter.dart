@@ -79,7 +79,8 @@ class EngineClarityAdapter implements IEngineAnalyticsAdapter<EngineClarityConfi
 
   @override
   Future<void> setUserId(final String? userId, [final String? email, final String? name]) async {
-    Clarity.setCustomUserId(userId ?? email ?? name ?? '');
+    final customUserId = userId ?? email ?? name ?? '';
+    Clarity.setCustomUserId(customUserId);
     await Future.value(null);
   }
 
