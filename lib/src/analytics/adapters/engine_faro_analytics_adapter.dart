@@ -2,23 +2,34 @@ import 'package:engine_tracking/engine_tracking.dart';
 import 'package:faro/faro.dart';
 import 'package:flutter/widgets.dart';
 
+/// Grafana Faro analytics adapter for the Engine Tracking library.
+///
+/// Provides integration with Grafana Faro for observability and analytics.
 class EngineFaroAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineFaroConfig> {
+  /// Creates a new Grafana Faro analytics adapter.
+  ///
+  /// [config] - The Grafana Faro configuration.
   EngineFaroAnalyticsAdapter(this.config);
 
+  /// The Grafana Faro configuration.
   @override
   final EngineFaroConfig config;
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Grafana Faro';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
   bool _isInitialized = false;
 
+  /// Whether Grafana Faro is initialized and ready.
   bool get isFaroInitialized => isEnabled && _isInitialized && _faro != null;
 
   Faro? _faro;

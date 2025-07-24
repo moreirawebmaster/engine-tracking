@@ -7,7 +7,23 @@ import 'package:engine_tracking/src/http/engine_http_client.dart';
 /// This class extends HttpOverrides to intercept HTTP requests and log them
 /// using the Engine Tracking logging system. It provides detailed logging
 /// of request/response data including timing, status codes, and headers.
+/// Custom HTTP override that logs HTTP requests using EngineLog.debug
+///
+/// This class extends HttpOverrides to intercept HTTP requests and log them
+/// using the Engine Tracking logging system. It provides detailed logging
+/// of request/response data including timing, status codes, and headers.
 class EngineHttpOverride extends HttpOverrides {
+  /// Creates a new HTTP override for logging
+  ///
+  /// [enableRequestLogging] Whether to log HTTP requests
+  /// [enableResponseLogging] Whether to log HTTP responses
+  /// [enableTimingLogging] Whether to log request/response timing
+  /// [enableHeaderLogging] Whether to log request/response headers
+  /// [enableBodyLogging] Whether to log request/response body
+  /// [maxBodyLogLength] Maximum length of body content to log
+  /// [logName] Custom log name for HTTP tracking logs
+  /// [ignoreDomains] List of domains to ignore in logging
+  /// [existingOverrides] Optional existing Overrides to chain with
   EngineHttpOverride({
     this.enableRequestLogging = true,
     this.enableResponseLogging = true,

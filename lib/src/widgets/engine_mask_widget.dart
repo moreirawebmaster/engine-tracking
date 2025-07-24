@@ -13,11 +13,15 @@ import 'package:flutter/material.dart';
 /// )
 /// ```
 class EngineMaskWidget extends StatelessWidget {
+  /// Creates a new EngineMaskWidget
+  ///
+  /// [child] The widget to mask
   const EngineMaskWidget({
     required this.child,
     super.key,
   });
 
+  /// The widget to mask from recordings
   final Widget child;
 
   @override
@@ -45,11 +49,15 @@ class EngineMaskWidget extends StatelessWidget {
 /// )
 /// ```
 class EngineUnmaskWidget extends StatelessWidget {
+  /// Creates a new EngineUnmaskWidget
+  ///
+  /// [child] The widget to unmask
   const EngineUnmaskWidget({
     required this.child,
     super.key,
   });
 
+  /// The widget to unmask in recordings
   final Widget child;
 
   @override

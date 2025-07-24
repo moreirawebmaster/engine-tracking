@@ -2,22 +2,31 @@ import 'package:clarity_flutter/clarity_flutter.dart';
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/widgets.dart';
 
+/// Microsoft Clarity analytics adapter for the Engine Tracking library.
+///
+/// Provides integration with Microsoft Clarity for session recording,
+/// heatmaps, and user behavior analytics.
 class EngineClarityAdapter implements IEngineAnalyticsAdapter<EngineClarityConfig> {
+  /// Creates a new Microsoft Clarity analytics adapter.
+  ///
+  /// [config] - The Microsoft Clarity configuration.
   EngineClarityAdapter(this.config);
 
+  /// The Microsoft Clarity configuration.
   @override
   final EngineClarityConfig config;
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Microsoft Clarity';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
-
-  bool get isFaroInitialized => isEnabled && _isInitialized;
 
   bool _isInitialized = false;
 
@@ -70,7 +79,8 @@ class EngineClarityAdapter implements IEngineAnalyticsAdapter<EngineClarityConfi
 
   @override
   Future<void> setUserId(final String? userId, [final String? email, final String? name]) async {
-    Clarity.setCustomUserId(userId ?? email ?? name ?? '');
+    final customUserId = userId ?? email ?? name ?? '';
+    Clarity.setCustomUserId(customUserId);
     await Future.value(null);
   }
 

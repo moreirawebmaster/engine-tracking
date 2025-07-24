@@ -4,23 +4,34 @@ import 'package:flutter/foundation.dart';
 import 'package:googleapis/logging/v2.dart' as logging;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 
+/// Google Cloud Logging bug tracking adapter for the Engine Tracking library.
+///
+/// Provides integration with Google Cloud Logging for error tracking and logging.
 class EngineGoogleLoggingBugTrackingAdapter implements IEngineBugTrackingAdapter<EngineGoogleLoggingConfig> {
+  /// Creates a new Google Cloud Logging bug tracking adapter.
+  ///
+  /// [config] - The Google Cloud Logging configuration.
   EngineGoogleLoggingBugTrackingAdapter(this.config);
 
   bool _isInitialized = false;
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Google Cloud Logging Bug Tracking';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
+  /// The Google Cloud Logging configuration.
   @override
   final EngineGoogleLoggingConfig config;
 
+  /// Whether Google Cloud Logging Bug Tracking is initialized and ready.
   bool get isGoogleLoggingBugTrackingInitialized => isEnabled && _isInitialized;
 
   late final logging.LoggingApi _loggingApi;

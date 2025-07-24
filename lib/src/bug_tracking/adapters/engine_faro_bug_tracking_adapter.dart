@@ -4,22 +4,33 @@ import 'package:engine_tracking/engine_tracking.dart';
 import 'package:faro/faro.dart';
 import 'package:flutter/foundation.dart';
 
+/// Grafana Faro bug tracking adapter for the Engine Tracking library.
+///
+/// Provides integration with Grafana Faro for error tracking and crash reporting.
 class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter<EngineFaroConfig> {
+  /// Creates a new Grafana Faro bug tracking adapter.
+  ///
+  /// [config] - The Grafana Faro configuration.
   EngineFaroBugTrackingAdapter(this.config);
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Grafana Faro Bug Tracking';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
+  /// Whether Grafana Faro is initialized and ready.
   bool get isFaroInitialized => isEnabled && _isInitialized && _faro != null;
 
   bool _isInitialized = false;
 
+  /// The Grafana Faro configuration.
   @override
   final EngineFaroConfig config;
 

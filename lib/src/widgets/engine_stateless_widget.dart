@@ -24,6 +24,9 @@ import 'package:flutter/widgets.dart';
 /// }
 /// ```
 abstract class EngineStatelessWidget extends StatelessWidget {
+  /// Creates a new EngineStatelessWidget
+  ///
+  /// [key] The widget key
   EngineStatelessWidget({super.key}) {
     _screenOpenTime = DateTime.now();
 

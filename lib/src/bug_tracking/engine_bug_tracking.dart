@@ -150,11 +150,22 @@ class EngineBugTracking {
     _isInitialized = false;
   }
 
+  /// Resets the bug tracking system to its initial state
+  ///
+  /// This method clears all adapters and resets the initialization flag.
+  /// Use this to completely reset the bug tracking system.
   static void reset() {
     _adapters.clear();
     _isInitialized = false;
   }
 
+  /// Sets a custom key-value pair for bug tracking across all adapters
+  ///
+  /// This method allows setting custom metadata that will be included
+  /// in crash reports and error logs across all configured bug tracking adapters.
+  ///
+  /// [key] The custom key to set
+  /// [value] The value associated with the key
   static Future<void> setCustomKey(final String key, final Object value) async {
     if (!isEnabled || !_isInitialized) {
       return;
@@ -164,6 +175,14 @@ class EngineBugTracking {
     await Future.wait(setCustomKeys);
   }
 
+  /// Sets user identification information across all bug tracking adapters
+  ///
+  /// This method allows associating user information with crash reports
+  /// and error logs across all configured bug tracking adapters.
+  ///
+  /// [id] The user identifier
+  /// [email] The user email address
+  /// [name] The user display name
   static Future<void> setUserIdentifier(final String id, final String email, final String name) async {
     if (!isEnabled || !_isInitialized) {
       return;
@@ -173,6 +192,15 @@ class EngineBugTracking {
     await Future.wait(setUserIdentifiers);
   }
 
+  /// Logs a message across all bug tracking adapters
+  ///
+  /// This method sends a log message to all configured bug tracking adapters
+  /// with optional level, attributes, and stack trace information.
+  ///
+  /// [message] The message to log
+  /// [level] Optional log level (e.g., 'info', 'warning', 'error')
+  /// [attributes] Optional key-value pairs to include with the log
+  /// [stackTrace] Optional stack trace to include with the log
   static Future<void> log(
     final String message, {
     final String? level,
@@ -194,6 +222,17 @@ class EngineBugTracking {
     await Future.wait(logs);
   }
 
+  /// Records an error across all bug tracking adapters
+  ///
+  /// This method records an exception with optional metadata across all
+  /// configured bug tracking adapters for crash reporting and error analysis.
+  ///
+  /// [exception] The exception to record
+  /// [stackTrace] Optional stack trace associated with the exception
+  /// [reason] Optional reason for the error
+  /// [information] Optional additional information about the error
+  /// [isFatal] Whether this error is considered fatal
+  /// [data] Optional additional data to include with the error
   static Future<void> recordError(
     final dynamic exception,
     final StackTrace? stackTrace, {
@@ -221,6 +260,12 @@ class EngineBugTracking {
     await Future.wait(errors);
   }
 
+  /// Records a Flutter error across all bug tracking adapters
+  ///
+  /// This method records Flutter-specific error details across all
+  /// configured bug tracking adapters for crash reporting and error analysis.
+  ///
+  /// [errorDetails] The Flutter error details to record
   static Future<void> recordFlutterError(final FlutterErrorDetails errorDetails) async {
     if (!isEnabled || !_isInitialized) {
       return;
@@ -234,6 +279,10 @@ class EngineBugTracking {
     await Future.wait(erros);
   }
 
+  /// Triggers a test crash across all bug tracking adapters
+  ///
+  /// This method is used for testing crash reporting functionality
+  /// across all configured bug tracking adapters.
   static Future<void> testCrash() async {
     if (!isEnabled || !_isInitialized) {
       return;

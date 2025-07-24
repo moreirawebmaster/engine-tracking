@@ -1,7 +1,13 @@
 import 'package:engine_tracking/src/src.dart';
 import 'package:flutter/widgets.dart';
 
+/// Navigator observer that automatically tracks page navigation for analytics
+///
+/// This class extends RouteObserver to automatically track page navigation
+/// events and send them to the analytics system when routes are pushed,
+/// popped, or replaced.
 class EngineNavigationObserver extends RouteObserver<PageRoute<dynamic>> {
+  /// Default route name used when no route name is available
   final String rootRouteName = 'root';
   @override
   Future<void> didPop(final Route<dynamic> route, final Route<dynamic>? previousRoute) async {
