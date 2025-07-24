@@ -5,6 +5,24 @@ All notable changes to the Engine Tracking library will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2025-01-24
+
+### Added
+- **Public API Documentation**: Complete documentation for all public API members
+- **Lint Compliance**: Full compliance with `public_member_api_docs` rule
+- **Developer Experience**: Comprehensive Dartdoc comments for all public interfaces
+
+### Fixed
+- **Deprecated Warning**: Resolved `userId` deprecation warning in Clarity adapter
+- **Code Quality**: Improved code maintainability and readability
+- **Future-Proof**: Resolved deprecation warnings for upcoming versions
+
+### Documentation
+- Added 562+ lines of public API documentation across 32 files
+- Documented all public classes, methods, getters, and constructors
+- Resolved 38 lint issues related to missing public API documentation
+- Fixed HTML interpretation issues in documentation comments
+
 ## [1.5.0] - 2025-01-23
 
 ### Added
