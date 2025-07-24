@@ -2,21 +2,32 @@ import 'package:engine_tracking/engine_tracking.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
+/// Firebase Analytics adapter for the Engine Tracking library.
+///
+/// Provides integration with Firebase Analytics for event tracking and user analytics.
 class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineFirebaseAnalyticsConfig> {
+  /// Creates a new Firebase Analytics adapter.
+  ///
+  /// [config] - The Firebase Analytics configuration.
   EngineFirebaseAnalyticsAdapter(this.config);
 
+  /// The Firebase Analytics configuration.
   @override
   final EngineFirebaseAnalyticsConfig config;
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Firebase Analytics';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
+  /// Whether Firebase Analytics is initialized and ready.
   bool get isFirebaseAnalyticsInitialized => isEnabled && _isInitialized && _firebaseAnalytics != null;
 
   bool _isInitialized = false;

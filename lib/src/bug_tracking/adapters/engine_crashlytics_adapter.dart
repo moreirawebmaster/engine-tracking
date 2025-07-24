@@ -3,21 +3,32 @@ import 'package:engine_tracking/src/config/engine_crashlytics_config.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
+/// Firebase Crashlytics adapter for the Engine Tracking library.
+///
+/// Provides integration with Firebase Crashlytics for crash reporting and error tracking.
 class EngineCrashlyticsAdapter implements IEngineBugTrackingAdapter<EngineCrashlyticsConfig> {
+  /// Creates a new Firebase Crashlytics adapter.
+  ///
+  /// [config] - The Firebase Crashlytics configuration.
   EngineCrashlyticsAdapter(this.config);
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Firebase Crashlytics';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
+  /// The Firebase Crashlytics configuration.
   @override
   final EngineCrashlyticsConfig config;
 
+  /// Whether Firebase Crashlytics is initialized and ready.
   bool get isCrashlyticsInitialized => isEnabled && _isInitialized && _crashlytics != null;
 
   bool _isInitialized = false;

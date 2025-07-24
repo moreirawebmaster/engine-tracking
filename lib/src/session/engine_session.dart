@@ -1,13 +1,22 @@
 import 'dart:math';
 
+/// Session management for Engine Tracking
+///
+/// This class provides session management functionality including
+/// session ID generation and enrichment of data with session information.
 class EngineSession {
   EngineSession._();
 
+  /// Singleton instance of EngineSession
   static EngineSession? _i;
+
+  /// Returns the singleton instance of EngineSession
   static EngineSession get instance => _i ??= EngineSession._();
 
+  /// Current session ID
   String? _sessionId;
 
+  /// Returns the current session ID, generating a new one if needed
   String get sessionId => _sessionId ??= _generateUUID();
 
   String _generateHex(final int length) {
@@ -32,12 +41,20 @@ class EngineSession {
     return '$part1-$part2-$part3-$part4-$part5';
   }
 
+  /// Enriches data with the current session ID
+  ///
+  /// This method adds the current session ID to the provided data map,
+  /// creating a new map if the input is null.
+  ///
+  /// [data] The data map to enrich with session ID
+  /// Returns a new map containing the original data plus session ID
   Map<String, dynamic>? enrichWithSessionId(final Map<String, dynamic>? data) {
     final enriched = <String, dynamic>{...?data};
     enriched['session_id'] = sessionId;
     return enriched;
   }
 
+  /// Resets the singleton instance for testing purposes
   static void resetForTesting() {
     _i = null;
   }

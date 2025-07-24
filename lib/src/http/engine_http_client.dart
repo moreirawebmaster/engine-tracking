@@ -2,8 +2,21 @@ import 'dart:io';
 
 import 'package:engine_tracking/src/http/engine_http_client_request.dart';
 
-/// Internal HTTP client wrapper that handles the actual logging
+/// HTTP client wrapper for Engine Tracking HTTP logging.
+///
+/// Wraps a [HttpClient] and intercepts requests for logging and tracking.
 class EngineHttpClient implements HttpClient {
+  /// Creates a new Engine HTTP client.
+  ///
+  /// [_inner] - The inner [HttpClient] to wrap.
+  /// [enableRequestLogging] - Whether to log requests.
+  /// [enableResponseLogging] - Whether to log responses.
+  /// [enableTimingLogging] - Whether to log timing.
+  /// [enableHeaderLogging] - Whether to log headers.
+  /// [enableBodyLogging] - Whether to log bodies.
+  /// [maxBodyLogLength] - Maximum body length to log.
+  /// [logName] - Log name for tracking.
+  /// [ignoreDomains] - List of domains to ignore.
   EngineHttpClient(
     this._inner, {
     required this.enableRequestLogging,
@@ -16,14 +29,31 @@ class EngineHttpClient implements HttpClient {
     required this.ignoreDomains,
   });
 
+  /// The inner [HttpClient] instance.
   final HttpClient _inner;
+
+  /// Whether to log HTTP requests.
   final bool enableRequestLogging;
+
+  /// Whether to log HTTP responses.
   final bool enableResponseLogging;
+
+  /// Whether to log request/response timing.
   final bool enableTimingLogging;
+
+  /// Whether to log request/response headers.
   final bool enableHeaderLogging;
+
+  /// Whether to log request/response bodies.
   final bool enableBodyLogging;
+
+  /// Maximum length of body content to log.
   final int maxBodyLogLength;
+
+  /// Log name for HTTP tracking logs.
   final String logName;
+
+  /// List of domains to ignore for logging.
   final List<String> ignoreDomains;
 
   @override

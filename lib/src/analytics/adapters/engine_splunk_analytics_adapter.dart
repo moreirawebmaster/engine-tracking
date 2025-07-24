@@ -5,21 +5,32 @@ import 'package:engine_tracking/src/analytics/adapters/i_engine_analytics_adapte
 import 'package:engine_tracking/src/config/engine_splunk_config.dart';
 import 'package:flutter/material.dart';
 
+/// Splunk analytics adapter for the Engine Tracking library.
+///
+/// Provides integration with Splunk for analytics event tracking and logging.
 class EngineSplunkAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineSplunkConfig> {
+  /// Creates a new Splunk analytics adapter.
+  ///
+  /// [config] - The Splunk configuration.
   EngineSplunkAnalyticsAdapter(this.config);
 
+  /// The Splunk configuration.
   @override
   final EngineSplunkConfig config;
 
+  /// The name of this adapter.
   @override
   String get adapterName => 'Splunk';
 
+  /// Whether this adapter is enabled.
   @override
   bool get isEnabled => config.enabled;
 
+  /// Whether this adapter has been initialized.
   @override
   bool get isInitialized => _isInitialized;
 
+  /// Whether Splunk is initialized and ready.
   bool get isSplunkInitialized => isEnabled && _isInitialized;
 
   bool _isInitialized = false;

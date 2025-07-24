@@ -35,6 +35,10 @@ import 'package:flutter/material.dart';
 /// }
 /// ```
 class EngineWidget extends StatelessWidget {
+  /// Creates a new EngineWidget
+  ///
+  /// [app] The main application widget to wrap
+  /// [key] The widget key
   const EngineWidget({
     required this.app,
     super.key,

@@ -50,6 +50,7 @@ analyzer:
 
 linter:
   rules:
+    public_member_api_docs: true
     # === SECURITY & SAFETY (2025 Critical) ===
     # Modern security practices
     avoid_dynamic_calls: false

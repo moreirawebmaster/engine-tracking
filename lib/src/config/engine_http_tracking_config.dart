@@ -6,7 +6,22 @@ import 'package:engine_tracking/src/config/config.dart';
 ///
 /// This class defines the configuration options for HTTP request/response logging
 /// using the EngineHttpOverride system.
+/// Configuration class for Engine HTTP tracking
+///
+/// This class defines the configuration options for HTTP request/response logging
+/// using the EngineHttpOverride system.
 class EngineHttpTrackingConfig extends IEngineConfig {
+  /// Creates a new HTTP tracking configuration
+  ///
+  /// [enabled] Whether HTTP tracking is enabled
+  /// [enableRequestLogging] Whether to log HTTP requests
+  /// [enableResponseLogging] Whether to log HTTP responses
+  /// [enableTimingLogging] Whether to log request/response timing
+  /// [enableHeaderLogging] Whether to log request/response headers
+  /// [enableBodyLogging] Whether to log request/response body
+  /// [maxBodyLogLength] Maximum length of body content to log
+  /// [logName] Custom log name for HTTP tracking logs
+  /// [baseOverride] Optional base HttpOverrides to chain with
   EngineHttpTrackingConfig({
     super.enabled = true,
     this.enableRequestLogging = true,

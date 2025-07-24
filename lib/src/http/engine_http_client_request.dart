@@ -4,8 +4,23 @@ import 'dart:io';
 
 import 'package:engine_tracking/engine_tracking.dart';
 
-/// Internal HTTP request wrapper that handles logging
+/// HTTP request wrapper for Engine Tracking HTTP logging.
+///
+/// Wraps a [HttpClientRequest] and intercepts requests for logging and tracking.
 class EngineHttpClientRequest implements HttpClientRequest {
+  /// Creates a new Engine HTTP client request.
+  ///
+  /// [_inner] - The inner [HttpClientRequest] to wrap.
+  /// [method] - HTTP method.
+  /// [uri] - Request URI.
+  /// [enableRequestLogging] - Whether to log requests.
+  /// [enableResponseLogging] - Whether to log responses.
+  /// [enableTimingLogging] - Whether to log timing.
+  /// [enableHeaderLogging] - Whether to log headers.
+  /// [enableBodyLogging] - Whether to log bodies.
+  /// [maxBodyLogLength] - Maximum body length to log.
+  /// [logName] - Log name for tracking.
+  /// [ignoreDomains] - List of domains to ignore.
   EngineHttpClientRequest(
     this._inner, {
     required this.method,
@@ -23,18 +38,39 @@ class EngineHttpClientRequest implements HttpClientRequest {
     unawaited(_logRequest());
   }
 
+  /// The inner [HttpClientRequest] instance.
   final HttpClientRequest _inner;
+
+  /// HTTP method.
   @override
   final String method;
+
+  /// Request URI.
   @override
   final Uri uri;
+
+  /// Whether to log HTTP requests.
   final bool enableRequestLogging;
+
+  /// Whether to log HTTP responses.
   final bool enableResponseLogging;
+
+  /// Whether to log request/response timing.
   final bool enableTimingLogging;
+
+  /// Whether to log request/response headers.
   final bool enableHeaderLogging;
+
+  /// Whether to log request/response bodies.
   final bool enableBodyLogging;
+
+  /// Maximum length of body content to log.
   final int maxBodyLogLength;
+
+  /// Log name for HTTP tracking logs.
   final String logName;
+
+  /// List of domains to ignore for logging.
   final List<String> ignoreDomains;
 
   late final DateTime _startTime;
