@@ -3,6 +3,28 @@ import 'dart:async';
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/foundation.dart';
 
+/// Main bug tracking service for the Engine Tracking library.
+///
+/// Provides a unified interface for error tracking and crash reporting across multiple services
+/// including Firebase Crashlytics, Grafana Faro, and Google Cloud Logging.
+///
+/// This class automatically captures Flutter errors and platform errors, and manages
+/// multiple bug tracking adapters simultaneously.
+///
+/// Example:
+/// ```dart
+/// // Initialize with specific adapters
+/// await EngineBugTracking.init([
+///   EngineCrashlyticsAdapter(crashlyticsConfig),
+///   EngineFaroBugTrackingAdapter(faroConfig),
+/// ]);
+///
+/// // Or initialize with a model
+/// await EngineBugTracking.initWithModel(bugTrackingModel);
+///
+/// // Set custom keys for better error context
+/// await EngineBugTracking.setCustomKey('user_level', 'premium');
+/// ```
 class EngineBugTracking {
   EngineBugTracking._() {
     FlutterError.onError = (final details) async {
@@ -17,13 +39,21 @@ class EngineBugTracking {
 
   static bool _isInitialized = false;
 
+  /// Whether bug tracking is enabled and has at least one adapter configured.
   static bool get isEnabled => _adapters.isNotEmpty;
+
+  /// Whether the bug tracking service has been initialized.
   static bool get isInitialized => _isInitialized;
 
   static final _adapters = <IEngineBugTrackingAdapter>[];
 
+  /// Whether Firebase Crashlytics adapter is initialized and ready.
   static bool get isCrashlyticsInitialized => _isAdapterTypeInitialized<EngineCrashlyticsAdapter>();
+
+  /// Whether Grafana Faro bug tracking adapter is initialized and ready.
   static bool get isFaroInitialized => _isAdapterTypeInitialized<EngineFaroBugTrackingAdapter>();
+
+  /// Whether Google Cloud Logging bug tracking adapter is initialized and ready.
   static bool get isGoogleLoggingInitialized => _isAdapterTypeInitialized<EngineGoogleLoggingBugTrackingAdapter>();
 
   static bool _isAdapterTypeInitialized<T extends IEngineBugTrackingAdapter>() =>
@@ -48,6 +78,20 @@ class EngineBugTracking {
     return null;
   }
 
+  /// Initializes the bug tracking service with the provided adapters.
+  ///
+  /// Only enabled adapters will be initialized. If the service is already
+  /// initialized, this method will return immediately.
+  ///
+  /// [adapters] - List of bug tracking adapters to initialize.
+  ///
+  /// Example:
+  /// ```dart
+  /// await EngineBugTracking.init([
+  ///   EngineCrashlyticsAdapter(crashlyticsConfig),
+  ///   EngineFaroBugTrackingAdapter(faroConfig),
+  /// ]);
+  /// ```
   static Future<void> init(final List<IEngineBugTrackingAdapter> adapters) async {
     if (_isInitialized) {
       return;
@@ -63,6 +107,21 @@ class EngineBugTracking {
     _isInitialized = true;
   }
 
+  /// Initializes the bug tracking service using a configuration model.
+  ///
+  /// Creates adapters based on the provided model's configuration objects.
+  /// Only configurations that are not null will be used to create adapters.
+  ///
+  /// [model] - Bug tracking configuration model containing various service configs.
+  ///
+  /// Example:
+  /// ```dart
+  /// final model = EngineBugTrackingModel(
+  ///   crashlyticsConfig: crashlyticsConfig,
+  ///   faroConfig: faroConfig,
+  /// );
+  /// await EngineBugTracking.initWithModel(model);
+  /// ```
   static Future<void> initWithModel(final EngineBugTrackingModel model) async {
     final adapters = <IEngineBugTrackingAdapter>[
       if (model.crashlyticsConfig != null) EngineCrashlyticsAdapter(model.crashlyticsConfig!),
@@ -73,6 +132,12 @@ class EngineBugTracking {
     await init(adapters);
   }
 
+  /// Disposes of all bug tracking adapters and resets the service state.
+  ///
+  /// This method should be called when the bug tracking service is no longer needed,
+  /// typically during app shutdown or when switching configurations.
+  ///
+  /// If the service is not initialized, this method will return immediately.
   static Future<void> dispose() async {
     if (!_isInitialized) {
       return;

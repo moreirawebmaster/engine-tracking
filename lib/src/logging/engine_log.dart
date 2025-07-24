@@ -3,10 +3,27 @@ import 'dart:developer' as developer;
 
 import 'package:engine_tracking/engine_tracking.dart';
 
-/// Utility class for logging and crash reporting in the Engine framework.
+/// Centralized logging service for the Engine Tracking library.
 ///
-/// This class provides methods for logging at different levels (debug, info, warning, error, fatal)
-/// and integrates with Firebase Crashlytics for crash reporting or other logging services.
+/// Provides comprehensive logging capabilities with multiple levels (debug, info, warning, error, fatal)
+/// and automatic integration with analytics and bug tracking services.
+///
+/// This service automatically enriches log messages with session information and can
+/// send logs to both analytics and bug tracking services when they are initialized.
+///
+/// Example:
+/// ```dart
+/// // Basic logging
+/// await EngineLog.info('User logged in successfully');
+/// await EngineLog.error('Failed to load user data', error: exception);
+///
+/// // Logging with additional data
+/// await EngineLog.debug('API request completed', data: {
+///   'endpoint': '/api/users',
+///   'duration_ms': 150,
+///   'status_code': 200,
+/// });
+/// ```
 class EngineLog {
   static const String _name = 'ENGINE_LOG';
 
@@ -64,13 +81,17 @@ class EngineLog {
     }
   }
 
-  /// Log debug level message
+  /// Logs a debug level message.
   ///
-  /// [message] The message to log
-  /// [logName] Optional custom log name
-  /// [error] Optional error object
-  /// [stackTrace] Optional stack trace
-  /// [data] Optional additional data to include with the log
+  /// Debug messages are typically used for detailed diagnostic information
+  /// that is only useful during development and debugging.
+  ///
+  /// [message] - The message to log.
+  /// [includeInAnalytics] - Whether to include this log in analytics events.
+  /// [logName] - Optional custom log name for categorization.
+  /// [error] - Optional error object to include with the log.
+  /// [stackTrace] - Optional stack trace to include with the log.
+  /// [data] - Optional additional data to include with the log.
   static Future<void> debug(
     final String message, {
     final bool includeInAnalytics = true,
@@ -90,7 +111,17 @@ class EngineLog {
     );
   }
 
-  /// Log info level message
+  /// Logs an info level message.
+  ///
+  /// Info messages are used for general information about application flow
+  /// and important events that are not errors or warnings.
+  ///
+  /// [message] - The message to log.
+  /// [includeInAnalytics] - Whether to include this log in analytics events.
+  /// [logName] - Optional custom log name for categorization.
+  /// [error] - Optional error object to include with the log.
+  /// [stackTrace] - Optional stack trace to include with the log.
+  /// [data] - Optional additional data to include with the log.
   static Future<void> info(
     final String message, {
     final bool includeInAnalytics = true,
@@ -110,7 +141,17 @@ class EngineLog {
     );
   }
 
-  /// Log warning level message
+  /// Logs a warning level message.
+  ///
+  /// Warning messages indicate potential issues or unexpected conditions
+  /// that are not errors but should be monitored.
+  ///
+  /// [message] - The message to log.
+  /// [includeInAnalytics] - Whether to include this log in analytics events.
+  /// [logName] - Optional custom log name for categorization.
+  /// [error] - Optional error object to include with the log.
+  /// [stackTrace] - Optional stack trace to include with the log.
+  /// [data] - Optional additional data to include with the log.
   static Future<void> warning(
     final String message, {
     final bool includeInAnalytics = true,
@@ -130,7 +171,17 @@ class EngineLog {
     );
   }
 
-  /// Log error level message
+  /// Logs an error level message.
+  ///
+  /// Error messages indicate that something went wrong but the application
+  /// can continue running. These are automatically sent to bug tracking services.
+  ///
+  /// [message] - The message to log.
+  /// [includeInAnalytics] - Whether to include this log in analytics events.
+  /// [logName] - Optional custom log name for categorization.
+  /// [error] - Optional error object to include with the log.
+  /// [stackTrace] - Optional stack trace to include with the log.
+  /// [data] - Optional additional data to include with the log.
   static Future<void> error(
     final String message, {
     final bool includeInAnalytics = true,
@@ -150,7 +201,18 @@ class EngineLog {
     );
   }
 
-  /// Log fatal level message
+  /// Logs a fatal level message.
+  ///
+  /// Fatal messages indicate critical errors that may cause the application
+  /// to crash or become unusable. These are automatically sent to bug tracking
+  /// services as fatal errors.
+  ///
+  /// [message] - The message to log.
+  /// [includeInAnalytics] - Whether to include this log in analytics events.
+  /// [logName] - Optional custom log name for categorization.
+  /// [error] - Optional error object to include with the log.
+  /// [stackTrace] - Optional stack trace to include with the log.
+  /// [data] - Optional additional data to include with the log.
   static Future<void> fatal(
     final String message, {
     final bool includeInAnalytics = true,

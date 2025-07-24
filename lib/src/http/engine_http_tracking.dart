@@ -4,28 +4,62 @@ import 'dart:io';
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:engine_tracking/src/http/engine_http_override.dart';
 
-/// Utility class for managing Engine HTTP tracking
+/// HTTP tracking service for the Engine Tracking library.
 ///
-/// This class provides static methods to enable/disable HTTP tracking
-/// and manage the global HttpOverrides configuration.
+/// Provides comprehensive HTTP request and response tracking capabilities
+/// by intercepting all HTTP requests through Flutter's HttpOverrides system.
+///
+/// This service can log request/response headers, bodies, timing information,
+/// and other HTTP-related data for debugging and monitoring purposes.
+///
+/// Example:
+/// ```dart
+/// final config = EngineHttpTrackingConfig(
+///   enabled: true,
+///   enableRequestLogging: true,
+///   enableResponseLogging: true,
+///   enableTimingLogging: true,
+/// );
+///
+/// EngineHttpTracking.initialize(config);
+/// ```
 class EngineHttpTracking {
   static EngineHttpTrackingConfig? _config;
   static HttpOverrides? _previousOverride;
   static bool _isEnabled = false;
 
-  /// Gets the current HTTP tracking configuration
+  /// Gets the current HTTP tracking configuration.
+  ///
+  /// Returns null if HTTP tracking has not been initialized.
   static EngineHttpTrackingConfig? get config => _config;
 
-  /// Whether HTTP tracking is currently enabled
+  /// Whether HTTP tracking is currently enabled and active.
+  ///
+  /// Returns true if HTTP tracking has been initialized and is actively
+  /// intercepting HTTP requests.
   static bool get isEnabled => _isEnabled;
 
-  /// Initializes HTTP tracking with the given configuration
+  /// Initializes HTTP tracking with the given configuration.
   ///
   /// This method sets up the global HttpOverrides to use EngineHttpOverride
-  /// for logging HTTP requests and responses.
+  /// for logging HTTP requests and responses. If HTTP tracking is disabled
+  /// in the configuration, this method will disable tracking instead.
   ///
-  /// [config] The configuration for HTTP tracking
-  /// [preserveExisting] Whether to preserve existing HttpOverrides by chaining them
+  /// [config] - The configuration for HTTP tracking.
+  /// [preserveExisting] - Whether to preserve existing HttpOverrides by chaining them.
+  ///                      If true, existing overrides will be called before Engine overrides.
+  ///
+  /// Example:
+  /// ```dart
+  /// final config = EngineHttpTrackingConfig(
+  ///   enabled: true,
+  ///   enableRequestLogging: true,
+  ///   enableResponseLogging: true,
+  ///   maxBodyLogLength: 1000,
+  /// );
+  ///
+  /// EngineHttpTracking.initialize(config);
+  /// ```
   static void initialize(final EngineHttpTrackingConfig config, {final bool preserveExisting = true}) {
     if (!config.enabled) {
       disable();
@@ -67,10 +101,13 @@ class EngineHttpTracking {
     );
   }
 
-  /// Disables HTTP tracking
+  /// Disables HTTP tracking and restores previous HttpOverrides.
   ///
-  /// This method removes the EngineHttpOverride and optionally restores
-  /// the previous HttpOverrides configuration.
+  /// This method removes the EngineHttpOverride and restores the previous
+  /// HttpOverrides configuration if one existed. If no previous override
+  /// was found, it sets HttpOverrides.global to null.
+  ///
+  /// If HTTP tracking is not currently enabled, this method does nothing.
   static void disable() {
     if (!_isEnabled) return;
 
@@ -88,10 +125,13 @@ class EngineHttpTracking {
     unawaited(EngineLog.info('HTTP tracking disabled', logName: 'ENGINE_HTTP_TRACKING'));
   }
 
-  /// Updates the HTTP tracking configuration
+  /// Updates the HTTP tracking configuration.
   ///
   /// This method allows you to update the configuration without fully
-  /// reinitializing the system.
+  /// reinitializing the system. If HTTP tracking has not been initialized,
+  /// it will initialize with the new configuration.
+  ///
+  /// [newConfig] - The new configuration to apply.
   static void updateConfig(final EngineHttpTrackingConfig newConfig) {
     if (_config == null) {
       initialize(newConfig);
