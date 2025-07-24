@@ -9,6 +9,12 @@ import 'package:engine_tracking/engine_tracking.dart';
 class EngineTrackingInitialize {
   EngineTrackingInitialize._();
 
+  static void _initEngineHttp(final EngineHttpTrackingConfig? httpTrackingConfig) {
+    if (httpTrackingConfig != null) {
+      EngineHttpTracking.initialize(httpTrackingConfig, preserveExisting: true);
+    }
+  }
+
   /// Initialize tracking services with custom adapters
   ///
   /// [analyticsAdapters] List of analytics adapters to initialize.
@@ -16,9 +22,13 @@ class EngineTrackingInitialize {
   ///
   /// [bugTrackingAdapters] List of bug tracking adapters to initialize.
   /// Can be null to skip bug tracking initialization.
+  ///
+  /// [httpTrackingConfig] HTTP tracking configuration.
+  /// Can be null to skip HTTP tracking initialization.
   static Future<void> initWithAdapters({
     final List<IEngineAnalyticsAdapter>? analyticsAdapters,
     final List<IEngineBugTrackingAdapter>? bugTrackingAdapters,
+    final EngineHttpTrackingConfig? httpTrackingConfig,
   }) async {
     final futures = <Future<void>>[];
 
@@ -31,6 +41,8 @@ class EngineTrackingInitialize {
     }
 
     await Future.wait(futures);
+
+    _initEngineHttp(httpTrackingConfig);
   }
 
   /// Initialize tracking services with configuration models
@@ -40,9 +52,13 @@ class EngineTrackingInitialize {
   ///
   /// [bugTrackingModel] Bug tracking configuration model.
   /// Can be null to skip bug tracking initialization.
+  ///
+  /// [httpTrackingConfig] HTTP tracking configuration.
+  /// Can be null to skip HTTP tracking initialization.
   static Future<void> initWithModels({
     final EngineAnalyticsModel? analyticsModel,
     final EngineBugTrackingModel? bugTrackingModel,
+    final EngineHttpTrackingConfig? httpTrackingConfig,
   }) async {
     final futures = <Future<void>>[];
 
@@ -55,6 +71,8 @@ class EngineTrackingInitialize {
     }
 
     await Future.wait(futures);
+
+    _initEngineHttp(httpTrackingConfig);
   }
 
   /// Initialize both services with default disabled configurations

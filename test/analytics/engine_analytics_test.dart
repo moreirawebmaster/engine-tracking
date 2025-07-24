@@ -10,12 +10,12 @@ void main() {
     });
 
     test('should initialize with adapters', () async {
-      final adapters = [
+      final adapters = <IEngineAnalyticsAdapter>[
         EngineFirebaseAnalyticsAdapter(
-          const EngineFirebaseAnalyticsConfig(enabled: false),
+          EngineFirebaseAnalyticsConfig(enabled: false),
         ),
         EngineFaroAnalyticsAdapter(
-          const EngineFaroConfig(
+          EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -27,7 +27,7 @@ void main() {
           ),
         ),
         EngineSplunkAnalyticsAdapter(
-          const EngineSplunkConfig(
+          EngineSplunkConfig(
             enabled: false,
             endpoint: '',
             token: '',
@@ -46,8 +46,8 @@ void main() {
 
     test('should initialize with model', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -58,7 +58,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -66,7 +66,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -80,8 +80,8 @@ void main() {
 
     test('should handle log event without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -92,7 +92,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -100,7 +100,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -113,8 +113,8 @@ void main() {
 
     test('should handle setUserId without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -125,7 +125,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -133,7 +133,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -146,8 +146,8 @@ void main() {
 
     test('should handle setUserProperty without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -158,7 +158,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -166,7 +166,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -179,8 +179,8 @@ void main() {
 
     test('should handle setPage without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -191,7 +191,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -199,7 +199,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -212,8 +212,8 @@ void main() {
 
     test('should handle logAppOpen without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -224,7 +224,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -232,7 +232,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -245,8 +245,8 @@ void main() {
 
     test('should have enabled adapters when configs are enabled', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: true),
+        faroConfig: EngineFaroConfig(
           enabled: true,
           endpoint: 'https://example.com',
           appName: 'TestApp',
@@ -257,7 +257,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -265,7 +265,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -279,8 +279,8 @@ void main() {
 
     test('should handle reset without throwing', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -291,7 +291,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -299,7 +299,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),
@@ -312,8 +312,8 @@ void main() {
 
     test('should handle custom events', () async {
       final model = EngineAnalyticsModel(
-        firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-        faroConfig: const EngineFaroConfig(
+        firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(enabled: false),
+        faroConfig: EngineFaroConfig(
           enabled: false,
           endpoint: '',
           appName: '',
@@ -324,7 +324,7 @@ void main() {
           platform: '',
         ),
         googleLoggingConfig: TestConfigs.googleLoggingConfig,
-        splunkConfig: const EngineSplunkConfig(
+        splunkConfig: EngineSplunkConfig(
           enabled: false,
           endpoint: '',
           token: '',
@@ -332,7 +332,7 @@ void main() {
           sourcetype: '',
           index: '',
         ),
-        clarityConfig: const EngineClarityConfig(
+        clarityConfig: EngineClarityConfig(
           enabled: false,
           projectId: '',
         ),

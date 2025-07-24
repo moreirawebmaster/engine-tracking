@@ -1,7 +1,7 @@
-class EngineCrashlyticsConfig {
-  const EngineCrashlyticsConfig({required this.enabled});
+import 'package:engine_tracking/src/config/config.dart';
 
-  final bool enabled;
+class EngineCrashlyticsConfig extends IEngineConfig {
+  EngineCrashlyticsConfig({required super.enabled});
 
   @override
   String toString() => 'EngineCrashlyticsConfig(enabled: $enabled)';

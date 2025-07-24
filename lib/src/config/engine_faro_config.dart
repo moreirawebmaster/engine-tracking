@@ -1,8 +1,10 @@
 import 'dart:io';
 
-class EngineFaroConfig {
-  const EngineFaroConfig({
-    required this.enabled,
+import 'package:engine_tracking/src/config/config.dart';
+
+class EngineFaroConfig extends IEngineConfig {
+  EngineFaroConfig({
+    required super.enabled,
     required this.endpoint,
     required this.appName,
     required this.appVersion,
@@ -10,10 +12,10 @@ class EngineFaroConfig {
     required this.apiKey,
     required this.namespace,
     required this.platform,
+    this.httpTrackingEnable = false,
     this.httpOverrides,
   });
 
-  final bool enabled;
   final String endpoint;
   final String appName;
   final String appVersion;
@@ -22,6 +24,7 @@ class EngineFaroConfig {
   final String namespace;
   final String platform;
   final HttpOverrides? httpOverrides;
+  final bool httpTrackingEnable;
 
   @override
   String toString() =>

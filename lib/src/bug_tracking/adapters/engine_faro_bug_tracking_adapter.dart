@@ -1,17 +1,17 @@
 import 'dart:io';
 
 import 'package:engine_tracking/engine_tracking.dart';
-import 'package:faro/faro_sdk.dart';
+import 'package:faro/faro.dart';
 import 'package:flutter/foundation.dart';
 
-class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
-  EngineFaroBugTrackingAdapter(this._config);
+class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter<EngineFaroConfig> {
+  EngineFaroBugTrackingAdapter(this.config);
 
   @override
   String get adapterName => 'Grafana Faro Bug Tracking';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
@@ -19,7 +19,10 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
   bool get isFaroInitialized => isEnabled && _isInitialized && _faro != null;
 
   bool _isInitialized = false;
-  final EngineFaroConfig _config;
+
+  @override
+  final EngineFaroConfig config;
+
   Faro? _faro;
 
   @override
@@ -29,9 +32,14 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _faro = Faro();
-      HttpOverrides.global = FaroHttpOverrides(_config.httpOverrides);
+
+      if (config.httpTrackingEnable) {
+        HttpOverrides.global = FaroHttpOverrides(config.httpOverrides ?? HttpOverrides.current);
+      }
 
       if (EngineAnalytics.isFaroInitialized) {
         return;
@@ -39,18 +47,16 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
 
       await _faro?.init(
         optionsConfiguration: FaroConfig(
-          apiKey: _config.apiKey,
-          appName: _config.appName,
-          appVersion: _config.appVersion,
-          appEnv: _config.environment,
-          collectorUrl: _config.endpoint,
+          apiKey: config.apiKey,
+          appName: config.appName,
+          appVersion: config.appVersion,
+          appEnv: config.environment,
+          collectorUrl: config.endpoint,
           enableCrashReporting: true,
           anrTracking: true,
-          refreshRateVitals: true,
-          namespace: _config.namespace,
+          namespace: config.namespace,
         ),
       );
-      _isInitialized = true;
     } catch (e) {
       _isInitialized = false;
       debugPrint('failed to initialize Faro Bug Tracking $e');
@@ -102,9 +108,9 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
     }
 
     try {
-      await _faro!.pushLog(
+      _faro!.pushLog(
         message,
-        level: level,
+        level: LogLevel.fromString(level) ?? LogLevel.info,
         context: convertToStringMap(attributes),
         trace: {'stack': (stackTrace ?? StackTrace.current).toString()},
       );
@@ -134,7 +140,7 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
         'isFatal': isFatal.toString(),
       };
 
-      await _faro!.pushError(
+      _faro!.pushError(
         type: reason ?? 'Unknown',
         value: exception.toString(),
         context: convertToStringMap(contextData),
@@ -163,7 +169,7 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
         'summary': errorDetails.summary.toString(),
       };
 
-      await _faro!.pushError(
+      _faro!.pushError(
         type: 'FlutterError',
         value: errorDetails.exception.toString(),
         context: convertToStringMap(contextData),
@@ -185,7 +191,7 @@ class EngineFaroBugTrackingAdapter implements IEngineBugTrackingAdapter {
       try {
         final contextData = <String, dynamic>{'test': 'true'};
 
-        await _faro!.pushError(
+        _faro!.pushError(
           type: 'TestCrash',
           value: 'This is a test crash for Faro',
           context: convertToStringMap(contextData),

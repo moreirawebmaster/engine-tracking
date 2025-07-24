@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('EngineFaroConfig', () {
     test('should create config with all parameters', () {
-      const config = EngineFaroConfig(
+      final config = EngineFaroConfig(
         enabled: true,
         endpoint: 'https://faro.example.com',
         appName: 'TestApp',
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('should create disabled config', () {
-      const config = EngineFaroConfig(
+      final config = EngineFaroConfig(
         enabled: false,
         endpoint: '',
         appName: '',
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('should have correct toString representation with masked API key', () {
-      const config = EngineFaroConfig(
+      final config = EngineFaroConfig(
         enabled: true,
         endpoint: 'https://faro.example.com',
         appName: 'TestApp',
@@ -66,7 +66,7 @@ void main() {
     });
 
     test('should handle empty API key in toString', () {
-      const config = EngineFaroConfig(
+      final config = EngineFaroConfig(
         enabled: false,
         endpoint: '',
         appName: '',

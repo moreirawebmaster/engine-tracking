@@ -16,8 +16,8 @@ void main() {
 
       test('should handle disabled services', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -37,12 +37,12 @@ void main() {
       });
 
       test('should initialize with adapters', () async {
-        final adapters = [
+        final adapters = <IEngineBugTrackingAdapter>[
           EngineCrashlyticsAdapter(
-            const EngineCrashlyticsConfig(enabled: false),
+            EngineCrashlyticsConfig(enabled: false),
           ),
           EngineFaroBugTrackingAdapter(
-            const EngineFaroConfig(
+            EngineFaroConfig(
               enabled: false,
               endpoint: '',
               appName: '',
@@ -63,8 +63,8 @@ void main() {
 
       test('should initialize with Crashlytics enabled only (mocked)', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: true),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -77,14 +77,14 @@ void main() {
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
-        expect(model.crashlyticsConfig.enabled, isTrue);
-        expect(model.faroConfig.enabled, isFalse);
+        expect(model.crashlyticsConfig?.enabled, isTrue);
+        expect(model.faroConfig?.enabled, isFalse);
       });
 
       test('should initialize with Faro enabled only (mocked)', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: true,
             endpoint: 'https://faro.example.com',
             appName: 'TestApp',
@@ -97,15 +97,15 @@ void main() {
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
-        expect(model.crashlyticsConfig.enabled, isFalse);
-        expect(model.faroConfig.enabled, isTrue);
-        expect(model.faroConfig.endpoint, equals('https://faro.example.com'));
+        expect(model.crashlyticsConfig?.enabled, isFalse);
+        expect(model.faroConfig?.enabled, isTrue);
+        expect(model.faroConfig?.endpoint, equals('https://faro.example.com'));
       });
 
       test('should initialize with both services enabled (mocked)', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: true),
+          faroConfig: EngineFaroConfig(
             enabled: true,
             endpoint: 'https://faro.example.com',
             appName: 'TestApp',
@@ -118,17 +118,17 @@ void main() {
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
-        expect(model.crashlyticsConfig.enabled, isTrue);
-        expect(model.faroConfig.enabled, isTrue);
-        expect(model.faroConfig.appName, equals('TestApp'));
+        expect(model.crashlyticsConfig?.enabled, isTrue);
+        expect(model.faroConfig?.enabled, isTrue);
+        expect(model.faroConfig?.appName, equals('TestApp'));
       });
     });
 
     group('Method Calls', () {
       test('should handle custom key when services disabled', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -148,8 +148,8 @@ void main() {
 
       test('should handle user identifier when services disabled', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -170,8 +170,8 @@ void main() {
 
       test('should handle logging when services disabled', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -197,8 +197,8 @@ void main() {
 
       test('should handle error recording when services disabled', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -230,8 +230,8 @@ void main() {
 
       test('should handle Flutter error recording when services disabled', () async {
         final model = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -259,8 +259,8 @@ void main() {
     group('Configuration Checks', () {
       test('should correctly identify enabled services (configuration only)', () async {
         final crashlyticsModel = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: true),
+          faroConfig: EngineFaroConfig(
             enabled: false,
             endpoint: '',
             appName: '',
@@ -273,12 +273,12 @@ void main() {
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
-        expect(crashlyticsModel.crashlyticsConfig.enabled, isTrue);
-        expect(crashlyticsModel.faroConfig.enabled, isFalse);
+        expect(crashlyticsModel.crashlyticsConfig?.enabled, isTrue);
+        expect(crashlyticsModel.faroConfig?.enabled, isFalse);
 
         final faroModel = EngineBugTrackingModel(
-          crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-          faroConfig: const EngineFaroConfig(
+          crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
+          faroConfig: EngineFaroConfig(
             enabled: true,
             endpoint: 'https://faro.example.com',
             appName: 'TestApp',
@@ -291,8 +291,8 @@ void main() {
           googleLoggingConfig: TestConfigs.googleLoggingConfig,
         );
 
-        expect(faroModel.crashlyticsConfig.enabled, isFalse);
-        expect(faroModel.faroConfig.enabled, isTrue);
+        expect(faroModel.crashlyticsConfig?.enabled, isFalse);
+        expect(faroModel.faroConfig?.enabled, isTrue);
       });
     });
   });

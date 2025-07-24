@@ -22,11 +22,12 @@ class EngineLog {
     final levelLog = level ?? EngineLogLevelType.info;
     final prefix = _getLevelPrefix(levelLog);
     final dataString = data == null ? '' : '- [Data]: ${data.toString()}';
+    final time = DateTime.now().toIso8601String();
 
-    final logMessage = '$prefix $message $dataString';
+    final logMessage = '$prefix $message';
 
     developer.log(
-      logMessage,
+      logMessage + dataString,
       name: logName,
       error: error,
       stackTrace: stackTrace,
@@ -39,27 +40,17 @@ class EngineLog {
       'tag': logName,
       'level': levelLog.name,
       if (data != null) ...data,
-      'time': DateTime.now(),
+      'time': time,
     };
 
     final attributes = EngineSession.instance.enrichWithSessionId(baseAttributes);
 
     if (EngineAnalytics.isEnabled && includeInAnalytics) {
-      await EngineAnalytics.logEvent(
-        message,
-        attributes,
-      );
+      await EngineAnalytics.logEvent(message, attributes);
     }
 
     if (EngineBugTracking.isEnabled) {
-      unawaited(
-        EngineBugTracking.log(
-          message,
-          attributes: attributes,
-          level: levelLog.name,
-          stackTrace: stackTrace,
-        ),
-      );
+      unawaited(EngineBugTracking.log(message, attributes: attributes, level: levelLog.name, stackTrace: stackTrace));
 
       if (levelLog == EngineLogLevelType.error || levelLog == EngineLogLevelType.fatal) {
         await EngineBugTracking.recordError(

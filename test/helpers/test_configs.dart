@@ -5,7 +5,7 @@ class TestConfigs {
   TestConfigs._();
 
   /// Configuração padrão do Google Cloud Logging para testes
-  static const googleLoggingConfig = EngineGoogleLoggingConfig(
+  static final googleLoggingConfig = EngineGoogleLoggingConfig(
     enabled: false,
     projectId: '',
     logName: '',
@@ -13,7 +13,7 @@ class TestConfigs {
   );
 
   /// Configuração habilitada do Google Cloud Logging para testes
-  static const googleLoggingConfigEnabled = EngineGoogleLoggingConfig(
+  static final googleLoggingConfigEnabled = EngineGoogleLoggingConfig(
     enabled: true,
     projectId: 'test-project',
     logName: 'test-logs',

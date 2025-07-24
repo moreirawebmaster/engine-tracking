@@ -1,21 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:engine_tracking/engine_tracking.dart';
+import 'package:engine_tracking_example/http_tracking_example.dart';
+import 'package:engine_tracking_example/view_tracking_example.dart';
 import 'package:flutter/material.dart';
-
-import 'view_tracking_example.dart';
-import 'http_tracking_example.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final (analyticsModel, bugTrackingModel) = await initializeTracking();
+  await initializeTracking();
 
-  runApp(
-    EngineWidget(
-      app: const MyApp(),
-      clarityConfig: analyticsModel.clarityConfig,
-    ),
-  );
+  runApp(const EngineWidget(app: MyApp()));
 }
 
 Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingModel)> initializeTracking() async {
@@ -28,6 +23,7 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
     apiKey: '54d9b2d4c4e2a550c890876a914a3525',
     namespace: 'engine.stmr.tech',
     platform: Platform.isAndroid ? 'android' : 'ios',
+    httpTrackingEnable: true,
   );
 
   final clarityConfig = EngineClarityConfig(
@@ -36,9 +32,11 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
   );
 
   final analyticsModel = EngineAnalyticsModel(
-    firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
+    firebaseAnalyticsConfig: EngineFirebaseAnalyticsConfig(
+      enabled: false,
+    ),
     faroConfig: faroConfig,
-    splunkConfig: const EngineSplunkConfig(
+    splunkConfig: EngineSplunkConfig(
       enabled: false,
       endpoint: '',
       token: '',
@@ -47,7 +45,7 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
       index: '',
     ),
     clarityConfig: clarityConfig,
-    googleLoggingConfig: const EngineGoogleLoggingConfig(
+    googleLoggingConfig: EngineGoogleLoggingConfig(
       enabled: false,
       projectId: '',
       logName: '',
@@ -56,9 +54,9 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
   );
 
   final bugTrackingModel = EngineBugTrackingModel(
-    crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
+    crashlyticsConfig: EngineCrashlyticsConfig(enabled: false),
     faroConfig: faroConfig,
-    googleLoggingConfig: const EngineGoogleLoggingConfig(
+    googleLoggingConfig: EngineGoogleLoggingConfig(
       enabled: false,
       projectId: '',
       logName: '',
@@ -72,13 +70,36 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
       EngineBugTracking.initWithModel(bugTrackingModel),
     ]);
 
+    final httpTrackingConfig = EngineHttpTrackingConfig(
+      enabled: true,
+      enableRequestLogging: true,
+      enableResponseLogging: true,
+      enableTimingLogging: true,
+      enableHeaderLogging: true,
+      enableBodyLogging: true,
+      maxBodyLogLength: 2000,
+    );
+
+    EngineHttpTracking.initialize(httpTrackingConfig);
+
     await Future.wait([
-      EngineAnalytics.setUserId('demo_user_123', 'demo@example.com', 'Demo User'),
-      EngineBugTracking.setUserIdentifier('demo_user_123', 'demo@example.com', 'Demo User'),
+      EngineAnalytics.setUserId(
+        'demo_user_123',
+        'demo@example.com',
+        'Demo User',
+      ),
+      EngineBugTracking.setUserIdentifier(
+        'demo_user_123',
+        'demo@example.com',
+        'Demo User',
+      ),
     ]);
 
     await EngineAnalytics.logAppOpen();
     await EngineBugTracking.log('App initialized successfully', level: 'info');
+    await EngineHttpTracking.logCustomEvent(
+      'HTTP tracking initialized for example app',
+    );
 
     return (analyticsModel, bugTrackingModel);
   } catch (e, stackTrace) {
@@ -97,14 +118,12 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Engine Tracking Example',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: const HomePage(),
-      navigatorObservers: [EngineNavigationObserver()],
-    );
-  }
+  Widget build(final BuildContext context) => MaterialApp(
+    title: 'Engine Tracking Example',
+    theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+    home: const HomePage(),
+    navigatorObservers: [EngineNavigationObserver()],
+  );
 }
 
 class HomePage extends StatefulWidget {
@@ -120,10 +139,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    EngineAnalytics.setPage('HomePage');
+    unawaited(EngineAnalytics.setPage('HomePage'));
   }
 
-  void _incrementCounter() async {
+  Future<void> _incrementCounter() async {
     setState(() {
       _counter++;
     });
@@ -141,7 +160,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _simulateError() async {
+  Future<void> _simulateError() async {
     try {
       throw Exception('This is a simulated error for testing purposes');
     } catch (error, stackTrace) {
@@ -155,139 +174,171 @@ class _HomePageState extends State<HomePage> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Error recorded and logged!'), backgroundColor: Colors.orange));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error recorded and logged!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
       }
     }
   }
 
-  void _setUserProperty() async {
+  Future<void> _setUserProperty() async {
     await EngineAnalytics.setUserProperty('user_level', 'beginner');
     await EngineBugTracking.setCustomKey('user_engagement', 'active');
 
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('User properties updated!'), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('User properties updated!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
-  void _navigateToSecondPage() async {
-    await EngineAnalytics.logEvent('navigation', {'from_page': 'HomePage', 'to_page': 'SecondPage'});
-
+  Future<void> _navigateToSecondPage() async {
     if (mounted) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (final context) => const SecondPage()),
+        ),
+      );
     }
   }
 
-  void _navigateToViewTrackingExample() async {
-    await EngineAnalytics.logEvent('navigation', {'from_page': 'HomePage', 'to_page': 'ViewTrackingExample'});
-
+  Future<void> _navigateToViewTrackingExample() async {
     if (mounted) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewTrackingExample()));
+      unawaited(Navigator.push(context, MaterialPageRoute(builder: (final context) => const ViewTrackingExample())));
     }
   }
 
-  void _navigateToHttpTrackingExample() async {
-    await EngineAnalytics.logEvent('navigation', {'from_page': 'HomePage', 'to_page': 'HttpTrackingExample'});
-
+  Future<void> _navigateToHttpTrackingExample() async {
     if (mounted) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const HttpTrackingExample()));
+      unawaited(
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (final context) => const HttpTrackingExample()),
+        ),
+      );
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Engine Tracking Example'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Icon(Icons.analytics, size: 80, color: Colors.blue),
-            const SizedBox(height: 20),
-            const Text('Engine Tracking Demo', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            Text('You have pushed the button this many times:', style: Theme.of(context).textTheme.bodyLarge),
-            Text('$_counter', style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 40),
+  Widget build(final BuildContext context) => Scaffold(
+    appBar: AppBar(
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      title: const Text('Engine Tracking Example'),
+    ),
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          const Icon(Icons.analytics, size: 80, color: Colors.blue),
+          const SizedBox(height: 20),
+          const Text(
+            'Engine Tracking Demo',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'You have pushed the button this many times:',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          Text(
+            '$_counter',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: 40),
 
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Service Status:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    _buildStatusRow('Analytics', EngineAnalytics.isEnabled),
-                    _buildStatusRow('Bug Tracking', EngineBugTracking.isEnabled),
-                  ],
-                ),
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Service Status:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildStatusRow('Analytics', EngineAnalytics.isEnabled),
+                  _buildStatusRow(
+                    'Bug Tracking',
+                    EngineBugTracking.isEnabled,
+                  ),
+                  _buildStatusRow(
+                    'HTTP Tracking',
+                    EngineHttpTracking.isEnabled,
+                  ),
+                ],
               ),
             ),
+          ),
 
-            const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _setUserProperty,
-                  icon: const Icon(Icons.person),
-                  label: const Text('Set User Property'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _simulateError,
-                  icon: const Icon(Icons.error_outline),
-                  label: const Text('Simulate Error'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _navigateToSecondPage,
-                  icon: const Icon(Icons.navigate_next),
-                  label: const Text('Navigate'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _navigateToViewTrackingExample,
-                  icon: const Icon(Icons.visibility),
-                  label: const Text('View Tracking'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _navigateToHttpTrackingExample,
-                  icon: const Icon(Icons.http),
-                  label: const Text('HTTP Tracking'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildStatusRow(String service, bool isEnabled) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(isEnabled ? Icons.check_circle : Icons.cancel, color: isEnabled ? Colors.green : Colors.red, size: 20),
-          const SizedBox(width: 8),
-          Text('$service: ${isEnabled ? "Enabled" : "Disabled"}'),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _setUserProperty,
+                icon: const Icon(Icons.person),
+                label: const Text('Set User Property'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _simulateError,
+                icon: const Icon(Icons.error_outline),
+                label: const Text('Simulate Error'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _navigateToSecondPage,
+                icon: const Icon(Icons.navigate_next),
+                label: const Text('Navigate'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _navigateToViewTrackingExample,
+                icon: const Icon(Icons.visibility),
+                label: const Text('View Tracking'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _navigateToHttpTrackingExample,
+                icon: const Icon(Icons.http),
+                label: const Text('HTTP Tracking'),
+              ),
+            ],
+          ),
         ],
       ),
-    );
-  }
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: _incrementCounter,
+      tooltip: 'Increment',
+      child: const Icon(Icons.add),
+    ),
+  );
+
+  Widget _buildStatusRow(final String service, final bool isEnabled) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      children: [
+        Icon(
+          isEnabled ? Icons.check_circle : Icons.cancel,
+          color: isEnabled ? Colors.green : Colors.red,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Text('$service: ${isEnabled ? "Enabled" : "Disabled"}'),
+      ],
+    ),
+  );
 }
 
 class SecondPage extends StatefulWidget {
@@ -301,25 +352,32 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    EngineAnalytics.setPage('SecondPage', 'HomePage');
+    unawaited(EngineAnalytics.setPage('SecondPage', 'HomePage'));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Second Page'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.star, size: 100, color: Colors.amber),
-            SizedBox(height: 20),
-            Text('Second Page', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
-            Text('This navigation was tracked!', style: TextStyle(fontSize: 16)),
-          ],
-        ),
+  Widget build(final BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text('Second Page'),
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+    ),
+    body: const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.star, size: 100, color: Colors.amber),
+          SizedBox(height: 20),
+          Text(
+            'Second Page',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'This navigation was tracked!',
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
 }

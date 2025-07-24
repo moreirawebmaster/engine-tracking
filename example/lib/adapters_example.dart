@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:engine_tracking/engine_tracking.dart';
@@ -11,13 +12,11 @@ class AdaptersExampleApp extends StatelessWidget {
   const AdaptersExampleApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Engine Tracking Adapters Demo',
-      theme: ThemeData(primarySwatch: Colors.purple),
-      home: const AdaptersExamplePage(title: 'Adapters Pattern Demo'),
-    );
-  }
+  Widget build(final BuildContext context) => MaterialApp(
+    title: 'Engine Tracking Adapters Demo',
+    theme: ThemeData(primarySwatch: Colors.purple),
+    home: const AdaptersExamplePage(title: 'Adapters Pattern Demo'),
+  );
 }
 
 class AdaptersExamplePage extends StatefulWidget {
@@ -38,7 +37,7 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   @override
   void initState() {
     super.initState();
-    _initializeServices();
+    unawaited(_initializeServices());
   }
 
   Future<void> _initializeServices() async {
@@ -46,7 +45,6 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
     await _initializeBugTracking();
   }
 
-  // Configurações compartilhadas - Boa prática de reaproveitamento
   static final _sharedFaroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro-collector-prod-sa-east-1.grafana.net/collect',
@@ -58,9 +56,9 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
     platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
-  static const _firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: false);
-  static const _crashlyticsConfig = EngineCrashlyticsConfig(enabled: false);
-  static const _splunkConfig = EngineSplunkConfig(
+  static final _firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: false);
+  static final _crashlyticsConfig = EngineCrashlyticsConfig(enabled: false);
+  static final _splunkConfig = EngineSplunkConfig(
     enabled: false,
     endpoint: 'https://splunk.example.com:8088/services/collector',
     token: 'demo-token',
@@ -71,10 +69,9 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
 
   Future<void> _initializeAnalytics() async {
     try {
-      // Exemplo 1: Inicialização direta com adapters
-      final analyticsAdapters = [
+      final analyticsAdapters = <IEngineAnalyticsAdapter>[
         EngineFirebaseAnalyticsAdapter(_firebaseAnalyticsConfig),
-        EngineFaroAnalyticsAdapter(_sharedFaroConfig), // Config compartilhada
+        EngineFaroAnalyticsAdapter(_sharedFaroConfig),
         EngineSplunkAnalyticsAdapter(_splunkConfig),
       ];
 
@@ -95,10 +92,9 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
 
   Future<void> _initializeBugTracking() async {
     try {
-      // Exemplo 2: Inicialização com modelo tradicional reutilizando configs
       final bugTrackingModel = EngineBugTrackingModel(
         crashlyticsConfig: _crashlyticsConfig,
-        faroConfig: _sharedFaroConfig, // Mesma config do analytics!
+        faroConfig: _sharedFaroConfig,
       );
 
       await EngineBugTracking.initWithModel(bugTrackingModel);
@@ -117,204 +113,191 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              '🎯 Demo do Padrão Adapter',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
+  Widget build(final BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(widget.title), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            '🎯 Demo do Padrão Adapter',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
 
-            // Analytics Status
-            _buildStatusCard(
-              title: '📊 Analytics Adapters',
-              status: _analyticsStatus,
-              isInitialized: _analyticsInitialized,
-              adapters: ['Firebase Analytics Adapter', 'Grafana Faro Analytics Adapter', 'Splunk Analytics Adapter'],
-            ),
+          _buildStatusCard(
+            title: '📊 Analytics Adapters',
+            status: _analyticsStatus,
+            isInitialized: _analyticsInitialized,
+            adapters: ['Firebase Analytics Adapter', 'Grafana Faro Analytics Adapter', 'Splunk Analytics Adapter'],
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-            // Bug Tracking Status
-            _buildStatusCard(
-              title: '🐛 Bug Tracking Adapters',
-              status: _bugTrackingStatus,
-              isInitialized: _bugTrackingInitialized,
-              adapters: ['Firebase Crashlytics Adapter', 'Grafana Faro Bug Tracking Adapter'],
-            ),
+          _buildStatusCard(
+            title: '🐛 Bug Tracking Adapters',
+            status: _bugTrackingStatus,
+            isInitialized: _bugTrackingInitialized,
+            adapters: ['Firebase Crashlytics Adapter', 'Grafana Faro Bug Tracking Adapter'],
+          ),
 
-            const SizedBox(height: 30),
+          const SizedBox(height: 30),
 
-            const Text('🚀 Teste as Funcionalidades:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 16),
+          const Text('🚀 Teste as Funcionalidades:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 16),
 
-            // Analytics Actions
-            _buildActionSection(
-              title: 'Analytics Actions',
-              actions: [
-                _buildActionButton(
-                  'Enviar Evento Personalizado',
-                  Icons.analytics,
-                  Colors.blue,
-                  _includeInAnalyticsEvent,
-                ),
-                _buildActionButton('Definir Propriedade do Usuário', Icons.person_add, Colors.green, _setUserProperty),
-                _buildActionButton('Rastrear Tela', Icons.pageview, Colors.orange, _trackScreen),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Bug Tracking Actions
-            _buildActionSection(
-              title: 'Bug Tracking Actions',
-              actions: [
-                _buildActionButton('Log de Informação', Icons.info, Colors.cyan, _logInfo),
-                _buildActionButton('Simular Erro', Icons.error, Colors.red, _simulateError),
-                _buildActionButton('Definir Chave Personalizada', Icons.key, Colors.purple, _setCustomKey),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            // Advantages Card
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('✨ Vantagens do Padrão Adapter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    SizedBox(height: 12),
-                    Text(
-                      '• Flexibilidade total na escolha de provedores\n'
-                      '• Inicialização independente de cada adapter\n'
-                      '• Fácil adição de novos sistemas de tracking\n'
-                      '• Código SOLID e extensível\n'
-                      '• Interface consistente para todos os adapters\n'
-                      '• Reaproveitamento de configurações (ex: Faro)\n'
-                      '• Dois métodos de inicialização: adapters direto ou modelos',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
+          _buildActionSection(
+            title: 'Analytics Actions',
+            actions: [
+              _buildActionButton(
+                'Enviar Evento Personalizado',
+                Icons.analytics,
+                Colors.blue,
+                _includeInAnalyticsEvent,
               ),
-            ),
+              _buildActionButton('Definir Propriedade do Usuário', Icons.person_add, Colors.green, _setUserProperty),
+              _buildActionButton('Rastrear Tela', Icons.pageview, Colors.orange, _trackScreen),
+            ],
+          ),
 
-            const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-            // Config Sharing Example Card
-            const Card(
-              color: Color(0xFFF3E5F5),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '🔄 Reaproveitamento de Configurações',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      'Demonstração:\n'
-                      '• Analytics: Inicializado com adapters diretos\n'
-                      '• Bug Tracking: Inicializado com modelo tradicional\n'
-                      '• Ambos compartilham a mesma config do Faro\n'
-                      '• Economia de configuração e consistência',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          _buildActionSection(
+            title: 'Bug Tracking Actions',
+            actions: [
+              _buildActionButton('Log de Informação', Icons.info, Colors.cyan, _logInfo),
+              _buildActionButton('Simular Erro', Icons.error, Colors.red, _simulateError),
+              _buildActionButton('Definir Chave Personalizada', Icons.key, Colors.purple, _setCustomKey),
+            ],
+          ),
 
-  Widget _buildStatusCard({
-    required String title,
-    required String status,
-    required bool isInitialized,
-    required List<String> adapters,
-  }) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isInitialized ? Colors.green[50] : Colors.orange[50],
-                border: Border.all(color: isInitialized ? Colors.green : Colors.orange),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
+          const SizedBox(height: 30),
+
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    isInitialized ? Icons.check_circle : Icons.info,
-                    color: isInitialized ? Colors.green : Colors.orange,
+                  Text('✨ Vantagens do Padrão Adapter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  SizedBox(height: 12),
+                  Text(
+                    '• Flexibilidade total na escolha de provedores\n'
+                    '• Inicialização independente de cada adapter\n'
+                    '• Fácil adição de novos sistemas de tracking\n'
+                    '• Código SOLID e extensível\n'
+                    '• Interface consistente para todos os adapters\n'
+                    '• Reaproveitamento de configurações (ex: Faro)\n'
+                    '• Dois métodos de inicialização: adapters direto ou modelos',
+                    style: TextStyle(fontSize: 14),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(status, style: const TextStyle(fontSize: 14))),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            const Text('Adapters disponíveis:', style: TextStyle(fontWeight: FontWeight.w500)),
-            const SizedBox(height: 4),
-            ...adapters.map(
-              (adapter) => Padding(
-                padding: const EdgeInsets.only(left: 16, top: 2),
-                child: Text('• $adapter', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          ),
+
+          const SizedBox(height: 16),
+
+          const Card(
+            color: Color(0xFFF3E5F5),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '🔄 Reaproveitamento de Configurações',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Demonstração:\n'
+                    '• Analytics: Inicializado com adapters diretos\n'
+                    '• Bug Tracking: Inicializado com modelo tradicional\n'
+                    '• Ambos compartilham a mesma config do Faro\n'
+                    '• Economia de configuração e consistência',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
 
-  Widget _buildActionSection({required String title, required List<Widget> actions}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 12),
-        ...actions.map((action) => Padding(padding: const EdgeInsets.only(bottom: 8), child: action)),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(String label, IconData icon, Color color, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-        ),
+  Widget _buildStatusCard({
+    required final String title,
+    required final String status,
+    required final bool isInitialized,
+    required final List<String> adapters,
+  }) => Card(
+    elevation: 2,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isInitialized ? Colors.green[50] : Colors.orange[50],
+              border: Border.all(color: isInitialized ? Colors.green : Colors.orange),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isInitialized ? Icons.check_circle : Icons.info,
+                  color: isInitialized ? Colors.green : Colors.orange,
+                ),
+                const SizedBox(width: 8),
+                Expanded(child: Text(status, style: const TextStyle(fontSize: 14))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text('Adapters disponíveis:', style: TextStyle(fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          ...adapters.map(
+            (final adapter) => Padding(
+              padding: const EdgeInsets.only(left: 16, top: 2),
+              child: Text('• $adapter', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+
+  Widget _buildActionSection({required final String title, required final List<Widget> actions}) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+      const SizedBox(height: 12),
+      ...actions.map((final action) => Padding(padding: const EdgeInsets.only(bottom: 8), child: action)),
+    ],
+  );
+
+  Widget _buildActionButton(final String label, final IconData icon, final Color color, final VoidCallback onPressed) =>
+      SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: onPressed,
+          icon: Icon(icon),
+          label: Text(label),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+          ),
+        ),
+      );
 
   Future<void> _includeInAnalyticsEvent() async {
     await EngineAnalytics.logEvent('adapter_demo_event', {
@@ -365,35 +348,32 @@ class _AdaptersExamplePageState extends State<AdaptersExamplePage> {
     _showSnackBar('Chave personalizada definida!', Colors.purple);
   }
 
-  void _showSnackBar(String message, Color color) {
+  void _showSnackBar(final String message, final Color color) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color, duration: const Duration(seconds: 2)));
   }
 }
 
-void adaptersFlexibleExample() async {
-  // Exemplo 1: Usando apenas Firebase Analytics
-  final firebaseAnalyticsAdapter = EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true));
+Future<void> adaptersFlexibleExample() async {
+  final firebaseAnalyticsAdapter = EngineFirebaseAnalyticsAdapter(EngineFirebaseAnalyticsConfig(enabled: true));
 
   await EngineAnalytics.init([firebaseAnalyticsAdapter]);
 
-  // Exemplo 2: Configurações compartilhadas entre Analytics e Bug Tracking
-  // Esta é uma prática recomendada para reaproveitar configurações
   final sharedFaroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro-collector.grafana.net/collect',
     appName: 'MyApp',
     appVersion: '1.0.0',
     environment: 'production',
-    apiKey: 'your-shared-faro-api-key', // Mesma chave para analytics e bug tracking
+    apiKey: 'your-shared-faro-api-key',
     namespace: 'exemple',
     platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
-  const firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: true);
-  const crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
-  const splunkConfig = EngineSplunkConfig(
+  final firebaseAnalyticsConfig = EngineFirebaseAnalyticsConfig(enabled: true);
+  final crashlyticsConfig = EngineCrashlyticsConfig(enabled: true);
+  final splunkConfig = EngineSplunkConfig(
     enabled: true,
     endpoint: 'https://splunk-hec.example.com:8088/services/collector',
     token: 'your-hec-token',
@@ -402,50 +382,49 @@ void adaptersFlexibleExample() async {
     index: 'main',
   );
 
-  // Analytics adapters usando configurações compartilhadas
-  final analyticsAdapters = [
+  final analyticsAdapters = <IEngineAnalyticsAdapter>[
     EngineFirebaseAnalyticsAdapter(firebaseAnalyticsConfig),
-    EngineFaroAnalyticsAdapter(sharedFaroConfig), // Reutilizando config
+    EngineFaroAnalyticsAdapter(sharedFaroConfig),
     EngineSplunkAnalyticsAdapter(splunkConfig),
   ];
 
-  // Bug tracking adapters reutilizando a mesma config do Faro
-  final bugTrackingAdapters = [
+  final bugTrackingAdapters = <IEngineBugTrackingAdapter>[
     EngineCrashlyticsAdapter(crashlyticsConfig),
-    EngineFaroBugTrackingAdapter(sharedFaroConfig), // Mesma config reutilizada!
+    EngineFaroBugTrackingAdapter(sharedFaroConfig),
   ];
 
-  // Inicialização simultânea dos serviços
-  await Future.wait([EngineAnalytics.init(analyticsAdapters), EngineBugTracking.init(bugTrackingAdapters)]);
+  await Future.wait([
+    EngineAnalytics.init(analyticsAdapters),
+    EngineBugTracking.init(bugTrackingAdapters),
+  ]);
 
-  // Exemplo 3: Usando modelos tradicionais com configurações compartilhadas
   final analyticsModel = EngineAnalyticsModel(
     firebaseAnalyticsConfig: firebaseAnalyticsConfig,
-    faroConfig: sharedFaroConfig, // Reutilizando mesma config
+    faroConfig: sharedFaroConfig,
     splunkConfig: splunkConfig,
+    clarityConfig: null,
+    googleLoggingConfig: null,
   );
 
   final bugTrackingModel = EngineBugTrackingModel(
     crashlyticsConfig: crashlyticsConfig,
-    faroConfig: sharedFaroConfig, // Mesma config compartilhada
+    faroConfig: sharedFaroConfig,
   );
 
-  // Reinicialização usando modelos (demonstra flexibilidade)
   await EngineAnalytics.dispose();
   await EngineBugTracking.dispose();
 
   await Future.wait([EngineAnalytics.initWithModel(analyticsModel), EngineBugTracking.initWithModel(bugTrackingModel)]);
 
-  // Exemplo de uso após inicialização
   await EngineAnalytics.logEvent('adapter_demo', {'demo': 'true'});
   await EngineBugTracking.log('Demo app started');
 }
 
-class CustomAnalyticsAdapter implements IEngineAnalyticsAdapter {
+class CustomAnalyticsAdapter implements IEngineAnalyticsAdapter<IEngineConfig> {
   final bool _enabled;
   bool _isInitialized = false;
 
-  CustomAnalyticsAdapter({required bool enabled}) : _enabled = enabled;
+  CustomAnalyticsAdapter({required final bool enabled}) : _enabled = enabled;
 
   @override
   String get adapterName => 'Custom Analytics';
@@ -460,64 +439,71 @@ class CustomAnalyticsAdapter implements IEngineAnalyticsAdapter {
   Future<void> initialize() async {
     if (!isEnabled || _isInitialized) return;
 
-    print('Inicializando Custom Analytics Adapter...');
+    debugPrint('Inicializando Custom Analytics Adapter...');
     _isInitialized = true;
   }
 
   @override
   Future<void> dispose() async {
-    print('Finalizando Custom Analytics Adapter...');
+    debugPrint('Finalizando Custom Analytics Adapter...');
     _isInitialized = false;
   }
 
   @override
-  Future<void> logEvent(String name, [Map<String, dynamic>? parameters]) async {
+  Future<void> logEvent(final String name, [final Map<String, dynamic>? parameters]) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - Evento: $name, Parâmetros: $parameters');
+    debugPrint('Custom Analytics - Evento: $name, Parâmetros: $parameters');
   }
 
   @override
-  Future<void> setUserId(String? userId, [String? email, String? name]) async {
+  Future<void> setUserId(final String? userId, [final String? email, final String? name]) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - Usuário: $userId, Email: $email, Nome: $name');
+    debugPrint('Custom Analytics - Usuário: $userId, Email: $email, Nome: $name');
   }
 
   @override
-  Future<void> setUserProperty(String name, String? value) async {
+  Future<void> setUserProperty(final String name, final String? value) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - Propriedade: $name = $value');
+    debugPrint('Custom Analytics - Propriedade: $name = $value');
   }
 
   @override
-  Future<void> setPage(String screenName, [String? previousScreen, Map<String, dynamic>? parameters]) async {
+  Future<void> setPage(
+    final String screenName, [
+    final String? previousScreen,
+    final Map<String, dynamic>? parameters,
+  ]) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - Página: $screenName');
+    debugPrint('Custom Analytics - Página: $screenName');
   }
 
   @override
-  Future<void> logAppOpen([Map<String, dynamic>? parameters]) async {
+  Future<void> logAppOpen([final Map<String, dynamic>? parameters]) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - App aberto');
+    debugPrint('Custom Analytics - App aberto');
   }
 
   @override
   Future<void> reset() async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Analytics - Reset');
+    debugPrint('Custom Analytics - Reset');
   }
+
+  @override
+  IEngineConfig get config => throw UnimplementedError();
 }
 
-class CustomBugTrackingAdapter implements IEngineBugTrackingAdapter {
+class CustomBugTrackingAdapter implements IEngineBugTrackingAdapter<IEngineConfig> {
   final bool _enabled;
   bool _isInitialized = false;
 
-  CustomBugTrackingAdapter({required bool enabled}) : _enabled = enabled;
+  CustomBugTrackingAdapter({required final bool enabled}) : _enabled = enabled;
 
   @override
   String get adapterName => 'Custom Bug Tracking';
@@ -532,68 +518,75 @@ class CustomBugTrackingAdapter implements IEngineBugTrackingAdapter {
   Future<void> initialize() async {
     if (!isEnabled || _isInitialized) return;
 
-    print('Inicializando Custom Bug Tracking Adapter...');
+    debugPrint('Inicializando Custom Bug Tracking Adapter...');
     _isInitialized = true;
   }
 
   @override
   Future<void> dispose() async {
-    print('Finalizando Custom Bug Tracking Adapter...');
+    debugPrint('Finalizando Custom Bug Tracking Adapter...');
     _isInitialized = false;
   }
 
   @override
-  Future<void> setCustomKey(String key, Object value) async {
+  Future<void> setCustomKey(final String key, final Object value) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Chave personalizada: $key = $value');
+    debugPrint('Custom Bug Tracking - Chave personalizada: $key = $value');
   }
 
   @override
-  Future<void> setUserIdentifier(String id, String email, String name) async {
+  Future<void> setUserIdentifier(final String id, final String email, final String name) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Usuário: $id, Email: $email, Nome: $name');
+    debugPrint('Custom Bug Tracking - Usuário: $id, Email: $email, Nome: $name');
   }
 
   @override
-  Future<void> log(String message, {String? level, Map<String, dynamic>? attributes, StackTrace? stackTrace}) async {
+  Future<void> log(
+    final String message, {
+    final String? level,
+    final Map<String, dynamic>? attributes,
+    final StackTrace? stackTrace,
+  }) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Log: $message [Level: $level]');
+    debugPrint('Custom Bug Tracking - Log: $message [Level: $level]');
   }
 
   @override
   Future<void> recordError(
-    dynamic exception,
-    StackTrace? stackTrace, {
-    String? reason,
-    Iterable<Object> information = const [],
-    bool isFatal = false,
-    Map<String, dynamic>? data,
+    final dynamic exception,
+    final StackTrace? stackTrace, {
+    final String? reason,
+    final Iterable<Object> information = const [],
+    final bool isFatal = false,
+    final Map<String, dynamic>? data,
   }) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Erro: $exception [Fatal: $isFatal]');
+    debugPrint('Custom Bug Tracking - Erro: $exception [Fatal: $isFatal]');
   }
 
   @override
-  Future<void> recordFlutterError(FlutterErrorDetails errorDetails) async {
+  Future<void> recordFlutterError(final FlutterErrorDetails errorDetails) async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Flutter Error: ${errorDetails.exception}');
+    debugPrint('Custom Bug Tracking - Flutter Error: ${errorDetails.exception}');
   }
 
   @override
   Future<void> testCrash() async {
     if (!isEnabled || !_isInitialized) return;
 
-    print('Custom Bug Tracking - Test Crash');
+    debugPrint('Custom Bug Tracking - Test Crash');
   }
+
+  @override
+  IEngineConfig get config => throw UnimplementedError();
 }
 
-void customAdaptersExample() async {
-  // Exemplo de adapters personalizados
+Future<void> customAdaptersExample() async {
   final customAnalyticsAdapter = CustomAnalyticsAdapter(enabled: true);
   final customBugTrackingAdapter = CustomBugTrackingAdapter(enabled: true);
 
@@ -607,11 +600,7 @@ void customAdaptersExample() async {
   await EngineBugTracking.dispose();
 }
 
-void mixedInitializationExample() async {
-  // Exemplo mostrando diferentes métodos de inicialização
-  // e reaproveitamento de configurações
-
-  // Configuração compartilhada do Faro
+Future<void> mixedInitializationExample() async {
   final sharedFaroConfig = EngineFaroConfig(
     enabled: true,
     endpoint: 'https://faro.example.com/collect',
@@ -623,21 +612,18 @@ void mixedInitializationExample() async {
     platform: Platform.isAndroid ? 'android' : 'ios',
   );
 
-  // Método 1: Analytics com adapters diretos
   await EngineAnalytics.init([
-    EngineFirebaseAnalyticsAdapter(const EngineFirebaseAnalyticsConfig(enabled: true)),
-    EngineFaroAnalyticsAdapter(sharedFaroConfig), // Config compartilhada
+    EngineFirebaseAnalyticsAdapter(EngineFirebaseAnalyticsConfig(enabled: true)),
+    EngineFaroAnalyticsAdapter(sharedFaroConfig),
   ]);
 
-  // Método 2: Bug tracking com modelo tradicional reutilizando config
   final bugTrackingModel = EngineBugTrackingModel(
-    crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
-    faroConfig: sharedFaroConfig, // Mesma config reutilizada!
+    crashlyticsConfig: EngineCrashlyticsConfig(enabled: true),
+    faroConfig: sharedFaroConfig,
   );
 
   await EngineBugTracking.initWithModel(bugTrackingModel);
 
-  // Uso demonstrando que ambos estão funcionando
   await EngineAnalytics.logEvent('mixed_init_demo', {'method': 'adapters'});
   await EngineBugTracking.log('Mixed initialization demo', attributes: {'method': 'model'});
 }

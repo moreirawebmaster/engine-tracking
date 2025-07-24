@@ -13,11 +13,11 @@ class EngineAnalyticsModel {
     required this.splunkConfig,
   });
 
-  final EngineClarityConfig clarityConfig;
-  final EngineFirebaseAnalyticsConfig firebaseAnalyticsConfig;
-  final EngineFaroConfig faroConfig;
-  final EngineGoogleLoggingConfig googleLoggingConfig;
-  final EngineSplunkConfig splunkConfig;
+  final EngineClarityConfig? clarityConfig;
+  final EngineFirebaseAnalyticsConfig? firebaseAnalyticsConfig;
+  final EngineFaroConfig? faroConfig;
+  final EngineGoogleLoggingConfig? googleLoggingConfig;
+  final EngineSplunkConfig? splunkConfig;
 
   @override
   String toString() =>
@@ -26,13 +26,13 @@ class EngineAnalyticsModel {
 
 class EngineAnalyticsModelDefault implements EngineAnalyticsModel {
   @override
-  EngineClarityConfig get clarityConfig => const EngineClarityConfig(enabled: false, projectId: '');
+  EngineClarityConfig get clarityConfig => EngineClarityConfig(enabled: false, projectId: '');
 
   @override
-  EngineFirebaseAnalyticsConfig get firebaseAnalyticsConfig => const EngineFirebaseAnalyticsConfig(enabled: false);
+  EngineFirebaseAnalyticsConfig get firebaseAnalyticsConfig => EngineFirebaseAnalyticsConfig(enabled: false);
 
   @override
-  EngineFaroConfig get faroConfig => const EngineFaroConfig(
+  EngineFaroConfig get faroConfig => EngineFaroConfig(
     enabled: false,
     endpoint: '',
     appName: '',
@@ -44,14 +44,10 @@ class EngineAnalyticsModelDefault implements EngineAnalyticsModel {
   );
 
   @override
-  EngineGoogleLoggingConfig get googleLoggingConfig => const EngineGoogleLoggingConfig(
-    enabled: false,
-    projectId: '',
-    logName: '',
-    credentials: {},
-  );
+  EngineGoogleLoggingConfig get googleLoggingConfig =>
+      EngineGoogleLoggingConfig(enabled: false, projectId: '', logName: '', credentials: {});
 
   @override
   EngineSplunkConfig get splunkConfig =>
-      const EngineSplunkConfig(enabled: false, endpoint: '', token: '', source: '', sourcetype: '', index: '');
+      EngineSplunkConfig(enabled: false, endpoint: '', token: '', source: '', sourcetype: '', index: '');
 }

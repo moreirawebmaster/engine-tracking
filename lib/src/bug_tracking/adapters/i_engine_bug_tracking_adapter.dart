@@ -1,9 +1,11 @@
+import 'package:engine_tracking/src/config/config.dart';
 import 'package:flutter/foundation.dart';
 
-abstract class IEngineBugTrackingAdapter {
+abstract class IEngineBugTrackingAdapter<TConfig extends IEngineConfig> {
   String get adapterName;
   bool get isEnabled;
   bool get isInitialized;
+  TConfig get config;
 
   Future<void> initialize();
   Future<void> dispose();

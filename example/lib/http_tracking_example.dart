@@ -1,933 +1,840 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
-class HttpTrackingExample extends StatelessWidget {
+class LogEntry {
+  final String message;
+  final DateTime timestamp;
+  final LogType type;
+  final Map<String, dynamic>? data;
+
+  LogEntry({
+    required this.message,
+    required this.timestamp,
+    required this.type,
+    this.data,
+  });
+
+  String get formattedTime =>
+      '${timestamp.hour.toString().padLeft(2, '0')}:'
+      '${timestamp.minute.toString().padLeft(2, '0')}:'
+      '${timestamp.second.toString().padLeft(2, '0')}';
+}
+
+enum LogType { info, success, warning, error }
+
+class HttpTrackingExample extends StatefulWidget {
   const HttpTrackingExample({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HTTP Tracking Example',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: HttpMainPage(),
-      routes: {
-        '/pokemon': (context) => PokemonListPage(),
-        '/posts': (context) => PostsListPage(),
-        '/users': (context) => UsersListPage(),
-      },
-    );
-  }
+  State<HttpTrackingExample> createState() => _HttpTrackingExampleState();
 }
 
-class HttpMainPage extends EngineStatelessWidget {
-  HttpMainPage({super.key});
+class _HttpTrackingExampleState extends State<HttpTrackingExample> {
+  String _status = 'Ready';
+  final List<LogEntry> _logs = [];
+  bool _isLoading = false;
 
   @override
-  String get screenName => 'HttpMainPage';
+  void initState() {
+    super.initState();
+    unawaited(_initializeHttpTracking());
+  }
 
-  @override
-  Map<String, dynamic>? get screenParameters => {'app_version': '1.0.0', 'example_type': 'http_tracking'};
+  Future<void> _initializeHttpTracking() async {
+    try {
+      if (!mounted) return;
 
-  @override
-  Widget buildWithTracking(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Exemplos HTTP Tracking'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Exemplos de Tracking com Chamadas HTTPS',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Este exemplo demonstra o tracking de requisições HTTP usando APIs públicas',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
+      _addLog('🔄 Initializing HTTP tracking...', LogType.info);
 
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Icon(Icons.catching_pokemon, size: 48, color: Colors.red),
-                    const SizedBox(height: 8),
-                    const Text('PokéAPI', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const Text('Lista de Pokémons com requisições GET', style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        logUserAction(
-                          'navigate_to_pokemon_api',
-                          parameters: {
-                            'api_name': 'pokeapi',
-                            'navigation_method': 'button_tap',
-                            'source_screen': screenName,
-                          },
-                        );
-                        Navigator.pushNamed(context, '/pokemon');
-                      },
-                      child: const Text('Ver Pokémons'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      setState(() {
+        _status = 'HTTP Tracking initialized';
+        _logs.add(
+          LogEntry(
+            message: '✅ HTTP tracking enabled',
+            timestamp: DateTime.now(),
+            type: LogType.success,
+          ),
+        );
+      });
 
-            const SizedBox(height: 16),
+      _addLog('🌐 Testing network connectivity...', LogType.info);
 
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Icon(Icons.article, size: 48, color: Colors.green),
-                    const SizedBox(height: 8),
-                    const Text('JSONPlaceholder - Posts', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const Text('Lista de posts com GET e criação com POST', style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        logUserAction(
-                          'navigate_to_posts_api',
-                          parameters: {
-                            'api_name': 'jsonplaceholder_posts',
-                            'navigation_method': 'button_tap',
-                            'source_screen': screenName,
-                          },
-                        );
-                        Navigator.pushNamed(context, '/posts');
-                      },
-                      child: const Text('Ver Posts'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      try {
+        final testResponse = await http
+            .get(
+              Uri.parse('https://httpbin.org/get'),
+            )
+            .timeout(const Duration(seconds: 5));
 
-            const SizedBox(height: 16),
+        if (testResponse.statusCode == 200) {
+          _addLog('✅ Network connectivity confirmed', LogType.success);
+        } else {
+          _addLog('⚠️ Network connectivity issue: ${testResponse.statusCode}', LogType.warning);
+        }
+      } catch (e) {
+        _addLog('⚠️ Network connectivity test failed: $e', LogType.warning);
+      }
+    } catch (e) {
+      if (!mounted) return;
 
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    const Icon(Icons.people, size: 48, color: Colors.orange),
-                    const SizedBox(height: 8),
-                    const Text('JSONPlaceholder - Users', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const Text('Lista de usuários com requisições GET', style: TextStyle(color: Colors.grey)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        logUserAction(
-                          'navigate_to_users_api',
-                          parameters: {
-                            'api_name': 'jsonplaceholder_users',
-                            'navigation_method': 'button_tap',
-                            'source_screen': screenName,
-                          },
-                        );
-                        Navigator.pushNamed(context, '/users');
-                      },
-                      child: const Text('Ver Usuários'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16), // Adiciona espaço extra no final
-          ],
+      setState(() {
+        _status = 'Failed to initialize HTTP tracking';
+        _logs.add(
+          LogEntry(
+            message: '❌ Failed to initialize: $e',
+            timestamp: DateTime.now(),
+            type: LogType.error,
+          ),
+        );
+      });
+    }
+  }
+
+  void _addLog(final String message, final LogType type, [final Map<String, dynamic>? data]) {
+    if (!mounted) return;
+
+    setState(() {
+      _logs.add(
+        LogEntry(
+          message: message,
+          timestamp: DateTime.now(),
+          type: type,
+          data: data,
         ),
-      ),
-    );
+      );
+    });
   }
-}
 
-class PokemonListPage extends EngineStatelessWidget {
-  PokemonListPage({super.key});
+  Future<void> _makeGetRequest() async {
+    if (_isLoading) return;
 
-  @override
-  String get screenName => 'PokemonListPage';
+    if (!mounted) return;
 
-  @override
-  Map<String, dynamic>? get screenParameters => {'api_name': 'pokeapi', 'endpoint': 'pokemon', 'request_type': 'GET'};
+    setState(() {
+      _isLoading = true;
+      _status = 'Making GET request...';
+    });
 
-  Future<List<dynamic>> _fetchPokemonList() async {
-    final stopwatch = Stopwatch()..start();
+    _addLog('🔄 Starting GET request to JSONPlaceholder', LogType.info);
 
     try {
-      logCustomEvent(
-        'api_request_started',
-        parameters: {
-          'api_name': 'pokeapi',
-          'endpoint': 'https://pokeapi.co/api/v2/pokemon',
-          'method': 'GET',
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
+      final stopwatch = Stopwatch()..start();
 
-      final response = await http.get(
-        Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=20'),
-        headers: {'Accept': 'application/json'},
-      );
+      final response = await http
+          .get(
+            Uri.parse('https://httpbin.org/get'),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'EngineTracking-Example/1.0',
+              'X-Request-ID': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+          )
+          .timeout(const Duration(seconds: 10));
 
       stopwatch.stop();
-
-      logCustomEvent(
-        'api_request_completed',
-        parameters: {
-          'api_name': 'pokeapi',
-          'endpoint': 'https://pokeapi.co/api/v2/pokemon',
-          'method': 'GET',
-          'status_code': response.statusCode,
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-          'response_size_bytes': response.body.length,
-          'success': response.statusCode == 200,
-        },
-      );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['results'] ?? [];
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            _status = 'GET request successful';
+          });
+        }
+        _addLog(
+          '✅ GET request completed: ${response.statusCode}',
+          LogType.success,
+          {
+            'duration_ms': stopwatch.elapsedMilliseconds,
+            'content_length': response.contentLength,
+            'response_headers': response.headers.length,
+          },
+        );
+        _addLog('📄 Response origin: ${data['origin']}', LogType.info);
       } else {
-        throw Exception('Failed to load pokemon: ${response.statusCode}');
+        if (mounted) {
+          setState(() {
+            _status = 'GET request failed';
+          });
+        }
+        _addLog('❌ GET request failed: ${response.statusCode}', LogType.error, {
+          'status_code': response.statusCode,
+          'reason_phrase': response.reasonPhrase,
+        });
       }
-    } catch (e, stackTrace) {
+    } on TimeoutException {
+      if (mounted) {
+        setState(() {
+          _status = 'GET request timeout';
+        });
+      }
+      _addLog('⏰ GET request timeout after 10 seconds', LogType.error);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _status = 'GET request error';
+        });
+      }
+      _addLog('💥 GET request error: $e', LogType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _makePostRequest() async {
+    if (_isLoading) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _status = 'Making POST request...';
+    });
+
+    _addLog('🔄 Starting POST request to httpbin.org', LogType.info);
+
+    try {
+      final requestBody = {
+        'title': 'Engine Tracking Test',
+        'body': 'This is a test post from Engine Tracking HTTP example',
+        'userId': 1,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+
+      final stopwatch = Stopwatch()..start();
+      final response = await http
+          .post(
+            Uri.parse('https://httpbin.org/post'),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'EngineTracking-Example/1.0',
+              'X-Request-ID': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+            body: json.encode(requestBody),
+          )
+          .timeout(const Duration(seconds: 10));
       stopwatch.stop();
 
-      logScreenError(
-        'Erro ao carregar lista de pokémons',
-        exception: e,
-        stackTrace: stackTrace,
-        additionalData: {
-          'api_name': 'pokeapi',
-          'endpoint': 'https://pokeapi.co/api/v2/pokemon',
-          'method': 'GET',
-          'response_time_ms': stopwatch.elapsedMilliseconds,
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            _status = 'POST request successful';
+          });
+        }
+        _addLog(
+          '✅ POST request completed: ${response.statusCode}',
+          LogType.success,
+          {
+            'duration_ms': stopwatch.elapsedMilliseconds,
+            'content_length': response.contentLength,
+            'response_headers': response.headers.length,
+          },
+        );
+        _addLog('📄 Response origin: ${data['origin']}', LogType.info);
+      } else {
+        if (mounted) {
+          setState(() {
+            _status = 'POST request failed';
+          });
+        }
+        _addLog('❌ POST request failed: ${response.statusCode}', LogType.error, {
+          'status_code': response.statusCode,
+          'reason_phrase': response.reasonPhrase,
+        });
+      }
+    } on TimeoutException {
+      if (mounted) {
+        setState(() {
+          _status = 'POST request timeout';
+        });
+      }
+      _addLog('⏰ POST request timeout after 10 seconds', LogType.error);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _status = 'POST request error';
+        });
+      }
+      _addLog('💥 POST request error: $e', LogType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _makeErrorRequest() async {
+    if (_isLoading) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _status = 'Making request that will fail...';
+    });
+
+    _addLog('🔄 Starting request to error endpoint', LogType.warning);
+
+    try {
+      final stopwatch = Stopwatch()..start();
+      final response = await http
+          .get(
+            Uri.parse('https://httpbin.org/status/404'),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'EngineTracking-Example/1.0',
+              'X-Request-ID': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+      stopwatch.stop();
+
+      if (mounted) {
+        setState(() {
+          _status = 'Error request completed';
+        });
+      }
+      _addLog(
+        '❌ Error request completed: ${response.statusCode}',
+        LogType.error,
+        {
+          'duration_ms': stopwatch.elapsedMilliseconds,
+          'status_code': response.statusCode,
+          'reason_phrase': response.reasonPhrase,
+        },
+      );
+    } on TimeoutException {
+      if (mounted) {
+        setState(() {
+          _status = 'Error request timeout';
+        });
+      }
+      _addLog('⏰ Error request timeout after 10 seconds', LogType.error);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _status = 'Error request failed';
+        });
+      }
+      _addLog('💥 Error request failed: $e', LogType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _testDifferentConfigs() async {
+    if (_isLoading) return;
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _status = 'Testing different configurations...';
+    });
+
+    _addLog('🔧 Testing minimal logging config', LogType.info);
+
+    try {
+      await EngineHttpTracking.withConfig(
+        EngineHttpTrackingConfig(
+          enabled: true,
+          enableRequestLogging: true,
+          enableResponseLogging: true,
+          enableTimingLogging: true,
+          enableHeaderLogging: false,
+          enableBodyLogging: false,
+          maxBodyLogLength: 500,
+          logName: 'HTTP_MINIMAL_TEST',
+        ),
+        () async {
+          await http
+              .get(
+                Uri.parse('https://httpbin.org/get'),
+              )
+              .timeout(const Duration(seconds: 10));
         },
       );
 
-      rethrow;
-    }
-  }
+      _addLog('✅ Minimal logging config test completed', LogType.success);
+      _addLog('🔧 Testing errors-only config', LogType.info);
 
-  @override
-  Widget buildWithTracking(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Pokémons'),
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _fetchPokemonList(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [CircularProgressIndicator(), SizedBox(height: 16), Text('Carregando pokémons...')],
-              ),
-            );
-          }
+      await EngineHttpTracking.withConfig(
+        EngineHttpTrackingConfig(
+          enabled: true,
+          enableRequestLogging: false,
+          enableResponseLogging: true,
+          enableTimingLogging: true,
+          enableHeaderLogging: false,
+          enableBodyLogging: false,
+          maxBodyLogLength: 0,
+          logName: 'HTTP_ERRORS_TEST',
+        ),
+        () async {
+          await http
+              .get(
+                Uri.parse('https://httpbin.org/get'),
+              )
+              .timeout(const Duration(seconds: 10));
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Erro: ${snapshot.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      logUserAction('retry_pokemon_list', parameters: {'error_message': snapshot.error.toString()});
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PokemonListPage()));
-                    },
-                    child: const Text('Tentar Novamente'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final pokemonList = snapshot.data ?? [];
-
-          return ListView.builder(
-            itemCount: pokemonList.length,
-            itemBuilder: (context, index) {
-              final pokemon = pokemonList[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.catching_pokemon)),
-                  title: Text(
-                    pokemon['name'].toString().toUpperCase(),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text('URL: ${pokemon['url']}'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    logUserAction(
-                      'pokemon_item_tapped',
-                      parameters: {
-                        'pokemon_name': pokemon['name'],
-                        'pokemon_url': pokemon['url'],
-                        'list_position': index,
-                      },
-                    );
-
-                    // Mostrar detalhes do pokémon
-                    showDialog(
-                      context: context,
-                      builder: (context) => PokemonDetailDialog(pokemonUrl: pokemon['url']),
-                    );
-                  },
-                ),
-              );
-            },
-          );
+          await http
+              .get(
+                Uri.parse('https://httpbin.org/status/500'),
+              )
+              .timeout(const Duration(seconds: 10));
         },
-      ),
-    );
-  }
-}
+      );
 
-/// Dialog para mostrar detalhes do pokémon
-class PokemonDetailDialog extends EngineStatelessWidget {
-  final String pokemonUrl;
-
-  PokemonDetailDialog({super.key, required this.pokemonUrl});
-
-  Future<Map<String, dynamic>> _fetchPokemonDetails() async {
-    final response = await http.get(Uri.parse(pokemonUrl));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to load pokemon details');
+      if (mounted) {
+        setState(() {
+          _status = 'Configuration tests completed';
+        });
+      }
+      _addLog('✅ Errors-only config test completed', LogType.success);
+    } catch (e) {
+      _addLog('💥 Configuration test failed: $e', LogType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
-  @override
-  Widget buildWithTracking(BuildContext context) {
-    return Dialog(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: _fetchPokemonDetails(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox(height: 200, child: Center(child: CircularProgressIndicator()));
-            }
+  Future<void> _testMultipleRequests() async {
+    if (_isLoading) return;
 
-            if (snapshot.hasError) {
-              return SizedBox(height: 200, child: Center(child: Text('Erro: ${snapshot.error}')));
-            }
+    if (!mounted) return;
 
-            final pokemon = snapshot.data!;
-            return Column(
+    setState(() {
+      _isLoading = true;
+      _status = 'Making multiple concurrent requests...';
+    });
+
+    _addLog('🔄 Starting 5 concurrent requests', LogType.info);
+
+    try {
+      final futures = List.generate(
+        5,
+        (final index) async => http
+            .get(
+              Uri.parse('https://httpbin.org/delay/${index + 1}'),
+              headers: {
+                'User-Agent': 'EngineTracking-Example/1.0',
+                'X-Request-ID': 'batch_${DateTime.now().millisecondsSinceEpoch}_$index',
+              },
+            )
+            .timeout(const Duration(seconds: 15)),
+      );
+
+      final stopwatch = Stopwatch()..start();
+      final responses = await Future.wait(futures);
+      stopwatch.stop();
+
+      final successCount = responses.where((final r) => r.statusCode == 200).length;
+
+      if (mounted) {
+        setState(() {
+          _status = 'Multiple requests completed';
+        });
+      }
+
+      _addLog(
+        '✅ Completed $successCount/5 requests successfully',
+        LogType.success,
+        {
+          'total_duration_ms': stopwatch.elapsedMilliseconds,
+          'success_rate': '${(successCount / 5 * 100).toStringAsFixed(1)}%',
+        },
+      );
+    } catch (e) {
+      _addLog('💥 Multiple requests failed: $e', LogType.error);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _clearLogs() {
+    if (!mounted) return;
+
+    setState(() {
+      _logs.clear();
+      _status = 'Logs cleared';
+    });
+  }
+
+  Future<void> _copyLog(final LogEntry log) async {
+    final logText = _formatLogForCopy(log);
+    await Clipboard.setData(ClipboardData(text: logText));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Log entry copied to clipboard'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
+  Future<void> _copyAllLogs() async {
+    if (_logs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No logs to copy'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+
+    final allLogsText = _logs.map(_formatLogForCopy).join('\n\n');
+    await Clipboard.setData(ClipboardData(text: allLogsText));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_logs.length} log entries copied to clipboard'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  String _formatLogForCopy(final LogEntry log) {
+    final timestamp = log.timestamp.toIso8601String();
+    final type = log.type.name.toUpperCase();
+    final message = log.message;
+
+    String result = '[$timestamp] [$type] $message';
+
+    if (log.data != null && log.data!.isNotEmpty) {
+      result += '\nData: ${json.encode(log.data)}';
+    }
+
+    return result;
+  }
+
+  void _showTrackingStats() {
+    final stats = EngineHttpTracking.getStats();
+    unawaited(
+      showDialog(
+        context: context,
+        builder: (final context) => AlertDialog(
+          title: const Text('HTTP Tracking Stats'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  pokemon['name'].toString().toUpperCase(),
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ...stats.entries.map(
+                  (final e) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          child: Text(
+                            '${e.key}:',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            '${e.value}',
+                            style: const TextStyle(fontFamily: 'monospace'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                if (pokemon['sprites']?['front_default'] != null)
-                  Image.network(pokemon['sprites']['front_default'], height: 100, width: 100),
-                const SizedBox(height: 16),
-                Text('ID: ${pokemon['id']}'),
-                Text('Altura: ${pokemon['height']} decímetros'),
-                Text('Peso: ${pokemon['weight']} hectogramas'),
-                Text('Exp. Base: ${pokemon['base_experience']}'),
-                const SizedBox(height: 16),
-                ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Fechar')),
               ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-/// Página de Posts do JSONPlaceholder - Exemplo com GET e POST
-class PostsListPage extends EngineStatelessWidget {
-  PostsListPage({super.key});
-
-  @override
-  String get screenName => 'posts_list_page';
-
-  @override
-  Map<String, dynamic>? get screenParameters => {
-    'api_name': 'jsonplaceholder',
-    'endpoint': 'posts',
-    'supported_methods': ['GET', 'POST'],
-  };
-
-  Future<List<dynamic>> _fetchPosts() async {
-    final stopwatch = Stopwatch()..start();
-
-    try {
-      logCustomEvent(
-        'api_request_started',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'GET',
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
-
-      final response = await http.get(
-        Uri.parse('https://jsonplaceholder.typicode.com/posts?_limit=10'),
-        headers: {'Accept': 'application/json'},
-      );
-
-      stopwatch.stop();
-
-      logCustomEvent(
-        'api_request_completed',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'GET',
-          'status_code': response.statusCode,
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-          'response_size_bytes': response.body.length,
-          'success': response.statusCode == 200,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Failed to load posts: ${response.statusCode}');
-      }
-    } catch (e, stackTrace) {
-      stopwatch.stop();
-
-      logScreenError(
-        'Erro ao carregar lista de posts',
-        exception: e,
-        stackTrace: stackTrace,
-        additionalData: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'GET',
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-        },
-      );
-
-      rethrow;
-    }
-  }
-
-  Future<Map<String, dynamic>> _createPost(String title, String body) async {
-    final stopwatch = Stopwatch()..start();
-
-    try {
-      logCustomEvent(
-        'api_request_started',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'POST',
-          'timestamp': DateTime.now().toIso8601String(),
-          'request_data': {'title': title, 'body': body},
-        },
-      );
-
-      final response = await http.post(
-        Uri.parse('https://jsonplaceholder.typicode.com/posts'),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: json.encode({'title': title, 'body': body, 'userId': 1}),
-      );
-
-      stopwatch.stop();
-
-      logCustomEvent(
-        'api_request_completed',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'POST',
-          'status_code': response.statusCode,
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-          'response_size_bytes': response.body.length,
-          'success': response.statusCode == 201,
-        },
-      );
-
-      if (response.statusCode == 201) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Failed to create post: ${response.statusCode}');
-      }
-    } catch (e, stackTrace) {
-      stopwatch.stop();
-
-      logScreenError(
-        'Erro ao criar post',
-        exception: e,
-        stackTrace: stackTrace,
-        additionalData: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/posts',
-          'method': 'POST',
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-          'request_data': {'title': title, 'body': body},
-        },
-      );
-
-      rethrow;
-    }
-  }
-
-  void _showCreatePostDialog(BuildContext context) {
-    final titleController = TextEditingController();
-    final bodyController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Criar Novo Post'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Título', border: OutlineInputBorder()),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: bodyController,
-              decoration: const InputDecoration(labelText: 'Conteúdo', border: OutlineInputBorder()),
-              maxLines: 3,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                await Clipboard.setData(
+                  ClipboardData(
+                    text: stats.entries.map((final e) => '${e.key}: ${e.value}').join('\n'),
+                  ),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Stats copied to clipboard')),
+                );
+              },
+              child: const Text('Copy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
             ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          ElevatedButton(
-            onPressed: () async {
-              if (titleController.text.isNotEmpty && bodyController.text.isNotEmpty) {
-                Navigator.pop(context);
-
-                try {
-                  logUserAction(
-                    'create_post_attempted',
-                    parameters: {
-                      'title_length': titleController.text.length,
-                      'body_length': bodyController.text.length,
-                    },
-                  );
-
-                  final newPost = await _createPost(titleController.text, bodyController.text);
-
-                  logUserAction(
-                    'create_post_success',
-                    parameters: {'post_id': newPost['id'], 'title': newPost['title']},
-                  );
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Post criado com sucesso! ID: ${newPost['id']}'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Erro ao criar post: $e'), backgroundColor: Colors.red));
-                }
-              }
-            },
-            child: const Text('Criar'),
-          ),
-        ],
       ),
     );
   }
 
-  @override
-  Widget buildWithTracking(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Posts - JSONPlaceholder'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              logUserAction('add_post_button_tapped', parameters: {'source_screen': screenName});
-              _showCreatePostDialog(context);
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _fetchPosts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [CircularProgressIndicator(), SizedBox(height: 16), Text('Carregando posts...')],
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Erro: ${snapshot.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      logUserAction('retry_posts_list', parameters: {'error_message': snapshot.error.toString()});
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PostsListPage()));
-                    },
-                    child: const Text('Tentar Novamente'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final posts = snapshot.data ?? [];
-
-          return ListView.builder(
-            itemCount: posts.length,
-            itemBuilder: (context, index) {
-              final post = posts[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(child: Text('${post['id']}')),
-                  title: Text(
-                    post['title'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(post['body'], maxLines: 2, overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    logUserAction(
-                      'post_item_tapped',
-                      parameters: {'post_id': post['id'], 'post_title': post['title'], 'list_position': index},
-                    );
-
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text('Post #${post['id']}'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(post['title'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              const SizedBox(height: 16),
-                              Text(post['body']),
-                            ],
-                          ),
-                        ),
-                        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Fechar'))],
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
+  Color _getLogColor(final LogType type) {
+    switch (type) {
+      case LogType.success:
+        return Colors.green;
+      case LogType.warning:
+        return Colors.orange;
+      case LogType.error:
+        return Colors.red;
+      case LogType.info:
+        return Colors.blue;
+    }
   }
-}
 
-/// Página de Usuários do JSONPlaceholder - Exemplo com GET
-class UsersListPage extends EngineStatelessWidget {
-  UsersListPage({super.key});
-
-  @override
-  String get screenName => 'users_list_page';
-
-  @override
-  Map<String, dynamic>? get screenParameters => {
-    'api_name': 'jsonplaceholder',
-    'endpoint': 'users',
-    'request_type': 'GET',
-  };
-
-  Future<List<dynamic>> _fetchUsers() async {
-    final stopwatch = Stopwatch()..start();
-
-    try {
-      logCustomEvent(
-        'api_request_started',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/users',
-          'method': 'GET',
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
-
-      final response = await http.get(
-        Uri.parse('https://jsonplaceholder.typicode.com/users'),
-        headers: {'Accept': 'application/json'},
-      );
-
-      stopwatch.stop();
-
-      logCustomEvent(
-        'api_request_completed',
-        parameters: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/users',
-          'method': 'GET',
-          'status_code': response.statusCode,
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-          'response_size_bytes': response.body.length,
-          'success': response.statusCode == 200,
-          'users_count': response.statusCode == 200 ? json.decode(response.body).length : 0,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Failed to load users: ${response.statusCode}');
-      }
-    } catch (e, stackTrace) {
-      stopwatch.stop();
-
-      logScreenError(
-        'Erro ao carregar lista de usuários',
-        exception: e,
-        stackTrace: stackTrace,
-        additionalData: {
-          'api_name': 'jsonplaceholder',
-          'endpoint': 'https://jsonplaceholder.typicode.com/users',
-          'method': 'GET',
-          'response_time_ms': stopwatch.elapsedMilliseconds,
-        },
-      );
-
-      rethrow;
+  IconData _getLogIcon(final LogType type) {
+    switch (type) {
+      case LogType.success:
+        return Icons.check_circle;
+      case LogType.warning:
+        return Icons.warning;
+      case LogType.error:
+        return Icons.error;
+      case LogType.info:
+        return Icons.info;
     }
   }
 
   @override
-  Widget buildWithTracking(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Usuários - JSONPlaceholder'),
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
-      ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _fetchUsers(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+  Widget build(final BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text('HTTP Tracking Example'),
+      backgroundColor: Colors.blue,
+      foregroundColor: Colors.white,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: _initializeHttpTracking,
+          tooltip: 'Reinitialize HTTP Tracking',
+        ),
+      ],
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [CircularProgressIndicator(), SizedBox(height: 16), Text('Carregando usuários...')],
-              ),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.error, size: 64, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text('Erro: ${snapshot.error}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      logUserAction('retry_users_list', parameters: {'error_message': snapshot.error.toString()});
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UsersListPage()));
-                    },
-                    child: const Text('Tentar Novamente'),
+                  Row(
+                    children: [
+                      Icon(
+                        _isLoading ? Icons.hourglass_empty : Icons.check_circle,
+                        color: _isLoading ? Colors.orange : Colors.green,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Status: $_status',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        EngineHttpTracking.isEnabled ? Icons.check_circle : Icons.cancel,
+                        color: EngineHttpTracking.isEnabled ? Colors.green : Colors.red,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'HTTP Tracking: ${EngineHttpTracking.isEnabled ? "Enabled" : "Disabled"}',
+                        style: TextStyle(
+                          color: EngineHttpTracking.isEnabled ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            );
-          }
-
-          final users = snapshot.data ?? [];
-
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(child: Text(user['name'][0])),
-                  title: Text(user['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Email: ${user['email']}'),
-                      Text('Telefone: ${user['phone']}'),
-                      Text('Website: ${user['website']}'),
-                    ],
-                  ),
-                  isThreeLine: true,
-                  onTap: () {
-                    logUserAction(
-                      'user_item_tapped',
-                      parameters: {
-                        'user_id': user['id'],
-                        'user_name': user['name'],
-                        'user_email': user['email'],
-                        'list_position': index,
-                      },
-                    );
-
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(user['name']),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildUserInfoRow('ID', user['id'].toString()),
-                              _buildUserInfoRow('Username', user['username']),
-                              _buildUserInfoRow('Email', user['email']),
-                              _buildUserInfoRow('Telefone', user['phone']),
-                              _buildUserInfoRow('Website', user['website']),
-                              const Divider(),
-                              const Text('Endereço:', style: TextStyle(fontWeight: FontWeight.bold)),
-                              _buildUserInfoRow('Rua', '${user['address']['street']}, ${user['address']['suite']}'),
-                              _buildUserInfoRow('Cidade', user['address']['city']),
-                              _buildUserInfoRow('CEP', user['address']['zipcode']),
-                              const Divider(),
-                              const Text('Empresa:', style: TextStyle(fontWeight: FontWeight.bold)),
-                              _buildUserInfoRow('Nome', user['company']['name']),
-                              _buildUserInfoRow('Slogan', user['company']['catchPhrase']),
-                            ],
-                          ),
-                        ),
-                        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Fechar'))],
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildUserInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text('$label:', style: const TextStyle(fontWeight: FontWeight.w500)),
+            ),
           ),
-          Expanded(child: Text(value)),
+
+          const SizedBox(height: 16),
+
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _makeGetRequest,
+                icon: const Icon(Icons.download),
+                label: const Text('GET Request'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _makePostRequest,
+                icon: const Icon(Icons.upload),
+                label: const Text('POST Request'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _makeErrorRequest,
+                icon: const Icon(Icons.error),
+                label: const Text('Error Request'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _testMultipleRequests,
+                icon: const Icon(Icons.multiple_stop),
+                label: const Text('Multiple Requests'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _isLoading ? null : _testDifferentConfigs,
+                icon: const Icon(Icons.settings),
+                label: const Text('Test Configs'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _showTrackingStats,
+                icon: const Icon(Icons.analytics),
+                label: const Text('Show Stats'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _clearLogs,
+                icon: const Icon(Icons.clear),
+                label: const Text('Clear Logs'),
+              ),
+              ElevatedButton.icon(
+                onPressed: _logs.isNotEmpty ? _copyAllLogs : null,
+                icon: const Icon(Icons.copy),
+                label: const Text('Copy All Logs'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          Expanded(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.list),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Activity Log (${_logs.length} entries)',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _logs.length,
+                        itemBuilder: (final context, final index) {
+                          final log = _logs[_logs.length - 1 - index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    _getLogIcon(log.type),
+                                    color: _getLogColor(log.type),
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    log.formattedTime,
+                                    style: const TextStyle(
+                                      fontFamily: 'monospace',
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          log.message,
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        if (log.data != null && log.data!.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 4.0),
+                                            child: Text(
+                                              'Data: ${json.encode(log.data)}',
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontFamily: 'monospace',
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.copy, size: 16),
+                                    onPressed: () => _copyLog(log),
+                                    tooltip: 'Copy log entry',
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 24,
+                                      minHeight: 24,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
-    );
+    ),
+  );
+
+  @override
+  void dispose() {
+    EngineHttpTracking.disable();
+    super.dispose();
   }
-}
-
-/// Função para demonstrar a inicialização do sistema com tracking HTTP
-Future<void> initializeHttpTrackingExample() async {
-  final analyticsModel = EngineAnalyticsModel(
-    firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: false),
-    faroConfig: const EngineFaroConfig(
-      enabled: true,
-      endpoint: 'https://faro-collector-prod-us-east-0.grafana.net/collect',
-      appName: 'engine_tracking_http_example',
-      appVersion: '1.0.0',
-      environment: 'development',
-      apiKey: 'your-api-key-here',
-      namespace: 'flutter_app',
-      platform: 'mobile',
-    ),
-    splunkConfig: const EngineSplunkConfig(
-      enabled: false,
-      endpoint: '',
-      token: '',
-      source: '',
-      sourcetype: '',
-      index: '',
-    ),
-    clarityConfig: const EngineClarityConfig(
-      enabled: false,
-      projectId: '',
-    ),
-    googleLoggingConfig: const EngineGoogleLoggingConfig(
-      enabled: false,
-      projectId: '',
-      logName: '',
-      credentials: {},
-    ),
-  );
-
-  final bugTrackingModel = EngineBugTrackingModel(
-    crashlyticsConfig: const EngineCrashlyticsConfig(enabled: false),
-    faroConfig: const EngineFaroConfig(
-      enabled: true,
-      endpoint: 'https://faro-collector-prod-us-east-0.grafana.net/collect',
-      appName: 'engine_tracking_http_example',
-      appVersion: '1.0.0',
-      environment: 'development',
-      apiKey: 'your-api-key-here',
-      namespace: 'flutter_app',
-      platform: 'mobile',
-    ),
-    googleLoggingConfig: const EngineGoogleLoggingConfig(
-      enabled: false,
-      projectId: '',
-      logName: '',
-      credentials: {},
-    ),
-  );
-
-  await EngineAnalytics.initWithModel(analyticsModel);
-  await EngineBugTracking.initWithModel(bugTrackingModel);
-
-  print('Sistema de tracking HTTP inicializado com sucesso!');
-  print('- PokéAPI: https://pokeapi.co/api/v2/pokemon');
-  print('- JSONPlaceholder Posts: https://jsonplaceholder.typicode.com/posts');
-  print('- JSONPlaceholder Users: https://jsonplaceholder.typicode.com/users');
 }

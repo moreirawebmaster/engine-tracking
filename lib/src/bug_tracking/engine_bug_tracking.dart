@@ -22,15 +22,31 @@ class EngineBugTracking {
 
   static final _adapters = <IEngineBugTrackingAdapter>[];
 
-  static bool isAdapterInitialized(final PredicateBugTracking predicate) => _adapters.any(predicate);
+  static bool get isCrashlyticsInitialized => _isAdapterTypeInitialized<EngineCrashlyticsAdapter>();
+  static bool get isFaroInitialized => _isAdapterTypeInitialized<EngineFaroBugTrackingAdapter>();
+  static bool get isGoogleLoggingInitialized => _isAdapterTypeInitialized<EngineGoogleLoggingBugTrackingAdapter>();
 
-  static bool get isCrashlyticsInitialized =>
-      isAdapterInitialized((final adapter) => adapter is EngineCrashlyticsAdapter && adapter.isInitialized);
-  static bool get isFaroInitialized =>
-      isAdapterInitialized((final adapter) => adapter is EngineFaroBugTrackingAdapter && adapter.isInitialized);
-  static bool get isGoogleLoggingInitialized => isAdapterInitialized(
-    (final adapter) => adapter is EngineGoogleLoggingBugTrackingAdapter && adapter.isInitialized,
-  );
+  static bool _isAdapterTypeInitialized<T extends IEngineBugTrackingAdapter>() =>
+      _adapters.whereType<T>().any((final adapter) => adapter.isInitialized);
+
+  /// Retrieves the configuration for a specific adapter type.
+  ///
+  /// Returns the configuration if an enabled adapter of type [TAdapter] is found,
+  /// otherwise returns null.
+  ///
+  /// Example:
+  /// ```dart
+  /// final config = EngineAnalytics.getConfig<EngineFirebaseAnalyticsConfig, EngineCrashlyticsAdapter>();
+  /// ```
+  static TConfig? getConfig<TConfig extends IEngineConfig, TAdapter extends IEngineBugTrackingAdapter>() {
+    final enabledAdapter = _adapters.whereType<TAdapter>().where((final adapter) => adapter.isEnabled).firstOrNull;
+
+    if (enabledAdapter?.config is TConfig) {
+      return enabledAdapter!.config as TConfig;
+    }
+
+    return null;
+  }
 
   static Future<void> init(final List<IEngineBugTrackingAdapter> adapters) async {
     if (_isInitialized) {
@@ -41,18 +57,17 @@ class EngineBugTracking {
       ..clear()
       ..addAll(adapters.where((final adapter) => adapter.isEnabled));
 
-    final futures = _adapters.map((final adapter) => adapter.initialize()).toList();
-
-    await Future.wait(futures);
+    final initializes = _adapters.map((final adapter) => adapter.initialize());
+    await Future.wait(initializes);
 
     _isInitialized = true;
   }
 
   static Future<void> initWithModel(final EngineBugTrackingModel model) async {
     final adapters = <IEngineBugTrackingAdapter>[
-      EngineCrashlyticsAdapter(model.crashlyticsConfig),
-      EngineFaroBugTrackingAdapter(model.faroConfig),
-      EngineGoogleLoggingBugTrackingAdapter(model.googleLoggingConfig),
+      if (model.crashlyticsConfig != null) EngineCrashlyticsAdapter(model.crashlyticsConfig!),
+      if (model.faroConfig != null) EngineFaroBugTrackingAdapter(model.faroConfig!),
+      if (model.googleLoggingConfig != null) EngineGoogleLoggingBugTrackingAdapter(model.googleLoggingConfig!),
     ];
 
     await init(adapters);
@@ -63,12 +78,8 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
-        .map(
-          (final adapter) => adapter.dispose(),
-        )
-        .toList();
-    await Future.wait(futures);
+    final disposes = _adapters.map((final adapter) => adapter.dispose());
+    await Future.wait(disposes);
 
     _adapters.clear();
     _isInitialized = false;
@@ -84,12 +95,8 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
-        .map(
-          (final adapter) => adapter.setCustomKey(key, value),
-        )
-        .toList();
-    await Future.wait(futures);
+    final setCustomKeys = _adapters.map((final adapter) => adapter.setCustomKey(key, value));
+    await Future.wait(setCustomKeys);
   }
 
   static Future<void> setUserIdentifier(final String id, final String email, final String name) async {
@@ -97,12 +104,8 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
-        .map(
-          (final adapter) => adapter.setUserIdentifier(id, email, name),
-        )
-        .toList();
-    await Future.wait(futures);
+    final setUserIdentifiers = _adapters.map((final adapter) => adapter.setUserIdentifier(id, email, name));
+    await Future.wait(setUserIdentifiers);
   }
 
   static Future<void> log(
@@ -115,17 +118,15 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
-        .map(
-          (final adapter) => adapter.log(
-            message,
-            level: level,
-            attributes: attributes,
-            stackTrace: stackTrace,
-          ),
-        )
-        .toList();
-    await Future.wait(futures);
+    final logs = _adapters.map(
+      (final adapter) => adapter.log(
+        message,
+        level: level,
+        attributes: attributes,
+        stackTrace: stackTrace,
+      ),
+    );
+    await Future.wait(logs);
   }
 
   static Future<void> recordError(
@@ -140,7 +141,7 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
+    final errors = _adapters
         .map(
           (final adapter) => adapter.recordError(
             exception,
@@ -152,7 +153,7 @@ class EngineBugTracking {
           ),
         )
         .toList();
-    await Future.wait(futures);
+    await Future.wait(errors);
   }
 
   static Future<void> recordFlutterError(final FlutterErrorDetails errorDetails) async {
@@ -160,12 +161,12 @@ class EngineBugTracking {
       return;
     }
 
-    final futures = _adapters
+    final erros = _adapters
         .map(
           (final adapter) => adapter.recordFlutterError(errorDetails),
         )
         .toList();
-    await Future.wait(futures);
+    await Future.wait(erros);
   }
 
   static Future<void> testCrash() async {

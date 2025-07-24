@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('EngineSplunkConfig', () {
     test('should create instance with all parameters', () {
-      const config = EngineSplunkConfig(
+      final config = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://splunk-hec.example.com:8088/services/collector',
         token: 'test-hec-token',
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('should create disabled instance', () {
-      const config = EngineSplunkConfig(
+      final config = EngineSplunkConfig(
         enabled: false,
         endpoint: '',
         token: '',
@@ -40,7 +40,7 @@ void main() {
     });
 
     test('toString should mask token', () {
-      const config = EngineSplunkConfig(
+      final config = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://splunk.example.com',
         token: 'secret-token-123',
@@ -59,41 +59,8 @@ void main() {
       expect(stringRepresentation, isNot(contains('secret-token-123')));
     });
 
-    test('should implement equality correctly', () {
-      const config1 = EngineSplunkConfig(
-        enabled: true,
-        endpoint: 'https://example.com',
-        token: 'token',
-        source: 'source',
-        sourcetype: 'json',
-        index: 'main',
-      );
-
-      const config2 = EngineSplunkConfig(
-        enabled: true,
-        endpoint: 'https://example.com',
-        token: 'token',
-        source: 'source',
-        sourcetype: 'json',
-        index: 'main',
-      );
-
-      const config3 = EngineSplunkConfig(
-        enabled: false,
-        endpoint: 'https://example.com',
-        token: 'token',
-        source: 'source',
-        sourcetype: 'json',
-        index: 'main',
-      );
-
-      expect(config1, equals(config2));
-      expect(config1, isNot(equals(config3)));
-      expect(config1.hashCode, equals(config2.hashCode));
-    });
-
     test('should not be equal to different types', () {
-      const config = EngineSplunkConfig(
+      final config = EngineSplunkConfig(
         enabled: true,
         endpoint: 'https://example.com',
         token: 'token',

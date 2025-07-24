@@ -1,7 +1,10 @@
-abstract class IEngineAnalyticsAdapter {
+import 'package:engine_tracking/src/config/config.dart';
+
+abstract class IEngineAnalyticsAdapter<TConfig extends IEngineConfig> {
   String get adapterName;
   bool get isEnabled;
   bool get isInitialized;
+  TConfig get config;
 
   Future<void> initialize();
   Future<void> dispose();

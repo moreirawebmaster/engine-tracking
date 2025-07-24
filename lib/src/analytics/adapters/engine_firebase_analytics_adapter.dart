@@ -1,26 +1,26 @@
-import 'package:engine_tracking/src/analytics/adapters/i_engine_analytics_adapter.dart';
-import 'package:engine_tracking/src/config/engine_firebase_analytics_config.dart';
-import 'package:engine_tracking/src/session/engine_session.dart';
+import 'package:engine_tracking/engine_tracking.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
-class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
-  EngineFirebaseAnalyticsAdapter(this._config);
+class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter<EngineFirebaseAnalyticsConfig> {
+  EngineFirebaseAnalyticsAdapter(this.config);
 
-  bool _isInitialized = false;
+  @override
+  final EngineFirebaseAnalyticsConfig config;
 
   @override
   String get adapterName => 'Firebase Analytics';
 
   @override
-  bool get isEnabled => _config.enabled;
+  bool get isEnabled => config.enabled;
 
   @override
   bool get isInitialized => _isInitialized;
 
   bool get isFirebaseAnalyticsInitialized => isEnabled && _isInitialized && _firebaseAnalytics != null;
 
-  final EngineFirebaseAnalyticsConfig _config;
+  bool _isInitialized = false;
+
   FirebaseAnalytics? _firebaseAnalytics;
 
   @override
@@ -29,9 +29,10 @@ class EngineFirebaseAnalyticsAdapter implements IEngineAnalyticsAdapter {
       return;
     }
 
+    _isInitialized = true;
+
     try {
       _firebaseAnalytics = FirebaseAnalytics.instance;
-      _isInitialized = true;
     } catch (e) {
       _isInitialized = false;
     }
