@@ -8,10 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2025-01-23
 
 ### Added
+- **HTTP Tracking**: Complete HTTP request/response tracking system with `EngineHttpTracking`
 - **EngineClarityAdapter**: New dedicated adapter for Microsoft Clarity analytics
+- **IEngineConfig**: Interface for standardized configuration management
 - Enhanced Microsoft Clarity integration with proper adapter pattern
 - Clarity-specific status verification methods in EngineAnalytics
 - Automatic session ID synchronization with Clarity sessions
+- HTTP client override for automatic request interception
+- Comprehensive HTTP tracking with request/response logging
 
 ### Changed
 - Improved documentation structure and readability
@@ -19,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced code examples with real-world scenarios
 - Updated README.md with professional tone and clearer sections
 - Microsoft Clarity now uses dedicated adapter instead of widget-only integration
+- Enhanced error handling across all adapters
+- Improved configuration masking for sensitive data
 
 ### Dependencies
 - Updated `firebase_crashlytics` from ^4.3.7 to ^4.3.10 - Enhanced crash reporting stability
@@ -35,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved installation and setup instructions
 - Enhanced code examples and usage patterns
 - Updated architecture diagrams to include Clarity adapter
+- Added HTTP tracking examples and documentation
 
 ## [1.4.0] - 2024-12-15
 
