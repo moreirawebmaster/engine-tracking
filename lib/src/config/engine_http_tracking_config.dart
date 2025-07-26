@@ -1,19 +1,12 @@
 import 'dart:io';
 
-import 'package:engine_tracking/src/config/config.dart';
-
 /// Configuration class for Engine HTTP tracking
 ///
 /// This class defines the configuration options for HTTP request/response logging
 /// using the EngineHttpOverride system.
-/// Configuration class for Engine HTTP tracking
-///
-/// This class defines the configuration options for HTTP request/response logging
-/// using the EngineHttpOverride system.
-class EngineHttpTrackingConfig extends IEngineConfig {
+class EngineHttpTrackingConfig {
   /// Creates a new HTTP tracking configuration
   ///
-  /// [enabled] Whether HTTP tracking is enabled
   /// [enableRequestLogging] Whether to log HTTP requests
   /// [enableResponseLogging] Whether to log HTTP responses
   /// [enableTimingLogging] Whether to log request/response timing
@@ -22,13 +15,12 @@ class EngineHttpTrackingConfig extends IEngineConfig {
   /// [maxBodyLogLength] Maximum length of body content to log
   /// [logName] Custom log name for HTTP tracking logs
   /// [baseOverride] Optional base HttpOverrides to chain with
-  EngineHttpTrackingConfig({
-    super.enabled = true,
+  const EngineHttpTrackingConfig({
     this.enableRequestLogging = true,
     this.enableResponseLogging = true,
     this.enableTimingLogging = true,
-    this.enableHeaderLogging = true,
-    this.enableBodyLogging = true,
+    this.enableHeaderLogging = false,
+    this.enableBodyLogging = false,
     this.maxBodyLogLength = 1000,
     this.logName = 'HTTP_TRACKING',
     this.baseOverride,
@@ -60,7 +52,7 @@ class EngineHttpTrackingConfig extends IEngineConfig {
 
   @override
   String toString() =>
-      'EngineHttpTrackingConfig(enabled: $enabled, enableRequestLogging: $enableRequestLogging, '
+      'EngineHttpTrackingConfig(enableRequestLogging: $enableRequestLogging, '
       'enableResponseLogging: $enableResponseLogging, enableTimingLogging: $enableTimingLogging, '
       'enableHeaderLogging: $enableHeaderLogging, enableBodyLogging: $enableBodyLogging, '
       'maxBodyLogLength: $maxBodyLogLength, logName: $logName)';

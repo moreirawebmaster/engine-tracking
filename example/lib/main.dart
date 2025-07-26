@@ -70,17 +70,20 @@ Future<(EngineAnalyticsModel analyticsModel, EngineBugTrackingModel bugTrackingM
       EngineBugTracking.initWithModel(bugTrackingModel),
     ]);
 
-    final httpTrackingConfig = EngineHttpTrackingConfig(
+    const httpTrackingModel = EngineHttpTrackingModel(
       enabled: true,
-      enableRequestLogging: true,
-      enableResponseLogging: true,
-      enableTimingLogging: true,
-      enableHeaderLogging: true,
-      enableBodyLogging: true,
-      maxBodyLogLength: 2000,
+      httpTrackingConfig: EngineHttpTrackingConfig(
+        enableRequestLogging: true,
+        enableResponseLogging: true,
+        enableTimingLogging: true,
+        enableHeaderLogging: true,
+        enableBodyLogging: true,
+        maxBodyLogLength: 2000,
+        logName: 'ENGINE_EXAMPLE_HTTP',
+      ),
     );
 
-    EngineHttpTracking.initialize(httpTrackingConfig);
+    EngineHttpTracking.initWithModel(httpTrackingModel);
 
     await Future.wait([
       EngineAnalytics.setUserId(

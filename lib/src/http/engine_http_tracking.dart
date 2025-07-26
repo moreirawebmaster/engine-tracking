@@ -24,14 +24,19 @@ import 'package:engine_tracking/src/http/engine_http_override.dart';
 /// EngineHttpTracking.initialize(config);
 /// ```
 class EngineHttpTracking {
-  static EngineHttpTrackingConfig? _config;
+  static EngineHttpTrackingModel? _model;
   static HttpOverrides? _previousOverride;
   static bool _isEnabled = false;
+
+  /// Gets the current HTTP tracking model.
+  ///
+  /// Returns null if HTTP tracking has not been initialized.
+  static EngineHttpTrackingModel? get model => _model;
 
   /// Gets the current HTTP tracking configuration.
   ///
   /// Returns null if HTTP tracking has not been initialized.
-  static EngineHttpTrackingConfig? get config => _config;
+  static EngineHttpTrackingConfig? get config => _model?.httpTrackingConfig;
 
   /// Whether HTTP tracking is currently enabled and active.
   ///
@@ -39,34 +44,37 @@ class EngineHttpTracking {
   /// intercepting HTTP requests.
   static bool get isEnabled => _isEnabled;
 
-  /// Initializes HTTP tracking with the given configuration.
+  /// Initializes HTTP tracking with the given model.
   ///
   /// This method sets up the global HttpOverrides to use EngineHttpOverride
   /// for logging HTTP requests and responses. If HTTP tracking is disabled
-  /// in the configuration, this method will disable tracking instead.
+  /// in the model, this method will disable tracking instead.
   ///
-  /// [config] - The configuration for HTTP tracking.
+  /// [model] - The HTTP tracking model containing configuration and enabled state.
   /// [preserveExisting] - Whether to preserve existing HttpOverrides by chaining them.
   ///                      If true, existing overrides will be called before Engine overrides.
   ///
   /// Example:
   /// ```dart
-  /// final config = EngineHttpTrackingConfig(
+  /// final model = EngineHttpTrackingModel(
   ///   enabled: true,
-  ///   enableRequestLogging: true,
-  ///   enableResponseLogging: true,
-  ///   maxBodyLogLength: 1000,
+  ///   httpTrackingConfig: EngineHttpTrackingConfig(
+  ///     enableRequestLogging: true,
+  ///     enableResponseLogging: true,
+  ///     maxBodyLogLength: 1000,
+  ///   ),
   /// );
   ///
-  /// EngineHttpTracking.initialize(config);
+  /// EngineHttpTracking.initWithModel(model);
   /// ```
-  static void initialize(final EngineHttpTrackingConfig config, {final bool preserveExisting = true}) {
-    if (!config.enabled) {
+  static void initWithModel(final EngineHttpTrackingModel model, {final bool preserveExisting = true}) {
+    if (!model.enabled) {
       disable();
       return;
     }
 
-    _config = config;
+    _model = model;
+    final config = model.httpTrackingConfig;
 
     HttpOverrides? baseOverride = config.baseOverride;
     if (preserveExisting && baseOverride == null) {
@@ -93,7 +101,7 @@ class EngineHttpTracking {
         'HTTP tracking initialized',
         logName: 'ENGINE_HTTP_TRACKING',
         data: {
-          'config': config.toString(),
+          'model': model.toString(),
           'has_base_override': baseOverride != null,
           'preserve_existing': preserveExisting,
         },
@@ -120,65 +128,70 @@ class EngineHttpTracking {
     }
 
     _isEnabled = false;
-    _config = null;
+    _model = null;
 
     unawaited(EngineLog.info('HTTP tracking disabled', logName: 'ENGINE_HTTP_TRACKING'));
   }
 
-  /// Updates the HTTP tracking configuration.
+  /// Updates the HTTP tracking model.
   ///
-  /// This method allows you to update the configuration without fully
+  /// This method allows you to update the model without fully
   /// reinitializing the system. If HTTP tracking has not been initialized,
-  /// it will initialize with the new configuration.
+  /// it will initialize with the new model.
   ///
-  /// [newConfig] - The new configuration to apply.
-  static void updateConfig(final EngineHttpTrackingConfig newConfig) {
-    if (_config == null) {
-      initialize(newConfig);
+  /// [newModel] - The new model to apply.
+  static void updateModel(final EngineHttpTrackingModel newModel) {
+    if (_model == null) {
+      initWithModel(newModel);
       return;
     }
 
     final preserveExisting = HttpOverrides.current != null;
-    initialize(newConfig, preserveExisting: preserveExisting);
-  }
-
-  /// Creates a scoped HTTP tracking configuration
-  ///
-  /// This method temporarily applies a different configuration for the
-  /// duration of the provided function execution.
-  static Future<T> withConfig<T>(final EngineHttpTrackingConfig config, final Future<T> Function() operation) async {
-    final previousConfig = _config;
-    final wasEnabled = _isEnabled;
-
-    try {
-      initialize(config);
-      return await operation();
-    } finally {
-      if (wasEnabled && previousConfig != null) {
-        initialize(previousConfig);
-      } else {
-        disable();
-      }
-    }
+    initWithModel(newModel, preserveExisting: preserveExisting);
   }
 
   /// Logs a custom HTTP-related event
   ///
   /// This method can be used to log custom HTTP-related events that
   /// are not automatically captured by the HttpOverride.
+  @Deprecated('Dont Use logCustomEvent it is removed in next version')
   static Future<void> logCustomEvent(
     final String message, {
     final Map<String, dynamic>? data,
     final String? logName,
   }) async {
-    await EngineLog.debug(message, logName: logName ?? _config?.logName ?? 'HTTP_TRACKING', data: data);
+    await EngineLog.debug(message, logName: logName ?? config?.logName ?? 'HTTP_TRACKING', data: data);
   }
 
-  /// Gets statistics about HTTP tracking
+  /// Initializes HTTP tracking with the given configuration (legacy method).
+  ///
+  /// This method is kept for backward compatibility. It creates a model
+  /// with the configuration and enabled=true, then calls initWithModel.
+  ///
+  /// [config] - The configuration for HTTP tracking.
+  /// [preserveExisting] - Whether to preserve existing HttpOverrides by chaining them.
+  @Deprecated('Use initWithModel instead')
+  static void initialize(final EngineHttpTrackingConfig config, {final bool preserveExisting = true}) {
+    final model = EngineHttpTrackingModel(
+      enabled: true,
+      httpTrackingConfig: config,
+    );
+    initWithModel(model, preserveExisting: preserveExisting);
+  }
+
+  /// Gets statistics about HTTP tracking.
+  ///
+  /// Returns a map containing information about the current state of HTTP tracking:
+  /// - `is_enabled`: Whether HTTP tracking is currently active
+  /// - `has_model`: Whether a tracking model has been initialized
+  /// - `model`: String representation of the current model (if any)
+  /// - `current_override`: Type of the current HttpOverrides instance
+  ///
+  /// This method is useful for debugging and monitoring the HTTP tracking state.
   static Map<String, dynamic> getStats() => {
     'is_enabled': _isEnabled,
-    'has_config': _config != null,
-    'config': _config?.toString(),
+    'has_model': _model != null,
+    'model': _model?.toString(),
     'current_override': HttpOverrides.current?.runtimeType.toString(),
   };
 }

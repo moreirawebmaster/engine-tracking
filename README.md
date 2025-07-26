@@ -27,15 +27,24 @@ Initialize the library:
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 
-// Initialize both analytics and bug tracking
+// Initialize all tracking services
 await EngineTrackingInitialize.initWithModels(
   analyticsModel: EngineAnalyticsModel(
     firebaseAnalyticsConfig: const EngineFirebaseAnalyticsConfig(enabled: true),
+    clarityConfig: const EngineClarityConfig(enabled: true, projectId: 'your-project-id'),
     // Configure other services as needed
   ),
   bugTrackingModel: EngineBugTrackingModel(
     crashlyticsConfig: const EngineCrashlyticsConfig(enabled: true),
     // Configure other services as needed
+  ),
+  httpTrackingModel: const EngineHttpTrackingModel(
+    enabled: true,
+    httpTrackingConfig: EngineHttpTrackingConfig(
+      enableRequestLogging: true,
+      enableResponseLogging: true,
+      logName: 'HTTP_TRACKING',
+    ),
   ),
 );
 
@@ -168,7 +177,7 @@ graph LR
 
 ### HTTP Tracking System
 
-Engine Tracking provides comprehensive HTTP request/response logging through `EngineHttpOverride` and `EngineHttpTracking`.
+Engine Tracking provides comprehensive HTTP request/response logging through `EngineHttpOverride` and `EngineHttpTracking` using a model-based configuration approach.
 
 ```mermaid
 graph TD
@@ -184,62 +193,46 @@ graph TD
 ```
 
 **Key Features:**
+- **Model-based Configuration**: Uses `EngineHttpTrackingModel` following the same pattern as analytics and bug tracking
 - **Automatic HTTP Logging**: Intercepts all HTTP requests/responses
 - **Configurable Logging**: Control what gets logged (headers, body, timing)
 - **Error Tracking**: Automatic error logging for failed requests
 - **Performance Metrics**: Request timing and performance data
 - **Chain-friendly**: Works with existing HttpOverrides (like FaroHttpOverrides)
-- **Multiple Configurations**: Development, production, and error-only presets
+- **Unified Initialization**: Integrates with `EngineTrackingInitialize.initWithModels()`
 
-**Configuration Options:**
+**Model-based Configuration:**
 ```dart
-// Development configuration (verbose logging)
-const EngineHttpTrackingConfig(
+// Development model (verbose logging)
+const EngineHttpTrackingModel(
   enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: true,
-  enableBodyLogging: true,
-  maxBodyLogLength: 2000,
-  logName: 'HTTP_TRACKING_DEV',
+  httpTrackingConfig: EngineHttpTrackingConfig(
+    enableRequestLogging: true,
+    enableResponseLogging: true,
+    enableTimingLogging: true,
+    enableHeaderLogging: true,
+    enableBodyLogging: true,
+    maxBodyLogLength: 2000,
+    logName: 'HTTP_TRACKING_DEV',
+  ),
 )
 
-// Production configuration (minimal logging)
-const EngineHttpTrackingConfig(
+// Production model (minimal logging)
+const EngineHttpTrackingModel(
   enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false, // Be careful with sensitive data
-  enableBodyLogging: false,   // Be careful with sensitive data
-  maxBodyLogLength: 500,
-  logName: 'HTTP_TRACKING_PROD',
+  httpTrackingConfig: EngineHttpTrackingConfig(
+    enableRequestLogging: true,
+    enableResponseLogging: true,
+    enableTimingLogging: true,
+    enableHeaderLogging: false, // Be careful with sensitive data
+    enableBodyLogging: false,   // Be careful with sensitive data
+    maxBodyLogLength: 500,
+    logName: 'HTTP_TRACKING_PROD',
+  ),
 )
 
-// Error-only configuration (only log failures)
-const EngineHttpTrackingConfig(
-  enabled: true,
-  enableRequestLogging: false,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false,
-  enableBodyLogging: false,
-  maxBodyLogLength: 0,
-  logName: 'HTTP_ERRORS',
-)
-
-// Custom configuration
-const EngineHttpTrackingConfig(
-  enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false, // Be careful with sensitive data
-  enableBodyLogging: false,   // Be careful with sensitive data
-  maxBodyLogLength: 1000,
-  logName: 'CUSTOM_HTTP',
-)
+// Disabled model
+const EngineHttpTrackingModelDefault() // All tracking disabled
 ```
 
 ## Installation
@@ -279,22 +272,25 @@ Use `EngineTrackingInitialize` to initialize both Analytics and Bug Tracking:
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 
-// Both services
+// All services
 await EngineTrackingInitialize.initWithModels(
   analyticsModel: EngineAnalyticsModel(/* configs */),
   bugTrackingModel: EngineBugTrackingModel(/* configs */),
+  httpTrackingModel: EngineHttpTrackingModel(/* config */),
 );
 
-// Analytics only
+// Analytics and HTTP tracking only
 await EngineTrackingInitialize.initWithModels(
   analyticsModel: EngineAnalyticsModel(/* configs */),
   bugTrackingModel: null,
+  httpTrackingModel: EngineHttpTrackingModel(/* config */),
 );
 
 // Bug tracking only
 await EngineTrackingInitialize.initWithModels(
   analyticsModel: null,
   bugTrackingModel: EngineBugTrackingModel(/* configs */),
+  httpTrackingModel: null,
 );
 
 // With adapters (granular control)
@@ -941,27 +937,29 @@ The `EngineNavigationObserver` automatically:
 
 ### HTTP Request Tracking
 
-Engine Tracking provides comprehensive HTTP request/response logging:
+Engine Tracking provides comprehensive HTTP request/response logging using a model-based approach:
 
 ```dart
 import 'package:engine_tracking/engine_tracking.dart';
 import 'package:http/http.dart' as http;
 
 void main() async {
-  // Initialize Engine Tracking
+  // Initialize Engine Tracking with HTTP tracking model
   await EngineTrackingInitialize.initWithModels(
     analyticsModel: myAnalyticsModel,
     bugTrackingModel: myBugTrackingModel,
-    // Add HTTP tracking configuration
-    httpTrackingConfig: const EngineHttpTrackingConfig(
+    // Add HTTP tracking model
+    httpTrackingModel: const EngineHttpTrackingModel(
       enabled: true,
-      enableRequestLogging: true,
-      enableResponseLogging: true,
-      enableTimingLogging: true,
-      enableHeaderLogging: true,
-      enableBodyLogging: true,
-      maxBodyLogLength: 2000,
-      logName: 'HTTP_TRACKING_DEV',
+      httpTrackingConfig: EngineHttpTrackingConfig(
+        enableRequestLogging: true,
+        enableResponseLogging: true,
+        enableTimingLogging: true,
+        enableHeaderLogging: true,
+        enableBodyLogging: true,
+        maxBodyLogLength: 2000,
+        logName: 'HTTP_TRACKING_DEV',
+      ),
     ),
   );
   
@@ -1005,97 +1003,52 @@ class ApiService {
 }
 ```
 
-**Configuration Examples:**
+**Model Configuration Examples:**
 
 ```dart
-// Development: Full logging with headers and body
-const devConfig = EngineHttpTrackingConfig(
+// Development model: Full logging with headers and body
+const devModel = EngineHttpTrackingModel(
   enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: true,
-  enableBodyLogging: true,
-  maxBodyLogLength: 2000,
-  logName: 'API_DEV',
-);
-
-// Production: Minimal logging, no sensitive data
-const prodConfig = EngineHttpTrackingConfig(
-  enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false, // Disable for security
-  enableBodyLogging: false,   // Disable for security
-  maxBodyLogLength: 500,
-  logName: 'API_PROD',
-);
-
-// Error-only: Only log failed requests
-const errorConfig = EngineHttpTrackingConfig(
-  enabled: true,
-  enableRequestLogging: false,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false,
-  enableBodyLogging: false,
-  maxBodyLogLength: 0,
-  logName: 'API_ERRORS',
-);
-
-// Custom configuration
-const customConfig = EngineHttpTrackingConfig(
-  enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false, // Disable for security
-  enableBodyLogging: false,   // Disable for security
-  maxBodyLogLength: 500,
-  logName: 'CUSTOM_API',
-);
-```
-
-**Advanced Usage:**
-
-```dart
-// Temporarily use different configuration
-await EngineHttpTracking.withConfig(
-  const EngineHttpTrackingConfig(
-    enabled: true,
+  httpTrackingConfig: EngineHttpTrackingConfig(
     enableRequestLogging: true,
     enableResponseLogging: true,
     enableTimingLogging: true,
     enableHeaderLogging: true,
     enableBodyLogging: true,
     maxBodyLogLength: 2000,
-    logName: 'DEBUG_HTTP',
+    logName: 'API_DEV',
   ),
-  () async {
-    // All HTTP requests in this block use development config
-    await apiService.debugEndpoint();
-  },
 );
 
-// Temporarily disable HTTP tracking
-final restore = EngineHttpTracking.temporaryDisable();
-await sensitiveApiCall(); // This won't be logged
-restore(); // Re-enable with previous config
-
-// Chain with existing HttpOverrides (like FaroHttpOverrides)
-final config = EngineHttpTrackingConfig(
+// Production model: Minimal logging, no sensitive data
+const prodModel = EngineHttpTrackingModel(
   enabled: true,
-  enableRequestLogging: true,
-  enableResponseLogging: true,
-  enableTimingLogging: true,
-  enableHeaderLogging: false,
-  enableBodyLogging: false,
-  maxBodyLogLength: 500,
-  logName: 'HTTP_TRACKING_PROD',
-  baseOverride: FaroHttpOverrides(existingOverride),
+  httpTrackingConfig: EngineHttpTrackingConfig(
+    enableRequestLogging: true,
+    enableResponseLogging: true,
+    enableTimingLogging: true,
+    enableHeaderLogging: false, // Disable for security
+    enableBodyLogging: false,   // Disable for security
+    maxBodyLogLength: 500,
+    logName: 'API_PROD',
+  ),
 );
-EngineHttpTracking.initialize(config);
+
+// Disabled model
+const disabledModel = EngineHttpTrackingModelDefault();
+```
+
+**Advanced Usage:**
+
+```dart
+// Initialize directly with model
+EngineHttpTracking.initWithModel(devModel);
+
+// Update model at runtime
+EngineHttpTracking.updateModel(prodModel);
+
+// Update model at runtime
+EngineHttpTracking.updateModel(prodModel);
 
 // Log custom HTTP-related events
 await EngineHttpTracking.logCustomEvent(
@@ -1110,6 +1063,14 @@ await EngineHttpTracking.logCustomEvent(
 // Get HTTP tracking statistics
 final stats = EngineHttpTracking.getStats();
 print('HTTP Tracking enabled: ${stats['is_enabled']}');
+```
+
+**Backward Compatibility:**
+
+```dart
+// Legacy configuration method (deprecated but still supported)
+@Deprecated('Use EngineHttpTrackingModel instead')
+EngineHttpTracking.initialize(config);
 ```
 
 ### Status Verification

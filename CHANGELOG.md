@@ -5,6 +5,70 @@ All notable changes to the Engine Tracking library will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-01-25
+
+### Added
+- **EngineHttpTrackingModel**: New model-based configuration system for HTTP tracking following the same pattern as analytics and bug tracking models
+- **Model-based Architecture**: HTTP tracking now uses `EngineHttpTrackingModel` with `enabled` flag in the model instead of configuration
+- **EngineHttpTrackingModelDefault**: Default implementation with HTTP tracking disabled
+- **Unified Initialization**: HTTP tracking now integrates with `EngineTrackingInitialize.initWithModels()` method
+- **Enhanced EngineWidget**: Automatically detects Clarity configuration from initialized adapters, no manual configuration needed
+
+### Changed
+- **BREAKING**: `EngineHttpTrackingConfig` no longer extends `IEngineConfig` and doesn't have `enabled` parameter
+- **BREAKING**: HTTP tracking initialization now uses `EngineHttpTracking.initWithModel()` instead of `initialize()`
+- **BREAKING**: `EngineWidget` no longer requires `clarityConfig` parameter - automatically detects from `EngineAnalytics`
+- **Improved**: HTTP tracking follows the same architectural pattern as analytics and bug tracking services
+- **Enhanced**: Better consistency across all tracking services with unified model approach
+- **Updated**: Example app demonstrates new model-based HTTP tracking configuration
+
+### Removed
+- **BREAKING**: `EngineHttpTracking.withConfig()` - Method removed as it was deemed irrelevant for the new architecture
+- **BREAKING**: `EngineHttpTracking.withModel()` - Method removed as it was deemed irrelevant for the new architecture
+
+### Deprecated
+- `EngineHttpTracking.initialize()` - Use `initWithModel()` instead
+- Manual `clarityConfig` parameter in `EngineWidget` - Now automatically detected
+
+### Documentation
+- Updated README.md with new model-based HTTP tracking examples
+- Enhanced documentation showing unified initialization approach
+- Added backward compatibility notes for deprecated methods
+- Improved example app with proper model usage
+
+### Migration Guide
+```dart
+// Before (v1.5.1)
+EngineHttpTracking.initialize(EngineHttpTrackingConfig(
+  enabled: true,
+  enableRequestLogging: true,
+  // ...
+));
+
+// After (v1.6.0)
+EngineHttpTracking.initWithModel(EngineHttpTrackingModel(
+  enabled: true,
+  httpTrackingConfig: EngineHttpTrackingConfig(
+    enableRequestLogging: true,
+    // ...
+  ),
+));
+
+// Removed methods (no direct replacement)
+// EngineHttpTracking.withConfig() - REMOVED
+// EngineHttpTracking.withModel() - REMOVED
+// Use updateModel() for runtime configuration changes instead
+
+// EngineWidget - Before
+EngineWidget(
+  app: MyApp(),
+  clarityConfig: clarityConfig,
+)
+
+// EngineWidget - After (automatic detection)
+EngineWidget(app: MyApp())
+```
+
 ## [1.5.1] - 2025-01-23
 
 ### Changed
