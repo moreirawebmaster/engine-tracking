@@ -179,7 +179,15 @@ class EngineHttpTracking {
     initWithModel(model, preserveExisting: preserveExisting);
   }
 
-  /// Gets statistics about HTTP tracking
+  /// Gets statistics about HTTP tracking.
+  ///
+  /// Returns a map containing information about the current state of HTTP tracking:
+  /// - `is_enabled`: Whether HTTP tracking is currently active
+  /// - `has_model`: Whether a tracking model has been initialized
+  /// - `model`: String representation of the current model (if any)
+  /// - `current_override`: Type of the current HttpOverrides instance
+  ///
+  /// This method is useful for debugging and monitoring the HTTP tracking state.
   static Map<String, dynamic> getStats() => {
     'is_enabled': _isEnabled,
     'has_model': _model != null,

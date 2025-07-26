@@ -26,6 +26,7 @@ class EngineHttpTrackingModel {
 
 /// Default implementation of EngineHttpTrackingModel with HTTP tracking disabled.
 class EngineHttpTrackingModelDefault implements EngineHttpTrackingModel {
+  /// Creates a default HTTP tracking model with tracking disabled.
   const EngineHttpTrackingModelDefault();
 
   @override
