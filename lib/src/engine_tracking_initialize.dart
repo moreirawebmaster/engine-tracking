@@ -9,9 +9,9 @@ import 'package:engine_tracking/engine_tracking.dart';
 class EngineTrackingInitialize {
   EngineTrackingInitialize._();
 
-  static void _initEngineHttp(final EngineHttpTrackingConfig? httpTrackingConfig) {
-    if (httpTrackingConfig != null) {
-      EngineHttpTracking.initialize(httpTrackingConfig, preserveExisting: true);
+  static void _initEngineHttp(final EngineHttpTrackingModel? httpTrackingModel) {
+    if (httpTrackingModel != null) {
+      EngineHttpTracking.initWithModel(httpTrackingModel, preserveExisting: true);
     }
   }
 
@@ -23,12 +23,12 @@ class EngineTrackingInitialize {
   /// [bugTrackingAdapters] List of bug tracking adapters to initialize.
   /// Can be null to skip bug tracking initialization.
   ///
-  /// [httpTrackingConfig] HTTP tracking configuration.
+  /// [httpTrackingModel] HTTP tracking model.
   /// Can be null to skip HTTP tracking initialization.
   static Future<void> initWithAdapters({
     final List<IEngineAnalyticsAdapter>? analyticsAdapters,
     final List<IEngineBugTrackingAdapter>? bugTrackingAdapters,
-    final EngineHttpTrackingConfig? httpTrackingConfig,
+    final EngineHttpTrackingModel? httpTrackingModel,
   }) async {
     final futures = <Future<void>>[];
 
@@ -42,7 +42,7 @@ class EngineTrackingInitialize {
 
     await Future.wait(futures);
 
-    _initEngineHttp(httpTrackingConfig);
+    _initEngineHttp(httpTrackingModel);
   }
 
   /// Initialize tracking services with configuration models
@@ -53,26 +53,19 @@ class EngineTrackingInitialize {
   /// [bugTrackingModel] Bug tracking configuration model.
   /// Can be null to skip bug tracking initialization.
   ///
-  /// [httpTrackingConfig] HTTP tracking configuration.
+  /// [httpTrackingModel] HTTP tracking model.
   /// Can be null to skip HTTP tracking initialization.
   static Future<void> initWithModels({
     final EngineAnalyticsModel? analyticsModel,
     final EngineBugTrackingModel? bugTrackingModel,
-    final EngineHttpTrackingConfig? httpTrackingConfig,
+    final EngineHttpTrackingModel? httpTrackingModel,
   }) async {
-    final futures = <Future<void>>[];
+    await Future.wait([
+      if (analyticsModel != null) EngineAnalytics.initWithModel(analyticsModel),
+      if (bugTrackingModel != null) EngineBugTracking.initWithModel(bugTrackingModel),
+    ]);
 
-    if (analyticsModel != null) {
-      futures.add(EngineAnalytics.initWithModel(analyticsModel));
-    }
-
-    if (bugTrackingModel != null) {
-      futures.add(EngineBugTracking.initWithModel(bugTrackingModel));
-    }
-
-    await Future.wait(futures);
-
-    _initEngineHttp(httpTrackingConfig);
+    _initEngineHttp(httpTrackingModel);
   }
 
   /// Initialize both services with default disabled configurations
@@ -80,6 +73,7 @@ class EngineTrackingInitialize {
     await initWithModels(
       analyticsModel: EngineAnalyticsModelDefault(),
       bugTrackingModel: EngineBugTrackingModelDefault(),
+      httpTrackingModel: const EngineHttpTrackingModelDefault(),
     );
   }
 
@@ -89,11 +83,14 @@ class EngineTrackingInitialize {
       EngineAnalytics.dispose(),
       EngineBugTracking.dispose(),
     ]);
+
+    // Disable HTTP tracking
+    EngineHttpTracking.disable();
   }
 
   /// Returns true if both analytics and bug tracking are initialized
   static bool get isInitialized => EngineAnalytics.isInitialized && EngineBugTracking.isInitialized;
 
   /// Returns true if at least one service is enabled
-  static bool get isEnabled => EngineAnalytics.isEnabled || EngineBugTracking.isEnabled;
+  static bool get isEnabled => EngineAnalytics.isEnabled || EngineBugTracking.isEnabled || EngineHttpTracking.isEnabled;
 }

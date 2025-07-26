@@ -352,9 +352,10 @@ class _HttpTrackingExampleState extends State<HttpTrackingExample> {
     _addLog('🔧 Testing minimal logging config', LogType.info);
 
     try {
-      await EngineHttpTracking.withConfig(
-        EngineHttpTrackingConfig(
-          enabled: true,
+      // Test with minimal logging config
+      final minimalModel = EngineHttpTrackingModel(
+        enabled: true,
+        httpTrackingConfig: EngineHttpTrackingConfig(
           enableRequestLogging: true,
           enableResponseLogging: true,
           enableTimingLogging: true,
@@ -363,21 +364,22 @@ class _HttpTrackingExampleState extends State<HttpTrackingExample> {
           maxBodyLogLength: 500,
           logName: 'HTTP_MINIMAL_TEST',
         ),
-        () async {
-          await http
-              .get(
-                Uri.parse('https://httpbin.org/get'),
-              )
-              .timeout(const Duration(seconds: 10));
-        },
       );
+      
+      EngineHttpTracking.updateModel(minimalModel);
+      await http
+          .get(
+            Uri.parse('https://httpbin.org/get'),
+          )
+          .timeout(const Duration(seconds: 10));
 
       _addLog('✅ Minimal logging config test completed', LogType.success);
       _addLog('🔧 Testing errors-only config', LogType.info);
 
-      await EngineHttpTracking.withConfig(
-        EngineHttpTrackingConfig(
-          enabled: true,
+      // Test with errors-only config
+      final errorsOnlyModel = EngineHttpTrackingModel(
+        enabled: true,
+        httpTrackingConfig: EngineHttpTrackingConfig(
           enableRequestLogging: false,
           enableResponseLogging: true,
           enableTimingLogging: true,
@@ -386,18 +388,20 @@ class _HttpTrackingExampleState extends State<HttpTrackingExample> {
           maxBodyLogLength: 0,
           logName: 'HTTP_ERRORS_TEST',
         ),
-        () async {
-          await http
-              .get(
-                Uri.parse('https://httpbin.org/get'),
-              )
-              .timeout(const Duration(seconds: 10));
+      );
+      
+      EngineHttpTracking.updateModel(errorsOnlyModel);
+      await http
+          .get(
+            Uri.parse('https://httpbin.org/get'),
+          )
+          .timeout(const Duration(seconds: 10));
 
-          await http
-              .get(
-                Uri.parse('https://httpbin.org/status/500'),
-              )
-              .timeout(const Duration(seconds: 10));
+      await http
+          .get(
+            Uri.parse('https://httpbin.org/status/500'),
+          )
+          .timeout(const Duration(seconds: 10));
         },
       );
 

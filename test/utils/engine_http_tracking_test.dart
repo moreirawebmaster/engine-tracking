@@ -11,85 +11,92 @@ void main() {
       HttpOverrides.global = null;
     });
 
-    test('should initialize with valid configuration', () {
-      final config = EngineHttpTrackingConfig(
+    test('should initialize with valid model', () {
+      const model = EngineHttpTrackingModel(
         enabled: true,
-        enableRequestLogging: true,
-        enableResponseLogging: true,
-        logName: 'TEST_HTTP',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          enableRequestLogging: true,
+          enableResponseLogging: true,
+          logName: 'TEST_HTTP',
+        ),
       );
 
-      EngineHttpTracking.initialize(config);
+      EngineHttpTracking.initWithModel(model);
 
       expect(EngineHttpTracking.isEnabled, isTrue);
-      expect(EngineHttpTracking.config, equals(config));
+      expect(EngineHttpTracking.model, equals(model));
+      expect(EngineHttpTracking.config?.logName, equals('TEST_HTTP'));
       expect(HttpOverrides.current, isA<EngineHttpOverride>());
     });
 
     test('should not initialize when disabled', () {
-      final config = EngineHttpTrackingConfig(
+      const model = EngineHttpTrackingModel(
         enabled: false,
-        logName: 'TEST_HTTP',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          logName: 'TEST_HTTP',
+        ),
       );
 
-      EngineHttpTracking.initialize(config);
+      EngineHttpTracking.initWithModel(model);
 
       expect(EngineHttpTracking.isEnabled, isFalse);
+      expect(EngineHttpTracking.model, isNull);
       expect(EngineHttpTracking.config, isNull);
     });
 
-    test('should update configuration', () {
-      final initialConfig = EngineHttpTrackingConfig(
+    test('should update model', () {
+      const initialModel = EngineHttpTrackingModel(
         enabled: true,
-        enableRequestLogging: true,
-        logName: 'INITIAL',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          enableRequestLogging: true,
+          logName: 'INITIAL',
+        ),
       );
 
-      final updatedConfig = EngineHttpTrackingConfig(
+      const updatedModel = EngineHttpTrackingModel(
         enabled: true,
-        enableRequestLogging: false,
-        enableResponseLogging: true,
-        logName: 'UPDATED',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          enableRequestLogging: false,
+          enableResponseLogging: true,
+          logName: 'UPDATED',
+        ),
       );
 
-      EngineHttpTracking.initialize(initialConfig);
+      EngineHttpTracking.initWithModel(initialModel);
       expect(EngineHttpTracking.config?.logName, equals('INITIAL'));
 
-      EngineHttpTracking.updateConfig(updatedConfig);
+      EngineHttpTracking.updateModel(updatedModel);
       expect(EngineHttpTracking.config?.logName, equals('UPDATED'));
       expect(EngineHttpTracking.config?.enableRequestLogging, isFalse);
       expect(EngineHttpTracking.config?.enableResponseLogging, isTrue);
     });
 
-    test('should provide temporary disable functionality', () {
-      final config = EngineHttpTrackingConfig(
+    test('should disable HTTP tracking', () {
+      const model = EngineHttpTrackingModel(
         enabled: true,
-        logName: 'TEST_HTTP',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          logName: 'TEST_HTTP',
+        ),
       );
 
-      EngineHttpTracking.initialize(config);
+      EngineHttpTracking.initWithModel(model);
       expect(EngineHttpTracking.isEnabled, isTrue);
-      expect(EngineHttpTracking.config?.logName, equals('TEST_HTTP'));
+
+      EngineHttpTracking.disable();
+      expect(EngineHttpTracking.isEnabled, isFalse);
+      expect(EngineHttpTracking.model, isNull);
+      expect(EngineHttpTracking.config, isNull);
     });
 
-    test('should execute with scoped configuration', () async {
-      final initialConfig = EngineHttpTrackingConfig(
+    test('should execute with scoped model', () async {
+      const initialModel = EngineHttpTrackingModel(
         enabled: true,
-        logName: 'INITIAL',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          logName: 'INITIAL',
+        ),
       );
 
-      final scopedConfig = EngineHttpTrackingConfig(
-        enabled: true,
-        logName: 'SCOPED',
-      );
-
-      EngineHttpTracking.initialize(initialConfig);
-      expect(EngineHttpTracking.config?.logName, equals('INITIAL'));
-
-      await EngineHttpTracking.withConfig(scopedConfig, () async {
-        expect(EngineHttpTracking.config?.logName, equals('SCOPED'));
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-      });
+      EngineHttpTracking.initWithModel(initialModel);
 
       expect(EngineHttpTracking.config?.logName, equals('INITIAL'));
     });
@@ -98,88 +105,57 @@ void main() {
       // First disable any existing tracking
       EngineHttpTracking.disable();
 
-      final config = EngineHttpTrackingConfig(
+      const model = EngineHttpTrackingModel(
         enabled: true,
-        logName: 'TEST_HTTP',
+        httpTrackingConfig: EngineHttpTrackingConfig(
+          logName: 'TEST_HTTP',
+        ),
       );
 
       final stats = EngineHttpTracking.getStats();
       expect(stats['is_enabled'], isFalse);
-      expect(stats['has_config'], isFalse);
+      expect(stats['has_model'], isFalse);
 
-      EngineHttpTracking.initialize(config);
+      EngineHttpTracking.initWithModel(model);
 
       final enabledStats = EngineHttpTracking.getStats();
       expect(enabledStats['is_enabled'], isTrue);
-      expect(enabledStats['has_config'], isTrue);
+      expect(enabledStats['has_model'], isTrue);
       expect(enabledStats['current_override'], contains('EngineHttpOverride'));
     });
 
-    group('Configuration validation', () {
-      test('should create development-like configuration', () {
-        final config = EngineHttpTrackingConfig(
+    group('Model validation', () {
+      test('should create development-like model', () {
+        const model = EngineHttpTrackingModel(
           enabled: true,
-          enableRequestLogging: true,
-          enableResponseLogging: true,
-          enableTimingLogging: true,
-          enableHeaderLogging: true,
-          enableBodyLogging: true,
-          maxBodyLogLength: 2000,
-          logName: 'HTTP_TRACKING_DEV',
+          httpTrackingConfig: EngineHttpTrackingConfig(
+            enableRequestLogging: true,
+            enableResponseLogging: true,
+            enableTimingLogging: true,
+            enableHeaderLogging: true,
+            enableBodyLogging: true,
+            maxBodyLogLength: 2000,
+            logName: 'HTTP_TRACKING_DEV',
+          ),
         );
 
-        expect(config.enabled, isTrue);
-        expect(config.enableRequestLogging, isTrue);
-        expect(config.enableResponseLogging, isTrue);
-        expect(config.enableTimingLogging, isTrue);
-        expect(config.enableHeaderLogging, isTrue);
-        expect(config.enableBodyLogging, isTrue);
-        expect(config.maxBodyLogLength, equals(2000));
-        expect(config.logName, equals('HTTP_TRACKING_DEV'));
+        expect(model.enabled, isTrue);
+        expect(model.httpTrackingConfig.enableRequestLogging, isTrue);
+        expect(model.httpTrackingConfig.enableResponseLogging, isTrue);
+        expect(model.httpTrackingConfig.enableTimingLogging, isTrue);
+        expect(model.httpTrackingConfig.enableHeaderLogging, isTrue);
+        expect(model.httpTrackingConfig.enableBodyLogging, isTrue);
+        expect(model.httpTrackingConfig.maxBodyLogLength, equals(2000));
+        expect(model.httpTrackingConfig.logName, equals('HTTP_TRACKING_DEV'));
       });
 
-      test('should create production-like configuration', () {
-        final config = EngineHttpTrackingConfig(
-          enabled: true,
-          enableRequestLogging: true,
-          enableResponseLogging: true,
-          enableTimingLogging: true,
-          enableHeaderLogging: false,
-          enableBodyLogging: false,
-          maxBodyLogLength: 500,
-          logName: 'HTTP_TRACKING_PROD',
-        );
+      test('should create default disabled model', () {
+        const model = EngineHttpTrackingModelDefault();
 
-        expect(config.enabled, isTrue);
-        expect(config.enableRequestLogging, isTrue);
-        expect(config.enableResponseLogging, isTrue);
-        expect(config.enableTimingLogging, isTrue);
-        expect(config.enableHeaderLogging, isFalse);
-        expect(config.enableBodyLogging, isFalse);
-        expect(config.maxBodyLogLength, equals(500));
-        expect(config.logName, equals('HTTP_TRACKING_PROD'));
-      });
-
-      test('should create errors-only configuration', () {
-        final config = EngineHttpTrackingConfig(
-          enabled: true,
-          enableRequestLogging: false,
-          enableResponseLogging: true,
-          enableTimingLogging: true,
-          enableHeaderLogging: false,
-          enableBodyLogging: false,
-          maxBodyLogLength: 0,
-          logName: 'HTTP_ERRORS',
-        );
-
-        expect(config.enabled, isTrue);
-        expect(config.enableRequestLogging, isFalse);
-        expect(config.enableResponseLogging, isTrue);
-        expect(config.enableTimingLogging, isTrue);
-        expect(config.enableHeaderLogging, isFalse);
-        expect(config.enableBodyLogging, isFalse);
-        expect(config.maxBodyLogLength, equals(0));
-        expect(config.logName, equals('HTTP_ERRORS'));
+        expect(model.enabled, isFalse);
+        expect(model.httpTrackingConfig.enableRequestLogging, isFalse);
+        expect(model.httpTrackingConfig.enableResponseLogging, isFalse);
+        expect(model.httpTrackingConfig.logName, equals('HTTP_TRACKING_DISABLED'));
       });
     });
   });
