@@ -19,7 +19,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  engine_tracking: ^1.5.0
+  engine_tracking: ^1.5.1
 ```
 
 Initialize the library:
@@ -248,7 +248,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  engine_tracking: ^1.5.0
+  engine_tracking: ^1.5.1
 ```
 
 Run:

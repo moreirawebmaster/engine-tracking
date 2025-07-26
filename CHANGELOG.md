@@ -5,6 +5,22 @@ All notable changes to the Engine Tracking library will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2025-01-23
+
+### Changed
+- Improved README.md structure and organization
+- Removed duplicate content and explanations
+- Enhanced documentation clarity for better developer experience
+- Optimized Mermaid diagrams for better readability
+- Consolidated examples and usage patterns
+
+### Documentation
+- Restructured README.md with better progressive disclosure
+- Improved Quick Start section for faster onboarding
+- Enhanced architecture overview with clearer diagrams
+- Better organization of usage examples and configuration options
+- Streamlined installation and setup instructions
+
 ## [1.5.0] - 2025-01-23
 
 ### Added
